@@ -16,6 +16,14 @@ function openCourse(opener){courseOpener=opener;panelDestination=null;if(!panel.
 panel.addEventListener('close',()=>{$('browse').setAttribute('aria-expanded','false');$('lesson-browse').setAttribute('aria-expanded','false');$('reset-confirm').hidden=true;if(panelDestination==='lesson')focusLesson();else courseOpener.focus({preventScroll:true});panelDestination=null;});
 $('browse').onclick=()=>openCourse($('browse'));$('lesson-browse').onclick=()=>openCourse($('lesson-browse'));$('close-panel').onclick=()=>closeCourse();
 let mediaEpoch=0,seekSerial=0,mediaObject=null,mediaRequest=null,mediaAbort=null,mediaURL='',autoSeekingAttempted=false;
+let playbackWanted=false,lastMediaPaused=v.paused;
+function observePlaybackIntent(){if(v.paused!==lastMediaPaused)playbackWanted=!v.paused;lastMediaPaused=v.paused;}
+v.addEventListener('play',()=>{lastMediaPaused=v.paused;if(!v.paused)playbackWanted=true;});
+v.addEventListener('pause',()=>{lastMediaPaused=v.paused;if(v.paused)playbackWanted=false;});
+// load() resets paused and discards queued media events. Preserve intent across
+// that internal reset, while observing any user pause before replacing the source.
+function replaceMedia(source,keepIntent=true){if(keepIntent)observePlaybackIntent();else playbackWanted=false;v.src=source;v.load();lastMediaPaused=v.paused;}
+function resumeWantedPlayback(){observePlaybackIntent();if(playbackWanted&&v.paused)v.play().catch(()=>{});}
 function mediaStatus(text='',retry=false){const p=$('media-status');if(p){p.textContent=text;p.hidden=!text;}if($('retry-media'))$('retry-media').hidden=!retry;}
 function metadataReady(signal,next=false){return new Promise((resolve,reject)=>{
  const clean=()=>{clearTimeout(timer);v.removeEventListener('loadedmetadata',loaded);v.removeEventListener('error',failed);signal?.removeEventListener('abort',aborted);};
@@ -29,21 +37,21 @@ function prepareSeeking(force=false){
  const epoch=mediaEpoch,signal=mediaAbort.signal,download=new AbortController(),cancel=()=>download.abort();let candidate=null;mediaStatus('Preparing chapter navigation…');
  signal.addEventListener('abort',cancel,{once:true});const downloadTimer=setTimeout(cancel,90000);
  const request=(async()=>{const response=await fetch(mediaURL,{credentials:'same-origin',signal:download.signal});if(!response.ok)throw new Error('Video unavailable');const blob=await response.blob();clearTimeout(downloadTimer);if(epoch!==mediaEpoch)return;
-  const resume=!v.paused,position=pending>0?pending:v.currentTime;v.pause();candidate=URL.createObjectURL(new Blob([blob],{type:'video/mp4'}));if(mediaObject)URL.revokeObjectURL(mediaObject);mediaObject=candidate;pending=position;
-  const ready=metadataReady(signal,true);v.src=candidate;v.load();await ready;if(epoch!==mediaEpoch)return;if(position<v.duration)v.currentTime=position;pending=0;mediaStatus();$('error').hidden=true;if(resume)v.play().catch(()=>{});
+  const position=pending>0?pending:v.currentTime;candidate=URL.createObjectURL(new Blob([blob],{type:'video/mp4'}));if(mediaObject)URL.revokeObjectURL(mediaObject);mediaObject=candidate;pending=position;
+  const ready=metadataReady(signal,true);replaceMedia(candidate);await ready;if(epoch!==mediaEpoch)return;if(position<v.duration)v.currentTime=position;pending=0;mediaStatus();$('error').hidden=true;resumeWantedPlayback();
  })().catch(error=>{if(candidate)URL.revokeObjectURL(candidate);if(epoch===mediaEpoch&&!signal.aborted){
-   if(mediaObject===candidate)mediaObject=null;if(candidate&&v.getAttribute('src')===candidate){v.src=mediaURL;v.load();}
+   if(mediaObject===candidate)mediaObject=null;if(candidate&&v.getAttribute('src')===candidate)replaceMedia(mediaURL);
    mediaStatus('Chapter navigation could not be prepared. Retry the video or download the MP4.',true);
   }throw error;
  }).finally(()=>{clearTimeout(downloadTimer);signal.removeEventListener('abort',cancel);if(mediaRequest===request)mediaRequest=null;});mediaRequest=request;return request;
 }
-async function jumpTo(time){const epoch=mediaEpoch,serial=++seekSerial;pending=time;try{
+async function jumpTo(time,requestPlayback=true){observePlaybackIntent();if(requestPlayback)playbackWanted=true;const epoch=mediaEpoch,serial=++seekSerial;pending=time;try{
  if(v.error)await prepareSeeking(true);else if(v.readyState===0)await metadataReady(mediaAbort.signal);
  if(epoch!==mediaEpoch||serial!==seekSerial)return;const end=v.seekable.length?v.seekable.end(v.seekable.length-1):0;if(time>end+.01)await prepareSeeking();
- if(epoch!==mediaEpoch||serial!==seekSerial)return;v.currentTime=Math.min(time,Math.max(0,v.duration-.01));pending=0;v.play().catch(()=>{});
+ if(epoch!==mediaEpoch||serial!==seekSerial)return;v.currentTime=Math.min(time,Math.max(0,v.duration-.01));pending=0;resumeWantedPlayback();
  }catch(error){if(epoch===mediaEpoch&&serial===seekSerial&&error.name!=='AbortError')mediaStatus('Chapter navigation could not be prepared. Retry the video or download the MP4.',true);}}
 v.addEventListener('loadeddata',()=>{if(!autoSeekingAttempted&&!mediaObject&&v.duration>0&&(!v.seekable.length||v.seekable.end(v.seekable.length-1)<v.duration-.1)){autoSeekingAttempted=true;prepareSeeking().catch(()=>{});}});
-if($('retry-media'))$('retry-media').onclick=()=>{const epoch=mediaEpoch,time=pending||v.currentTime||0;prepareSeeking(true).then(()=>{if(epoch===mediaEpoch)jumpTo(time);}).catch(()=>{});};
+if($('retry-media'))$('retry-media').onclick=()=>{observePlaybackIntent();playbackWanted=true;const epoch=mediaEpoch,time=pending||v.currentTime||0;prepareSeeking(true).then(()=>{if(epoch===mediaEpoch)jumpTo(time,false);}).catch(()=>{});};
 const save=()=>{try{localStorage.setItem(D.storageKey,JSON.stringify(state));}catch{}};
 const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 const date=value=>/^\d{4}-\d{2}-\d{2}/.test(String(value))?String(value).slice(0,10):String(value);
@@ -59,9 +67,9 @@ function progress(){const done=state.done.includes(D.lessons[current].id),summar
 function load(index,focus=false,remember=true){
   if(remember&&v.currentSrc&&!v.ended)state.positions[D.lessons[current].id]=v.currentTime;
   mediaEpoch++;seekSerial++;mediaAbort?.abort();mediaAbort=new AbortController();mediaRequest=null;if(mediaObject)URL.revokeObjectURL(mediaObject);mediaObject=null;autoSeekingAttempted=false;mediaStatus();
-  current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];v.pause();state.lesson=l.id;pending=Number(state.positions[l.id])||0;
+  current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];state.lesson=l.id;pending=Number(state.positions[l.id])||0;
   $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=l.coverage;$('lesson-part').textContent=l.part||'The learning journey';$('lesson-number').textContent=`Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
-  v.innerHTML='';v.poster=`posters/${l.id}.png`;mediaURL=`videos/${l.id}.mp4`;v.src=mediaURL;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);v.load();$('error').hidden=true;
+  v.innerHTML='';v.poster=`posters/${l.id}.png`;mediaURL=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);replaceMedia(mediaURL,false);$('error').hidden=true;
   $('download-video').href=v.getAttribute('src');$('download-captions').href=track.getAttribute('src');$('previous').disabled=current===0;$('next').disabled=current===D.lessons.length-1;
   lessonSources(l);practice(l);$('practice').open=false;
   $('transcript').replaceChildren();for(const beat of l.scenes){const b=document.createElement('button'),time=document.createElement('span'),body=document.createElement('span'),title=document.createElement('strong'),text=document.createElement('span');time.className='scene-time';time.textContent=clock(beat.start);body.className='scene-body';title.textContent=beat.headline;text.className='scene-copy';text.textContent=beat.narration;body.append(title,text);b.append(time,body);b.onclick=()=>jumpTo(beat.start);$('transcript').append(b);}
@@ -71,7 +79,7 @@ let lastPart=null;for(const [index,l] of D.lessons.entries()){if(l.part&&l.part!
 const parts=[...new Set(D.lessons.map(l=>l.part).filter(Boolean))];if(parts.length&&$('part-overview')){$('part-overview').hidden=false;for(const part of parts){const lessons=D.lessons.filter(l=>l.part===part),b=document.createElement('button');b.textContent=part+' · '+lessons.length+' chapters · '+clock(lessons.reduce((n,l)=>n+l.duration,0));b.onclick=()=>{load(D.lessons.indexOf(lessons[0]),false);closeCourse(true);};$('part-buttons').append(b);}}
 const minutes=Math.round(D.lessons.reduce((a,l)=>a+l.duration,0)/60),runtime=minutes>=60?`${Math.floor(minutes/60)}h ${String(minutes%60).padStart(2,'0')}m`:`${minutes} min`;$('runtime').textContent=`${D.lessons.length} lessons · ${runtime}`;
 $('download-transcript').onclick=()=>{const l=D.lessons[current],lines=[D.title,`${l.id}. ${l.title}`,'',l.goal,'','Independent educational material. Fictional work examples are simulations.','',...l.scenes.flatMap(s=>[`${clock(s.start)} · ${s.headline}`,s.narration,''])],url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=String(l.id).replace(/[^A-Za-z0-9_-]/g,'_')+'-transcript.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);};
-$('reset').onclick=()=>{$('reset-confirm').hidden=false;$('reset-yes').focus();};$('reset-no').onclick=()=>{$('reset-confirm').hidden=true;$('reset').focus();};$('reset-yes').onclick=()=>{state.done=[];state.positions={};pending=0;v.pause();v.currentTime=0;load(0,false,false);save();closeCourse(true);};
+$('reset').onclick=()=>{$('reset-confirm').hidden=false;$('reset-yes').focus();};$('reset-no').onclick=()=>{$('reset-confirm').hidden=true;$('reset').focus();};$('reset-yes').onclick=()=>{state.done=[];state.positions={};pending=0;v.currentTime=0;load(0,false,false);save();closeCourse(true);};
 $('previous').onclick=()=>load(current-1,true);$('next').onclick=()=>load(current+1,true);
 $('speed').value=String(state.speed);$('speed').onchange=e=>{state.speed=Number(e.target.value);v.playbackRate=state.speed;save();};
 $('captions').onclick=()=>{state.captions=!state.captions;cc();save();};

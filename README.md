@@ -74,7 +74,7 @@ Omit `--demo` for an empty authoring project. Its world refuses to draw until th
 
 ## Development and checks
 
-Edit the repository copies; installed copies are separate snapshots. Review and copy a changed skill back to the installation when ready. Generated courses, dependencies, audio, credentials, and local review artifacts do not belong in this repository.
+Edit the repository copies; installed copies are separate snapshots. For the combined skill, rebuild the complete assembled bundle with `scripts/build_skill.py`, preserve the previous installation as a recoverable backup, and replace the complete installed bundle after validation. Copying only the package folder omits its required shared resources. Review standalone skill updates separately. Generated courses, dependencies, audio, credentials, and local review artifacts do not belong in this repository.
 
 Run the offline checks with Python and Node available:
 
@@ -91,7 +91,7 @@ npm install --prefix skills/continuous-learning-videos/assets/starter/production
 python3 scripts/check.py --render
 ```
 
-The current core passes 43 Python regressions and 13 player contracts. The explicit 288-frame silent demonstration is rendered, audited and decoded separately. The rendering check uses a temporary project, and GitHub Actions runs the checks without requesting speech or publishing anything. The five real course cases add sourced narratives, measured narration, subject-specific illustration and selected encoded-frame review; these checks do not establish full-course listening, synchronized or silent viewing, or learner comprehension. See [development notes](docs/development-notes.md) and [current review coverage](docs/combined-skill-status.md).
+The current core passes 43 Python regressions and 21 player contracts. The explicit 288-frame silent demonstration is rendered, audited and decoded separately. The rendering check uses a temporary project, and GitHub Actions runs the checks without requesting speech or publishing anything. The five real course cases add sourced narratives, measured narration, subject-specific illustration and selected encoded-frame review; these checks do not establish full-course listening, synchronized or silent viewing, or learner comprehension. See [development notes](docs/development-notes.md) and [current review coverage](docs/combined-skill-status.md).
 
 ## Before a public release
 

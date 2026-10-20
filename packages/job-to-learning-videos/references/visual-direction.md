@@ -26,6 +26,8 @@ Construction, movement and transformations must respond to the explanation. Draw
 
 Anchor important events to the named phrase's measured word timing. Paragraph-wide linear interpolation can show a quantitative result too early or too late. A purposeful hold is appropriate for comprehension, but a mostly static labeled diagram under several minutes of new reasoning calls for redesigned staging, additional meaningful detail or tighter narration. Decorative movement does not solve that problem.
 
+Compare the actual sequence across the full explanation, not just its attractive final frame. Introduce the evidence before rejecting or superseding it, preserve the identity of the object that passes a gate, and depict a new denominator or changed physical assumption explicitly. If a prototype contains separate implemented, mocked, unknown and failed states, keep them distinct. Near-static intervals are review candidates rather than automatic failures; a camera pan or moving clock cannot substitute for a missing cause or consequence. Inspect active quantities and labels at the normal embedded viewing size as well as full screen.
+
 Physical forms must behave consistently with their stated model. A clamp must attach to the beam and change the depicted boundary; a shaft must visibly stop or enter; a conservation story must preserve the amount during transit. Label deliberate exaggeration where it helps interpret the model. Do not call an arbitrary sum of temperatures an energy-conservation check.
 
 ## Prove the direction before scaling

@@ -33,6 +33,8 @@ Plan objectives and decisions before choosing lesson count. In `curriculum.json`
 
 Keep a `narrative-map.json` linking manuscript chapters, consequential decisions and adapted lessons. Review purpose, supported strategic context, the operating chain, worked investigations, hiring evidence and growing professional responsibility in `review/editorial.json`. Adaptation may consolidate repetition; record what is retained or omitted and why. A requirement tag, topic heading or word count does not establish that the learner was taught the subject. Use plausible alternatives and evidence-based feedback in exercises, with worked reasoning for difficult cases.
 
+Read every learner-facing scene heading against its full narration and current visual state. Give transcript jump points concise, distinct event or concept labels. Do not duplicate the first sentence, retain a heading from an obsolete diagram, reverse a recurring person's role, or announce success while the evidence remains unresolved.
+
 For a substantial course, test transfer with changed constraints in the important parts. Use plausible misconceptions rather than obviously absurd distractors, vary correct-answer positions, and explain why a tempting alternative fails under the stated conditions. Review whether either the shortest or longest option reveals the answer; use natural parallel wording and keep every choice responsive to its question. Keep practice feedback separate from completion and professional readiness. A five-part evidence matrix should point to actual scenes, alternatives, failed hypotheses, consequences and checks; a broad finding that merely praises each part is insufficient review evidence.
 
 ## Teach through motion

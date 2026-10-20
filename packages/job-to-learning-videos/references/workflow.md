@@ -30,4 +30,4 @@ A blocked posting may require supplied text. Provider failure should leave usabl
 
 ## Release status
 
-This combined skill is a private development draft. Passing its local tests establishes mechanical behavior within their scope. A public product claim still requires realistic fresh-environment job-to-hosted-course runs, complete perceptual review of representative courses, installation checks, and a selected license. The current starter contains one mechanical visual example; Codex must author other topic-specific worlds. There is no bundled universal job-to-animation compiler or hosted backend.
+This combined skill is a private review candidate; public release requires the owner's approval. Passing its local tests establishes mechanical behavior within their scope. A public product claim still requires realistic fresh-environment job-to-hosted-course runs, complete perceptual review of representative courses, installation checks, and a selected license. The current starter contains one mechanical visual example; Codex must author other topic-specific worlds. There is no bundled universal job-to-animation compiler or hosted backend.
