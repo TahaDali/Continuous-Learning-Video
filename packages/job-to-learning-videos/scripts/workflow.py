@@ -149,6 +149,22 @@ def digest(path, stage=None):
     return hashlib.sha256(payload).hexdigest()
 
 
+def packaged_files_current(root):
+    """Check the actual export, including changes made after delivery recording."""
+    try:
+        manifest = read(root / 'export-manifest.json')
+        output = Path(manifest['output'])
+        if not output.is_dir() or output != output.resolve():
+            return False
+        paths = sorted(output.rglob('*'))
+        if any(path.is_symlink() for path in paths):
+            return False
+        actual = {str(path.relative_to(output)): digest(path) for path in paths if path.is_file()}
+        return actual == manifest['files']
+    except (OSError, KeyError, TypeError, ValueError):
+        return False
+
+
 def state(root):
     data = read(root / 'project.json')
     result, upstream = {}, False
@@ -156,6 +172,8 @@ def state(root):
         checkpoint = data['stages'].get(stage)
         stale = bool(checkpoint) and any(not (root / p).is_file() or digest(root / p, stage) != value
                                          for p, value in checkpoint['fingerprints'].items())
+        if checkpoint and stage == 'package':
+            stale |= not packaged_files_current(root)
         result[stage] = 'stale' if checkpoint and (stale or upstream) else 'completed' if checkpoint else 'pending'
         upstream |= result[stage] != 'completed'
     return data, result
@@ -181,7 +199,8 @@ def record(root, stage):
     fixed = {
         'research': ['job.json', 'sources.json'], 'curriculum': ['curriculum.json'],
         'script': ['manuscript.md', 'course.json'],
-        'visuals': ['visual-beat-sheet/beat-sheet.json', 'visual-beat-sheet/beat-sheet.md', 'production-source/world.cjs'],
+        'visuals': ['visual-beat-sheet/beat-sheet.json', 'visual-beat-sheet/beat-sheet.md',
+                    'production-source/world.cjs', 'production-source/motion.cjs'],
         'narration': ['course.json', 'player/course-data.js', 'settings.json'],
         'media': ['review/frame-audit.json', 'review/validation.json'],
         'review': ['review/acceptance.json'],
@@ -238,9 +257,7 @@ def record(root, stage):
         for key in ('provider', 'version', 'audience'):
             text(delivery.get(key), f'Missing deployment {key}')
         require(delivery.get('packageSha256') == package['packageSha256'], 'Deployment refers to another export')
-        exported = Path(package['output'])
-        actual = {str(p.relative_to(exported)): digest(p) for p in sorted(exported.rglob('*')) if p.is_file()}
-        require(actual == package['files'], 'Export changed after packaging')
+        require(packaged_files_current(root), 'Export changed after packaging')
     for name in artifacts:
         inside(root, name)
     for later in STAGES[STAGES.index(stage) + 1:]:
@@ -281,10 +298,21 @@ def export(root, output):
     course = {k: runtime[k] for k in ('title', 'storageKey', 'language', 'width', 'height', 'fps')}
     if isinstance(runtime.get('subtitle'), str):
         course['subtitle'] = runtime['subtitle']
+    if isinstance(runtime.get('tagline'), str) and runtime['tagline'].strip():
+        course['tagline'] = runtime['tagline']
+    if isinstance(runtime.get('glossary'), list):
+        course['glossary'] = [{key: item[key] for key in ('term', 'definition')}
+                              for item in runtime['glossary'] if isinstance(item, dict)
+                              and all(isinstance(item.get(key), str) and item[key].strip()
+                                      for key in ('term', 'definition'))]
     lesson_keys = {'id', 'title', 'goal', 'coverage', 'duration', 'part', 'question', 'options', 'answer', 'explanation'}
     course['lessons'] = []
     for lesson in runtime['lessons']:
         public_lesson = {k: value for k, value in lesson.items() if k in lesson_keys}
+        feedback = lesson.get('optionFeedback')
+        if (isinstance(feedback, list) and len(feedback) == len(lesson.get('options', []))
+                and all(isinstance(item, str) and item.strip() for item in feedback)):
+            public_lesson['optionFeedback'] = feedback
         public_lesson['scenes'] = [{k: beat[k] for k in ('id', 'headline', 'narration', 'start', 'end')} for beat in lesson['scenes']]
         course['lessons'].append(public_lesson)
     public_sources = [dict(id=s['id'], title=s['title'], url=s['url'], accessedAt=s['accessedAt'])

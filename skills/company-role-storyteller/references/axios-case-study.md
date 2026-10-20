@@ -20,10 +20,10 @@ The style to reproduce is the subsequent deep series. The initial all-in-one ove
 2. **The commercial engine:** follow an advertiser through discovery, proposal, agreement, handoff, delivery, reporting, and renewal.
 3. **The control room:** investigate a discrepancy, explain systems and data, resolve conflicting requirements, and test an improvement.
 4. **The ideal candidate and hiring room:** compare three applicants through the evidence their experience and practical answers provide.
-5. **The first year:** proposed as the next substantial part after Part IV; not yet delivered as a standalone serialized part in the supplied transcript.
-6. **Advancement:** the intended subsequent exploration of performance, broader responsibility, and possible career paths.
+5. **The employee journey:** the original transcript slice ended after Part IV, with the first year proposed next. A later recovered private compilation contains a complete Part V: local learning, a bounded project, the employee's own automation mistake, containment and prevention, feedback, growing independence, and sustained evidence.
+6. **Advancement:** explore broader responsibility and possible career paths using evidence, while distinguishing possible paths from verified employer policy.
 
-The initial overview had already touched on first-year milestones and promotions. If resuming the supplied series, acknowledge that briefly and proceed with the richer Part V story instead of restarting Parts I–IV.
+The recovered compilation and the earlier source slice are different historical artifacts. This public-facing reference preserves their method rather than reproducing the private compilation or its personal material. For a continuation, inspect the actual user's latest series state before deciding what remains; do not assume Part V is still unwritten.
 
 ## The recurring fictional world
 
@@ -39,6 +39,8 @@ The initial overview had already touched on first-year milestones and promotions
 | The analyst and manager | An imagined Salesforce Business Analyst and an unnamed revenue operations manager |
 
 The central campaign has a **$150,000 agreed value**. An earlier proposal can be **$200,000**; the $50,000 difference becomes a reporting investigation. State this revision explicitly rather than treating the two figures as interchangeable. A separate $100,000 Capital Solar example appeared in the initial overview; do not merge it into Atlantic Technology's campaign.
+
+The later video adaptation used a different editorial choice: a fresh discrepancy incident between an approved amount and a reported amount. A revised proposal and a newly introduced reporting error are alternative causal accounts. Choose and document one when adapting; do not silently combine their histories or present either as an actual employer incident.
 
 ## Scene 1: why the business needs a shared system
 

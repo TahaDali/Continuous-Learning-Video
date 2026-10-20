@@ -10,7 +10,7 @@ Develop scenes around a consequential decision: a person needs something; constr
 
 Maintain `narrative-map.json` with `parts` (`id`, `title`, `question`) and `chapters` (`id`, `partId`, exact Markdown `heading`, `lessonIds`, `retainedDecisions`, `adaptation`). Each chapter points to its actual manuscript heading; every lesson is assigned. `adaptation` explains retention and any omitted detail. Do not impose a universal lesson count, equal chapter sizes or minimum word quota. Respect the depth and part structure explicitly requested by the user.
 
-Write `review/editorial.json` with `status`, `reviewer`, `findings` and `limitations`. Each finding names a `partId`, a `chapterId` and an `observation` supported by the actual manuscript. Examine organization/strategy, operating handoffs, worked technical reasoning, hiring evidence and the employee learning arc where they belong in scope. Correct thin coverage before recording completion. This producer review is not an independent learner test.
+Write `review/editorial.json` with `status`, `reviewer`, `findings` and `limitations`. Each finding names a `partId`, a `chapterId` and an `observation` supported by the actual manuscript. Examine organization/strategy, operating handoffs, worked technical reasoning, hiring evidence and the employee learning arc where they belong in scope. Correct thin coverage before recording completion. Point to a concrete scene, plausible alternative, changed or failed hypothesis, consequence and check for each substantial part. A broad paragraph praising a part is not sufficient evidence. Compare source and adapted scope explicitly; do not use word counts as a proxy for understanding. This producer review is not an independent learner test.
 
 ## Meaningful motion
 

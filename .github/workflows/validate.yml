@@ -28,3 +28,5 @@ jobs:
         run: python3 scripts/check.py --render
       - name: Check validation regressions and the isolated combined skill
         run: python3 -m unittest discover -s tests -v
+      - name: Check player recovery and saved-state contracts
+        run: node tests/player-contract.test.cjs

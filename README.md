@@ -21,6 +21,8 @@ Build the self-contained skill folder from the repository root, choosing a new o
 python3 scripts/build_skill.py --output /absolute/path/job-to-learning-videos
 ```
 
+Add `--archive /absolute/path/job-to-learning-videos.zip` to create a reproducible ZIP containing the assembled folder, license, third-party notices, and a per-file SHA-256 manifest. Both outputs must use new paths. The builder rejects included symlinks and excludes dependency directories and environment files.
+
 Copy that complete generated folder into your personal Codex skills directory, reviewing any existing installation before replacement. It contains both methods and all bundled helpers; the original two skills do not need to be installed. The `packages/job-to-learning-videos/` folder is the source template and must be assembled before installation.
 
 Example invocation after installation:
@@ -77,6 +79,7 @@ Run the offline checks with Python and Node available:
 ```sh
 python3 scripts/check.py
 python3 -m unittest discover -s tests -v
+node tests/player-contract.test.cjs
 ```
 
 For the rendering check, install the starter's canvas dependency first, then run:
@@ -90,4 +93,4 @@ The rendering check uses a temporary project. GitHub Actions runs the same check
 
 ## Before a public release
 
-Review the complete Git history as well as the current files for private material. Decide on a license before inviting reuse; no open-source license has been selected here. Review the historical Axios example, the personalized Ava voice preference, external service expectations, and behavior on a fresh installation. A successful starter check does not establish teaching quality or validate a finished course.
+Review the complete Git history as well as the current files for private material. The private candidate proposes [MIT](LICENSE), subject to the owner's final release approval; [third-party notices](THIRD_PARTY_NOTICES.md) define its provenance boundary. Review the historical Axios example, voice preference, external service expectations and behavior on a fresh installation. See [supported environments](docs/supported-environments.md). A successful starter check does not establish teaching quality or validate a finished course.

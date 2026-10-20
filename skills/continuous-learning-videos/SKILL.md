@@ -19,6 +19,8 @@ Read [the beat-sheet guide](references/beat-sheet.md). Create the visual beat sh
 
 Author a persistent explanatory world for each lesson. Use camera reframing to reveal relationships, progressive construction to build the model, and existing objects to cause the next event. Retain enough visual context to explain how ideas connect. Camera travel across a mostly empty canvas is not educational density. Do not force all topics into an identical chain of icon cards.
 
+When a visual reference is supplied, inspect its actual edition and encoded transitions before implementing the new language. Match the explanatory anatomy: recognizable subject artifacts, scale, hierarchy, contextual anchors, construction and motion. Matching colors or replacing every artifact with a large labeled rectangle is insufficient. A user's rejection invalidates affected visual acceptance: preserve usable writing/audio, stop final bulk production, and repair representative scenes before scaling the redesign.
+
 Use this test: **If narration is muted and captions removed, can the viewer still infer the general concept from the graphics and their interactions?** Inspect the result and revise weak beats. Do not report audience comprehension as proven without an audience test.
 
 ## Produce the media

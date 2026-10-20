@@ -1,5 +1,17 @@
 # Combined skill development status
 
+## Current quality hold
+
+The owner rejected the current visual direction during the five-case evaluation: the designs did not match the original Axios Salesforce motion course. Final bulk rendering and new course export are paused for reference-based redesign. Earlier geometry/media passes remain technical evidence; they do not override this failed visual acceptance. Written cases, measured narration and prior private media are preserved. No public release or audience expansion is authorized.
+
+A dedicated design pass is inspecting the exact reference lineage and actual encoded transitions, then producing a representative illustrated scene before the language scales across the courses. The combined skill now makes that reference analysis and response to rejection explicit. Release readiness requires repaired visible outcomes, not an added instruction or review form alone.
+
+The corrected direction has private encoded studies for the company-first opening, a delayed revision race, a physical fit investigation and equipment/cash/expense timing. Full narrated chapter prototypes are now being integrated; the complete five-case visual review is still unfinished. The five cases cover Staff software engineering, product design internship, hardware design engineering internship, nonprofit financial partnering and public-sector enterprise sales. Their research, substantial five-part manuscripts and requirements maps exist; this does not mean five finished hosted courses have passed review.
+
+The reusable player now restores a compact editorial opening, a wide focused video, a modal course panel, per-chapter duration/current/completion state, transcript download and scoped confirmable progress reset. Practice uses selected-option feedback and an optional glossary. Recovery, chapter-fragment selection, object-URL cleanup and validated saved state remain tested. A fresh local run passes 28 Python regressions, 13 player contracts and the 288-frame silent starter check. Responsive/native download and physical-device coverage must be reported separately from these contracts.
+
+The builder now rejects included source symlinks and a symlink output, includes the proposed license/notices, and can produce a reproducible ZIP with per-file SHA-256 checksums. These packaging and player improvements do not remove the visual quality hold.
+
 October 20, 2026. The intended product is one installed Codex skill: a job URL starts research and delivers a hosted narrated video learning course. The GitHub repository remains private. Course hosting defaults to private separately from repository visibility.
 
 ## Implemented in the private draft

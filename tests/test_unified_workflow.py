@@ -99,6 +99,20 @@ class UnifiedWorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
             self.design_checks().visuals(self.root, {'01'})
 
+    def test_changed_motion_invalidates_recorded_visuals(self):
+        self.seed_curriculum()
+        self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
+        self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
+        self.save()
+        self.seed_design()
+        self.workflow.record(self.root, 'script')
+        self.workflow.record(self.root, 'visuals')
+        with (self.root / 'production-source/motion.cjs').open('a') as handle:
+            handle.write('\n// Changed after recorded prototype inspection\n')
+        self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'stale')
+        with self.assertRaisesRegex(ValueError, 'visuals'):
+            self.workflow.record(self.root, 'narration')
+
     def test_changed_declared_renderer_helper_invalidates_review(self):
         self.seed_design()
         w = self.workflow
@@ -148,11 +162,24 @@ class UnifiedWorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'missing from the curriculum'):
             self.workflow.curriculum(self.root)
 
+    def test_rejected_visual_acceptance_blocks_delivery_review(self):
+        report = {key: {'status': 'pending', 'coverage': 'Synthetic pending review.'}
+                  for key in ('content', 'listening', 'synchronizedViewing', 'silentInspection')}
+        report['silentInspection'] = {'status': 'failed', 'coverage': 'The course owner rejected the visual direction.'}
+        self.workflow.write(self.root / 'review/acceptance.json', report)
+        with self.assertRaisesRegex(ValueError, 'silentInspection'):
+            self.workflow.acceptance(self.root)
+
     def test_export_omits_working_data_and_detects_changed_package(self):
         self.seed_curriculum()
         self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
         self.data['privateNotes'] = 'PRIVATE_FIXTURE_MUST_NOT_EXPORT'
         self.data['subtitle'] = 'Public course introduction'
+        self.data['tagline'] = 'Follow the evidence.'
+        self.data['glossary'] = [{'term': 'Fixture term', 'definition': 'Public reminder', 'privateNotes': 'PRIVATE_FIXTURE_MUST_NOT_EXPORT'},
+                                 {'term': 'Incomplete entry'}]
+        self.data['lessons'][0].update(question='Which evidence?', options=['Bounded evidence', 'An unsupported leap'],
+            answer=0, explanation='General reasoning', optionFeedback=['The evidence addresses the claim.', 'The conclusion exceeds the evidence.'])
         self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
         self.save()
         self.seed_design()
@@ -189,6 +216,10 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.assertNotIn('Private fixture', player)
         self.assertIn('Synthetic public fixture', player)
         self.assertIn('Public course introduction', player)
+        self.assertIn('Follow the evidence.', player)
+        self.assertIn('Public reminder', player)
+        self.assertNotIn('Incomplete entry', player)
+        self.assertIn('The conclusion exceeds the evidence.', player)
         self.assertIn('fiction', player)
         source_player = self.root / 'player/player.js'
         original = source_player.read_bytes()
@@ -197,9 +228,26 @@ class UnifiedWorkflowTests(unittest.TestCase):
         source_player.write_bytes(original)
         self.workflow.write(self.root / 'delivery.json', {'status': 'deployed', 'url': 'https://example.org/fictional-fixture',
             'provider': 'test fixture only', 'version': 'fixture', 'audience': 'private', 'packageSha256': manifest['packageSha256']})
-        (output / 'index.html').write_text('Changed after export')
-        with self.assertRaisesRegex(ValueError, 'Export changed'):
+        exported_index = output / 'index.html'
+        original_exported_index = exported_index.read_bytes()
+        exported_index.write_text('Changed after export')
+        self.assertEqual(self.workflow.state(self.root)[1]['package'], 'stale')
+        with self.assertRaisesRegex(ValueError, 'package'):
             self.workflow.record(self.root, 'delivery')
+        exported_index.write_bytes(original_exported_index)
+        self.workflow.record(self.root, 'delivery')
+        exported_index.write_text('Changed after recorded delivery')
+        statuses = self.workflow.state(self.root)[1]
+        self.assertEqual(statuses['package'], 'stale')
+        self.assertEqual(statuses['delivery'], 'stale')
+        exported_index.write_bytes(original_exported_index)
+        self.assertEqual(self.workflow.state(self.root)[1]['delivery'], 'completed')
+        external = self.base / 'must-not-follow.txt'
+        external.write_bytes(original_exported_index)
+        exported_index.unlink()
+        exported_index.symlink_to(external)
+        self.assertFalse(self.workflow.packaged_files_current(self.root))
+        self.assertEqual(self.workflow.state(self.root)[1]['delivery'], 'stale')
 
 
 if __name__ == '__main__':
