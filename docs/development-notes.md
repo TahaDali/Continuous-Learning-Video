@@ -8,7 +8,7 @@ The original teaching approach grew from a company and Salesforce analyst discus
 
 In **Analyze Axios Salesforce Analyst Job**, that method became a reusable skill. The historical Axios case preserves narrative continuity and labels its fictional characters, transactions, and measures. It is not a current employer fact sheet, and its learner assumptions must not become another user's biography.
 
-The first real internship application in **Analyze U.S. Chamber role** exposed a scope problem. The skill activated, but compressed institutional context, internship details, candidate advice, and career development into one response. The earlier compact scenario checks had not tested the minimal prompt that caused the failure.
+The first realistic internship-posting test in **Analyze U.S. Chamber role** exposed a scope problem. The skill activated, but compressed institutional context, internship details, candidate advice, and career development into one response. The earlier compact scenario checks had not tested the minimal prompt that caused the failure.
 
 The correction made a substantial organization-first Part I the default for a new organization or job link. It preserved explicit requests for a brief answer, all-in-one analysis, narrow factual answers, and continuations. Internship milestones follow the actual appointment duration rather than a permanent employee's year-long review cycle.
 
@@ -32,7 +32,7 @@ Hosting and viewer access are separate operations. The reusable skill preserves 
 
 ## What is preserved in this repository
 
-The initial skill folders are byte-for-byte copies of the installed packages. Their references, UI metadata, executable helpers, canvas example, and player are included. The repository adds documentation, ignore rules, and offline starter checks; it does not rewrite the teaching method or change an installed skill.
+At the initial import, the skill folders were byte-for-byte copies of the installed packages, including their references, UI metadata, executable helpers, canvas example and player. The following checks describe that historical snapshot. Later combined-workflow, renderer and player changes are covered by the [current development status](combined-skill-status.md); they do not update a personal installation automatically.
 
 The skill-creator structural validator passed for both imported skills on October 20, 2026. Repository checks cover local reference resolution, source syntax and JSON parsing, project generation, refusal to overwrite, distinct player progress keys, and the starter's source/beat validation. The optional render check covers the silent example's geometry audit, video stream properties, and full decoding. These checks do not request narration, review an entire course, test learner understanding, or refresh employer research.
 

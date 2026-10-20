@@ -2,7 +2,7 @@
 
 A combined Codex skill for turning a job URL into a sourced, narrated video learning course, built from the organization-first storyteller and continuous-video production methods.
 
-This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow completed an initial job-to-private-course trial and now has five contrasting courses in private design review; see [current scope and remaining release work](docs/combined-skill-status.md).
+This repository remains a private release candidate. Five substantial illustrated review courses now cover 154 chapters and approximately 399 minutes across software engineering, product design, hardware engineering, nonprofit finance and public-sector sales. All five current editions are privately hosted for owner review. Public release and owner acceptance remain separate decisions. See [current validation and review limits](docs/combined-skill-status.md).
 
 | Skill | Purpose | Entry point |
 | --- | --- | --- |
@@ -11,7 +11,7 @@ This repository starts as a private development workspace. Changing its visibili
 
 The skills work independently. They can also form a workflow: research and write the learning series, then adapt the approved content into videos. Producing a series does not automatically authorize uploading its text to a speech service or publishing its videos.
 
-## Combined skill draft
+## Combined skill
 
 The intended user experience is one installed **`$job-to-learning-videos`** skill: paste a job URL, then receive a hosted course with videos, captions, transcripts, sources, and practice questions. Narration and hosting need one-time service setup and applicable authorization. An inaccessible posting may require its text.
 
@@ -91,8 +91,8 @@ npm install --prefix skills/continuous-learning-videos/assets/starter/production
 python3 scripts/check.py --render
 ```
 
-The rendering check uses a temporary project. GitHub Actions runs the same checks without requesting speech or publishing anything. See [development notes](docs/development-notes.md) for the decisions recovered from earlier sessions and the limits of historical validation.
+The current core passes 43 Python regressions and 13 player contracts. The explicit 288-frame silent demonstration is rendered, audited and decoded separately. The rendering check uses a temporary project, and GitHub Actions runs the checks without requesting speech or publishing anything. The five real course cases add sourced narratives, measured narration, subject-specific illustration and selected encoded-frame review; these checks do not establish full-course listening, synchronized or silent viewing, or learner comprehension. See [development notes](docs/development-notes.md) and [current review coverage](docs/combined-skill-status.md).
 
 ## Before a public release
 
-Review the complete Git history as well as the current files for private material. The private candidate proposes [MIT](LICENSE), subject to the owner's final release approval; [third-party notices](THIRD_PARTY_NOTICES.md) define its provenance boundary. Review the historical Axios example, voice preference, external service expectations and behavior on a fresh installation. See [supported environments](docs/supported-environments.md). A successful starter check does not establish teaching quality or validate a finished course.
+The current files and reachable history have received a privacy and provenance review; the owner must still approve the final public release and the proposed [MIT](LICENSE) boundary described in [third-party notices](THIRD_PARTY_NOTICES.md). The historical Axios example, external service terms and actual source rights need the owner's review; no legal clearance is claimed. Full-course listening, synchronized viewing and silent viewing, physical-device and screen-reader testing, and learner studies remain incomplete. Isolated installation and Linux CI checks do not establish a clean physical second-machine or Windows pass. See [supported environments](docs/supported-environments.md). Private course media and hosting identities are excluded from this repository.
