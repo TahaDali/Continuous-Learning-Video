@@ -16,9 +16,9 @@ The [rights review](docs/rights-review.md) records the owner's confirmation that
 
 The example is served from the separate `gh-pages` branch. Its media are not included in the installable skill bundle.
 
-![A frame from the bundled mechanical transfer demonstration](docs/images/mechanical-demo.png)
+[![The Axios Story, lesson 2: Two companies, three financial ideas](docs/images/axios-course-example.png)](https://tahadali.github.io/Continuous-Learning-Video/examples/axios/#lesson-02)
 
-*Actual rendered mechanical example: an identifiable amount moves while the total stays constant. It is a silent tooling demonstration, not a finished job-specific course.*
+*Screenshot from lesson 2, “Two companies, three financial ideas.” Select the image to open that lesson in the live course.*
 
 ## What you receive
 
