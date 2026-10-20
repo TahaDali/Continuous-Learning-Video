@@ -43,6 +43,15 @@ def align(text, events):
                       'start': event['offset'] / 1e7,
                       'end': (event['offset'] + event['duration']) / 1e7})
         pos = at + len(token)
+    # Some provider events are measured onsets with a zero duration (often after
+    # quoted dialogue). Retain that onset and use the next measured onset as the
+    # caption boundary; record the inference rather than claim a measured end.
+    # A trailing point or non-increasing onset remains invalid and is retried.
+    for word, following in zip(words, words[1:]):
+        if word['end'] == word['start'] and following['start'] > word['start']:
+            word['rawEnd'] = word['end']
+            word['end'] = following['start']
+            word['timingMethod'] = 'measured onset; end inferred from next measured onset'
     check_words(text, words)
     return words
 

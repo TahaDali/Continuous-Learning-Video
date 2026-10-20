@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const D=window.COURSE,$=id=>document.getElementById(id),v=$('video');
-document.title=D.title;$('course-title').textContent=D.title;document.documentElement.lang=D.language;
+document.title=D.title;$('course-title').textContent=D.title;document.documentElement.lang=D.language;if(D.subtitle&&$('course-subtitle')){$('course-subtitle').hidden=false;$('course-subtitle').textContent=D.subtitle;}
 let state={done:[],positions:{},lesson:D.lessons[0].id,speed:1,captions:false};
 try{Object.assign(state,JSON.parse(localStorage.getItem(D.storageKey)||'{}'));}catch{}
 if(!Array.isArray(state.done))state.done=[];
@@ -21,7 +21,7 @@ function progress(){const done=state.done.includes(D.lessons[current].id);$('com
 function load(index,focus=false){
   if(v.currentSrc&&!v.ended)state.positions[D.lessons[current].id]=v.currentTime;
   current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];v.pause();state.lesson=l.id;pending=Number(state.positions[l.id])||0;
-  $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=l.coverage;$('lesson-number').textContent=`Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
+  $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=l.coverage;$('lesson-number').textContent=`${l.part?l.part+' · ':''}Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
   v.innerHTML='';v.poster=`posters/${l.id}.png`;v.src=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);v.load();$('error').hidden=true;
   $('download-video').href=v.getAttribute('src');$('download-captions').href=track.getAttribute('src');$('previous').disabled=current===0;$('next').disabled=current===D.lessons.length-1;
   lessonSources(l);practice(l);
@@ -30,6 +30,7 @@ function load(index,focus=false){
 }
 let lastPart=null;for(const [index,l] of D.lessons.entries()){if(l.part&&l.part!==lastPart){const heading=document.createElement('h3');heading.className='chapter-heading';heading.textContent=l.part;$('lesson-list').append(heading);lastPart=l.part;}const b=document.createElement('button');b.dataset.lesson=l.id;b.textContent=`${index+1}. ${l.title}`;b.onclick=()=>{load(index,true);$('lesson-list').hidden=true;$('browse').textContent='Show lessons';$('browse').setAttribute('aria-expanded','false');};$('lesson-list').append(b);}
 $('browse').onclick=()=>{const hidden=$('lesson-list').hidden=!$('lesson-list').hidden;$('browse').textContent=hidden?'Show lessons':'Hide lessons';$('browse').setAttribute('aria-expanded',String(!hidden));};
+const parts=[...new Set(D.lessons.map(l=>l.part).filter(Boolean))];if(parts.length&&$('part-overview')){$('part-overview').hidden=false;for(const part of parts){const lessons=D.lessons.filter(l=>l.part===part),b=document.createElement('button');b.textContent=part+' · '+lessons.length+' chapters · '+clock(lessons.reduce((n,l)=>n+l.duration,0));b.onclick=()=>{load(D.lessons.indexOf(lessons[0]),true);$('lesson-title').scrollIntoView({block:'start'});};$('part-buttons').append(b);}}
 $('runtime').textContent=`${D.lessons.length} lessons · ${clock(D.lessons.reduce((a,l)=>a+l.duration,0))} total`;
 $('previous').onclick=()=>load(current-1,true);$('next').onclick=()=>load(current+1,true);
 $('speed').value=String(state.speed);$('speed').onchange=e=>{state.speed=Number(e.target.value);v.playbackRate=state.speed;save();};

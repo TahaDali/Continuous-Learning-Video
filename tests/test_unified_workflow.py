@@ -1,12 +1,15 @@
 """Exercise the built single skill in isolation using explicitly fictional course fixtures."""
 import importlib.util
+import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -51,12 +54,79 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.workflow.write(self.root / 'visual-beat-sheet/beat-sheet.json', self.sheet)
         (self.root / 'player/course-data.js').write_text('window.COURSE = ' + json.dumps(self.data) + ';')
 
+    def seed_design(self):
+        """Synthetic schema evidence, explicitly not a perceptual quality review."""
+        w = self.workflow
+        (self.root / 'manuscript.md').write_text('# Synthetic mechanical fixture\n\n## Transfer\n\nNot a researched employer course.\n')
+        w.write(self.root / 'narrative-map.json', {
+            'parts': [{'id': 'p1', 'title': 'Fixture', 'question': 'What is conserved?'}],
+            'chapters': [{'id': 'c1', 'partId': 'p1', 'heading': '## Transfer', 'lessonIds': ['01'],
+                          'retainedDecisions': ['Retain the total'], 'adaptation': 'Synthetic schema fixture only'}]})
+        w.write(self.root / 'review/editorial.json', {'status': 'completed', 'reviewer': 'Synthetic fixture',
+            'findings': [{'partId': 'p1', 'chapterId': 'c1', 'observation': 'Schema fixture only; no teaching-quality claim.'}]})
+        w.write(self.root / 'visual-design.json', {'mechanisms': [{'id': 'transfer', 'lessonIds': ['01'],
+            'question': 'Does the total stay fixed?', 'states': [{'id': 'a', 'meaning': 'Before'}, {'id': 'b', 'meaning': 'After'}],
+            'transitions': [{'from': 'a', 'to': 'b', 'trigger': 'Transfer', 'change': 'Amount moves', 'invariant': 'Total remains fixed'}]}]})
+        clip = self.root / 'review/fixture-clip.bin'
+        clip.write_bytes(b'Synthetic file-presence fixture; not an actual inspected clip')
+        hashes = {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest()
+                  for name in ['production-source/world.cjs', 'production-source/motion.cjs']}
+        w.write(self.root / 'review/prototypes.json', {'status': 'completed', 'reviewer': 'Synthetic fixture',
+            'worldSha256': hashes['production-source/world.cjs'], 'sourceHashes': hashes,
+            'clips': [{'mechanismId': 'transfer', 'path': 'review/fixture-clip.bin', 'observation': 'Schema fixture only.'}]})
+
+    def design_checks(self):
+        spec = importlib.util.spec_from_file_location('fixture_design_checks', self.skill / 'scripts/design_checks.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_missing_parent_chapter_is_rejected(self):
+        self.seed_design()
+        (self.root / 'manuscript.md').write_text('# Missing mapped chapter\n')
+        with self.assertRaisesRegex(ValueError, 'heading is missing'):
+            self.design_checks().script(self.root, {'01'})
+
+    def test_unassigned_narrative_lesson_is_rejected(self):
+        self.seed_design()
+        with self.assertRaisesRegex(ValueError, 'leaves lessons unassigned'):
+            self.design_checks().script(self.root, {'01', '02'})
+
+    def test_changed_motion_invalidates_prototype_review(self):
+        self.seed_design()
+        with (self.root / 'production-source/motion.cjs').open('a') as handle:
+            handle.write('\n// Changed after prototype inspection\n')
+        with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
+            self.design_checks().visuals(self.root, {'01'})
+
+    def test_changed_declared_renderer_helper_invalidates_review(self):
+        self.seed_design()
+        w = self.workflow
+        course = w.read(self.root / 'course.json')
+        course['renderSources'] = ['production-source/fixture-helper.cjs']
+        w.write(self.root / 'course.json', course)
+        helper = self.root / course['renderSources'][0]
+        helper.write_text('// Synthetic renderer dependency\n')
+        review = w.read(self.root / 'review/prototypes.json')
+        review['sourceHashes'][course['renderSources'][0]] = hashlib.sha256(helper.read_bytes()).hexdigest()
+        w.write(self.root / 'review/prototypes.json', review)
+        self.design_checks().visuals(self.root, {'01'})
+        helper.write_text('// Changed after prototype inspection\n')
+        with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
+            self.design_checks().visuals(self.root, {'01'})
+
     def test_bundle_is_self_contained(self):
         self.assertTrue((self.skill / 'references/research/chapter-structure.md').is_file())
         self.assertTrue((self.skill / 'references/video/beat-sheet.md').is_file())
         self.assertTrue((self.skill / 'assets/starter/production-source/text_checks.py').is_file())
         self.assertEqual(self.workflow.read(self.root / 'course.json')['lessons'], [])
         self.assertFalse(self.workflow.preflight()['serviceRequestsMade'])
+        for path in self.skill.rglob('*.md'):
+            for link in re.findall(r'\]\(([^\s)]+)\)', path.read_text()):
+                if re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*:', link) or link.startswith('#'):
+                    continue
+                with self.subTest(file=str(path.relative_to(self.skill)), link=link):
+                    self.assertTrue((path.parent / unquote(link.split('#', 1)[0])).is_file())
 
     def test_missing_research_blocks_later_stage(self):
         with self.assertRaisesRegex(ValueError, 'upstream'):
@@ -84,7 +154,7 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.data['privateNotes'] = 'PRIVATE_FIXTURE_MUST_NOT_EXPORT'
         self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
         self.save()
-        (self.root / 'manuscript.md').write_text('# Synthetic mechanical fixture\n\nNot a researched employer course.\n')
+        self.seed_design()
         self.workflow.record(self.root, 'script')
         (self.root / 'visual-beat-sheet/beat-sheet.md').write_text('# Synthetic transfer beat sheet\n')
         self.workflow.record(self.root, 'visuals')

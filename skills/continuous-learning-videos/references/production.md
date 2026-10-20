@@ -50,6 +50,8 @@ python3 production-source/narrate.py --voice en-US-AvaMultilingualNeural
 
 The helper fails on word alignment or cue-coverage differences. Fix the text/cue mapping; do not replace measured timing with equal estimates just to make a run pass. Every cue carries an explicit exact narration span, so abbreviations and non-English punctuation do not need an automatic sentence splitter. Supply narration with explicit units and intelligible phrasing instead of phonetic brand misspellings in the displayed transcript. Do not alter meaning to appease speech recognition.
 
+A provider may return a zero-duration word event after quoted dialogue. The helper retains its measured onset and uses the next measured onset as its caption end, preserving the raw endpoint and marking the inference in `wordTimings`. It does not claim that inferred endpoint is an acoustically measured word ending. A trailing zero-duration event still fails validation.
+
 The service exposes limited prosody controls. Use natural syntax, purposeful block boundaries, modest rate variation and appropriate voice selection. A model name alone does not prove human realism or emotional intelligence. Listen before accepting its delivery.
 
 With approved audio and final timings:

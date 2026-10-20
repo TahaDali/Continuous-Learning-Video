@@ -6,7 +6,7 @@ const allowances=require('./intentional-overlaps.json');
 for(const a of allowances)if(!a.lesson||!a.a||!a.b||!Number.isFinite(a.start)||!Number.isFinite(a.end)||a.start>=a.end||!a.reason?.trim())throw new Error('Invalid intentional-overlap rule');
 const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const report={method:'All output-frame timestamps; visible registered axis-aligned actor and label bounds after camera transform, plus label safe zones. Fully offscreen actors are ignored and actors may cross the clipped viewport. Excludes connector paths, glyph internals and raster/perceptual effects. Owner-contained labels are intentional.',fps:course.fps,sourceHashes:{},lessons:[],unresolvedPairs:0,totalFrames:0};
-for(const name of ['course.json','production-source/world.cjs','production-source/motion.cjs','production-source/intentional-overlaps.json'])report.sourceHashes[name]=sha(path.join(root,name));
+for(const name of ['course.json','production-source/world.cjs','production-source/motion.cjs','production-source/intentional-overlaps.json',...(course.renderSources||[])])report.sourceHashes[name]=sha(path.join(root,name));
 const framesDir=path.join(root,'review/flagged');
 if(fs.existsSync(framesDir)&&fs.readdirSync(framesDir).length){
   const history=fs.mkdtempSync(path.join(root,'review/audit-history-'));
@@ -30,6 +30,7 @@ for(const l of course.lessons) {
       if(intersects(a.bounds,b.bounds))problems.push({type:'intersection',a:a.id,b:b.id});
     }
     if(s.invariants?.expectedTotal!==undefined&&Math.abs(s.invariants.totalUnits-s.invariants.expectedTotal)>1e-6)problems.push({type:'conservation',a:'displayed-total',actual:s.invariants.totalUnits,expected:s.invariants.expectedTotal});
+    for(const check of s.invariants?.checks||[])if(check.passed!==true)problems.push({type:'mechanism-invariant',a:check.id,actual:check.actual,expected:check.expected});
     for(const p of problems) {
       const reason=allowances.find(a=>a.lesson===l.id&&t>=a.start&&t<=a.end&&((p.a===a.a&&p.b===a.b)||(p.a===a.b&&p.b===a.a)))?.reason;
       const target=reason?accepted:issues,key=[p.type,p.a,p.b||''].join(':');

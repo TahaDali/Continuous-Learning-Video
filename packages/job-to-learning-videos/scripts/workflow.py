@@ -187,6 +187,12 @@ def record(root, stage):
         'review': ['review/acceptance.json'], 'package': ['export-manifest.json'], 'delivery': ['delivery.json']
     }
     artifacts = fixed[stage].copy()
+    if data.get('reviewProfile') == 'narrative-motion-v2' and stage in {'script', 'visuals'}:
+        spec = importlib.util.spec_from_file_location('course_design_checks', SKILL / 'scripts/design_checks.py')
+        design = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(design)
+        ids = {lesson['id'] for lesson in read(root / 'course.json')['lessons']}
+        artifacts += design.script(root, ids) if stage == 'script' else design.visuals(root, ids)
     if stage == 'research':
         evidence(root)
     if stage in {'curriculum', 'script', 'visuals', 'narration', 'media'}:
@@ -194,6 +200,12 @@ def record(root, stage):
     if stage in {'script', 'visuals', 'narration', 'media'}:
         course = read(root / 'course.json')
         require([l['id'] for l in course['lessons']] == [l['id'] for l in plan['lessons']], 'Runtime lessons differ from curriculum')
+        render_sources = course.get('renderSources', [])
+        require(isinstance(render_sources, list) and len(set(render_sources)) == len(render_sources), 'Invalid render dependency list')
+        for source in render_sources:
+            inside(root, source)
+        if stage in {'visuals', 'media'}:
+            artifacts += render_sources
     if stage == 'visuals':
         validator(root)
         refresh_sheet(root)
@@ -206,7 +218,7 @@ def record(root, stage):
         validator(root, media=True)
         audit = read(root / 'review/frame-audit.json')
         require(audit['unresolvedPairs'] == 0, 'Unresolved frame audit findings')
-        expected_sources = {'course.json', 'production-source/world.cjs', 'production-source/motion.cjs', 'production-source/intentional-overlaps.json'}
+        expected_sources = {'course.json', 'production-source/world.cjs', 'production-source/motion.cjs', 'production-source/intentional-overlaps.json', *render_sources}
         require(set(audit['sourceHashes']) == expected_sources, 'Incomplete frame audit source identity')
         require(audit['totalFrames'] == sum(math.ceil(l['duration'] * course['fps']) for l in course['lessons']), 'Frame audit coverage is incomplete')
         for name, value in audit['sourceHashes'].items():
@@ -316,7 +328,7 @@ def init(root, job_url):
     write(root / 'course.json', data)
     (root / 'player/course-data.js').write_text('window.COURSE = ' + json.dumps(data) + ';\n')
     write(root / 'visual-beat-sheet/beat-sheet.json', {'lessons': []})
-    write(root / 'project.json', {'schemaVersion': 1, 'jobUrl': job_url, 'createdAt': now(), 'stages': {}})
+    write(root / 'project.json', {'schemaVersion': 2, 'reviewProfile': 'narrative-motion-v2', 'jobUrl': job_url, 'createdAt': now(), 'stages': {}})
     write(root / 'job.json', {'url': job_url, 'status': 'unretrieved', 'retrievedAt': None,
                             'employer': None, 'title': None, 'requirements': []})
     write(root / 'sources.json', {'sources': [], 'claims': []})

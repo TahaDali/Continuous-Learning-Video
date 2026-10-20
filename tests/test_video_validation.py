@@ -58,6 +58,20 @@ class VideoValidationTests(unittest.TestCase):
         check_words(text, [{'text': 'Value', 'charStart': 0, 'charEnd': 5, 'start': 0, 'end': .2},
                            {'text': 'ten', 'charStart': 6, 'charEnd': 9, 'start': .3, 'end': .5}])
 
+    def test_provider_point_boundary_retains_measured_onset(self):
+        spec = importlib.util.spec_from_file_location('fixture_narrate', SKILL / 'assets/starter/production-source/narrate.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        words = module.align('They share.', [
+            {'type': 'WordBoundary', 'text': 'They', 'offset': 10000000, 'duration': 0},
+            {'type': 'WordBoundary', 'text': 'share', 'offset': 12000000, 'duration': 2000000}])
+        self.assertEqual(words[0]['start'], 1)
+        self.assertEqual(words[0]['rawEnd'], 1)
+        self.assertEqual(words[0]['end'], words[1]['start'])
+        self.assertIn('inferred', words[0]['timingMethod'])
+        with self.assertRaisesRegex(ValueError, 'timings overlap or are invalid'):
+            module.align('They', [{'type': 'WordBoundary', 'text': 'They', 'offset': 10000000, 'duration': 0}])
+
     def test_overlapping_sentence_cues_are_rejected(self):
         cue = self.sheet['lessons'][0]['beats'][0]['cues'][0]
         other = copy.deepcopy(cue)
@@ -122,6 +136,24 @@ for(const item of labels)if(item.bounds.x<550||item.bounds.x+item.bounds.w>730||
     def media_fixture(self, audio_seconds):
         from media_fixture import media_fixture
         media_fixture(self, audio_seconds)
+
+    def test_failed_authored_model_invariant_blocks_audit(self):
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
+            if not module.exists():
+                self.skipTest('Canvas dependency not installed')
+            env['CANVAS_MODULE'] = str(module)
+        self.data['lessons'] = [dict(id='01', duration=1 / self.data['fps'])]
+        self.save()
+        (self.root / 'production-source/world.cjs').write_text(
+            "exports.draw=()=>({items:[],viewport:{x:0,y:0,w:1280,h:720},safe:{x:0,y:0,w:1280,h:720},"
+            "invariants:{checks:[{id:'accepted-values',passed:false,actual:97,expected:50}]}});")
+        result = subprocess.run(['node', str(self.root / 'production-source/audit.cjs')],
+                                env=env, capture_output=True)
+        self.assertEqual(result.returncode, 1)
+        report = json.loads((self.root / 'review/frame-audit.json').read_text())
+        self.assertEqual(report['lessons'][0]['unresolved'][0]['type'], 'mechanism-invariant')
 
     def test_complete_audio_stream_passes(self):
         self.media_fixture(12)

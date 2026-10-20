@@ -10,7 +10,7 @@ The repository maintains the original research and video modules. `scripts/build
 
 `workflow.py` initializes an empty job-course project, reports local prerequisites without speech requests, validates the evidence and requirement-to-objective maps, records stage fingerprints, detects upstream changes, and exports an allowlisted player package. Research evidence, private source records, arbitrary course metadata, original posting snapshots, narration stems, and production source stay outside the hosted export. An export manifest identifies the exact packaged files. A delivery record must refer to that package; editing the package invalidates that match. Deployment still requires a successful native hosting-tool result.
 
-The player now supports job context, learning objectives, lesson sources and evidence categories, optional practice questions with explanations, and visible review-version limitations. Existing video controls, caption toggling, transcript jumps, downloads, and progress are retained.
+The player supports job context, learning objectives, five-part overview jumps, grouped lesson navigation, lesson sources and evidence categories, practice questions with explanations, and visible review-version limitations. Existing video controls, caption toggling, transcript jumps, downloads, and progress are retained.
 
 The validation defects demonstrated in review have been corrected: comparisons retain signs, decimals, currencies and percent symbols; word-source alignment checks significant characters; sentence cues must be ordered and non-overlapping; measured sentence bounds must match their words; final audio and video stream durations are checked independently. Missing source-coverage notes are rejected. Reports distinguish text/beat coverage from factual source verification. Project generation excludes dependency folders, cache files, and environment files. Regenerated narration also regenerates its decoded PCM rather than depending only on timestamps.
 
@@ -30,11 +30,23 @@ The run found and fixed stale readable timing sheets, false upstream invalidatio
 
 Full perceptual listening is unavailable in this review environment. Full synchronized viewing, complete silent viewing, mobile-device checks and learner testing remain pending. The hosted page visibly identifies itself as a review edition. See the [sanitized trial report](e2e-axios-8229298.md) for exact coverage and limitations; private course media and Site identity are kept outside this repository.
 
+## Five-part fidelity revision
+
+The first Axios trial passed media checks but lost much of the parent narrative. Hiring and onboarding became single short lessons, the company context was compressed, and several diagrams named a mechanism without showing enough of its behavior. That trial remains useful technical evidence; it does not establish that the requested storytelling experience was preserved.
+
+New projects use the `narrative-motion-v2` review profile. The combined skill now requires a substantial parent narrative before video adaptation, a chapter-to-lesson map retaining consequential decisions, and producer editorial findings for every planned part. It distinguishes a published mission from an interpreted direction or a fictional project strategy. Automatic continuation no longer serves as a reason to shorten the original parts.
+
+The visual design contract names visible states, triggers, transformations, invariants and exceptions. Inspected encoded prototypes must identify the authored world, motion library and declared helper sources; edits make that evidence stale. Media audits fingerprint declared renderer dependencies and reject failed authored-model assertions. These checks establish traceability and mechanical integrity, not teaching quality.
+
+The current private Axios revision contains 45 full narrative chapters in five parts, approximately 17,000 narration words, and 270 spoken blocks. It expands the company and operating story, worked engineering investigations, candidate comparisons and work samples, onboarding, the employee's own consequential mistake, adoption, feedback and advancement. Concrete animations include a conserved allocation, stale-version overwrite and protection, duplicate versus distinct operations, transaction scope, record identity/value reconciliation, a skewed latency distribution, authorization, agent-test boundaries and a provider-scoped retry experiment. Production and final review evidence will be recorded in the trial report after regeneration.
+
+Twenty-one offline regressions pass, including missing manuscript headings, unassigned narrative lessons, changed prototype dependencies, failed model assertions and point-valued speech boundaries. Microsoft sometimes reports a zero-duration word event after dialogue; the helper retains the measured onset, infers its caption end from the next measured onset, and labels that inference. A trailing invalid point still fails rather than inventing a speech duration.
+
 ## Remaining before public release
 
 - Run from a clean machine or installation with contrasting roles, including an internship and an inaccessible-posting recovery case. This trial reused working local rendering and speech dependencies.
 - Complete full perceptual listening and synchronized viewing of the real course, then correct any pronunciation, pacing, timing or instructional problems found. The speech endpoint required a cached retry during this run.
-- Assess whether the 18 authored graphical mechanisms explain the subject without narration. Complete silent viewing and learner comprehension checks; geometry and frame samples cannot establish this.
+- Assess the regenerated course through complete silent viewing and learner comprehension checks; geometry, producer prototype inspection and frame samples cannot establish this.
 - Test mobile-device playback, fullscreen diagram legibility and a full accessibility pass. Desktop navigation, captions, transcript jumps, source presentation, question feedback, keyboard activation and saved completion were spot checked.
 - Review example provenance and complete repository history, choose a license, and specify supported tool/service environments before promising reliable job-link-only completion to new users.
 
