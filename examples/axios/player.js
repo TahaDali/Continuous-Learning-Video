@@ -5,6 +5,7 @@ const originalEditionReview={"listening":{"status":"unavailable","coverage":"The
 const D={...originalCourse,language:'en',storageKey:'axios-motion-v1',job:originalCourse.job||{employer:'Axios',title:'Salesforce Business Analyst',url:'https://job-boards.greenhouse.io/axios/jobs/8164656'},reviewVersion:originalCourse.reviewVersion??true,review:originalCourse.review||originalEditionReview,objectives:originalCourse.objectives||originalCourse.lessons.map(l=>l.goal),lessons:originalCourse.lessons.map(l=>({...l,...window.COURSE_PRACTICE?.[l.id],part:`Chapter ${l.module} · ${l.moduleTitle}`}))},$=id=>document.getElementById(id),v=$('video');
 document.documentElement.lang=D.language;
 if($('skip-lesson'))$('skip-lesson').onclick=event=>{event.preventDefault();$('lesson-title').focus({preventScroll:true});$('lesson-title').scrollIntoView({block:'start'});};
+$('read-transcript').onclick=event=>{event.preventDefault();$('transcript-panel').open=true;const summary=$('transcript-toggle');summary.focus({preventScroll:true});summary.scrollIntoView({block:'start'});};
 let state={done:[],positions:{},lesson:D.lessons[0].id,speed:1,captions:false};
 try{const saved=JSON.parse(localStorage.getItem(D.storageKey)||'{}');if(saved&&typeof saved==='object'){
  const ids=new Set(D.lessons.map(l=>l.id));state.done=[...new Set((Array.isArray(saved.done)?saved.done:[]).filter(id=>ids.has(id)))];
@@ -17,6 +18,19 @@ function focusLesson(){const heading=$('lesson-title');heading.focus({preventScr
 function closeCourse(toLesson=false){panelDestination=toLesson?'lesson':null;if(panel.open)panel.close();else if(toLesson)focusLesson();}
 function openCourse(opener){courseOpener=opener;panelDestination=null;if(!panel.open)panel.showModal();$('browse').setAttribute('aria-expanded','true');$('lesson-browse').setAttribute('aria-expanded','true');const row=lessonRows.get(D.lessons[current].id)?.button;if(row){row.focus({preventScroll:true});row.scrollIntoView({block:'nearest'});}}
 panel.addEventListener('close',()=>{$('browse').setAttribute('aria-expanded','false');$('lesson-browse').setAttribute('aria-expanded','false');$('reset-confirm').hidden=true;if(panelDestination==='lesson')focusLesson();else courseOpener.focus({preventScroll:true});panelDestination=null;});
+// Keep keyboard focus inside the open modal, including disclosure and reset states.
+panel.addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.preventDefault();closeCourse();return;}
+ if(event.key!=='Tab'||event.ctrlKey||event.altKey||event.metaKey)return;
+ const controls=Array.from(panel.querySelectorAll('button:not([disabled]),a[href],select,input:not([disabled]),textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')).filter(el=>{
+  if(el.tabIndex<0||!el.getClientRects().length)return false;
+  for(let parent=el;parent&&parent!==panel;parent=parent.parentElement){if(parent.hidden)return false;if(parent.tagName==='DETAILS'&&!parent.open&&el.closest('summary')?.parentElement!==parent)return false;}
+  return true;
+ });
+ const first=controls[0],last=controls[controls.length-1],active=document.activeElement;if(!first)return;
+ if(event.shiftKey&&(active===first||!panel.contains(active))){event.preventDefault();last.focus();}
+ else if(!event.shiftKey&&(active===last||!panel.contains(active))){event.preventDefault();first.focus();}
+});
 $('browse').onclick=()=>openCourse($('browse'));$('lesson-browse').onclick=()=>openCourse($('lesson-browse'));$('close-panel').onclick=()=>closeCourse();
 let mediaEpoch=0,seekSerial=0,mediaObject=null,mediaRequest=null,mediaAbort=null,mediaURL='',autoSeekingAttempted=false;
 let playbackWanted=false,lastMediaPaused=v.paused;
@@ -58,7 +72,7 @@ if($('retry-media'))$('retry-media').onclick=()=>{observePlaybackIntent();playba
 const save=()=>{try{localStorage.setItem(D.storageKey,JSON.stringify(state));}catch{}};
 const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 const date=value=>/^\d{4}-\d{2}-\d{2}/.test(String(value))?String(value).slice(0,10):String(value);
-function sourceLink(source){const a=document.createElement('a');try{const u=new URL(source.url);if(!['http:','https:'].includes(u.protocol))return null;a.href=u.href;}catch{return null;}a.textContent=source.title;a.target='_blank';a.rel='noopener noreferrer';return a;}
+function sourceLink(source){const a=document.createElement('a');try{const u=new URL(source.url);if(!['http:','https:'].includes(u.protocol))return null;a.href=u.href;}catch{return null;}a.textContent=source.title;a.setAttribute('aria-label',source.title+' (opens in a new tab)');a.target='_blank';a.rel='noopener noreferrer';return a;}
 if(D.job){$('job-context').hidden=false;const a=sourceLink({url:D.job.url,title:`${D.job.employer} · ${D.job.title}`});if(a)$('job-context').append(a);else $('job-context').append(document.createTextNode(`${D.job.employer} · ${D.job.title}`));if(D.job.sourceKind==='supplied-text')$('job-context').append(document.createTextNode(' · Supplied posting text; live vacancy not verified'));if(D.job.researchedAt)$('job-context').append(document.createTextNode(` · Researched ${date(D.job.researchedAt)}`));}
 if(D.objectives?.length){$('objectives-panel').hidden=false;for(const text of D.objectives){const li=document.createElement('li');li.textContent=text;$('objectives').append(li);}}
 if(Array.isArray(D.glossary)&&$('glossary')){for(const item of D.glossary){if(!item||typeof item.term!=='string'||!item.term.trim()||typeof item.definition!=='string'||!item.definition.trim())continue;const term=document.createElement('dt'),definition=document.createElement('dd');term.textContent=item.term;definition.textContent=item.definition;$('glossary').append(term,definition);}if($('glossary').children.length)$('glossary-panel').hidden=false;}
@@ -70,8 +84,9 @@ function practice(l){
  $('reflection-question').textContent=l.check?.question||'';$('reflection-prompt').textContent=l.check?.prompt||'';
  if(!valid)return;
  for(const [i,text] of l.options.entries()){
-  const b=document.createElement('button');b.type='button';b.textContent=text;b.setAttribute('aria-pressed','false');
-  b.onclick=()=>{for(const option of $('answers').children)option.setAttribute('aria-pressed',String(option===b));const correct=i===l.answer,detail=l.optionFeedback?.[i]||l.explanation||'';$('feedback').textContent=(correct?'Correct. ':'Try again. ')+detail;};
+  const b=document.createElement('button');b.type='button';b.textContent=text;b.setAttribute('role','radio');b.setAttribute('aria-checked','false');b.tabIndex=i===0?0:-1;
+  b.onclick=()=>{for(const option of $('answers').children){option.setAttribute('aria-checked',String(option===b));option.tabIndex=option===b?0:-1;}const correct=i===l.answer,detail=l.optionFeedback?.[i]||l.explanation||'';$('feedback').textContent=(correct?'Correct. ':'Try again. ')+detail;};
+  b.onkeydown=event=>{const keys=['ArrowDown','ArrowRight','ArrowUp','ArrowLeft','Home','End'];if(!keys.includes(event.key))return;event.preventDefault();const choices=Array.from($('answers').children),step=['ArrowDown','ArrowRight'].includes(event.key)?1:-1,next=event.key==='Home'?0:event.key==='End'?choices.length-1:(i+step+choices.length)%choices.length;choices[next].focus();choices[next].click();};
   $('answers').append(b);
  }
 }
@@ -82,7 +97,7 @@ function load(index,focus=false,remember=true){
   mediaEpoch++;seekSerial++;mediaAbort?.abort();mediaAbort=new AbortController();mediaRequest=null;if(mediaObject)URL.revokeObjectURL(mediaObject);mediaObject=null;autoSeekingAttempted=false;mediaStatus();
   current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];state.lesson=l.id;pending=Number(state.positions[l.id])||0;
   $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=`Original chapter coverage: ${l.coverage}`;$('lesson-part').textContent=l.part||'The learning journey';$('lesson-number').textContent=`Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
-  v.innerHTML='';v.poster=`posters/${l.id}.png`;mediaURL=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);replaceMedia(mediaURL,false);$('error').hidden=true;
+  v.setAttribute('aria-label',`Lesson ${current+1}: ${l.title}`);v.setAttribute('aria-describedby','goal viewing-help');v.innerHTML='';v.poster=`posters/${l.id}.png`;mediaURL=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label='English';track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);replaceMedia(mediaURL,false);$('error').hidden=true;
   $('download-video').href=v.getAttribute('src');$('download-captions').href=track.getAttribute('src');$('previous').disabled=current===0;$('next').disabled=current===D.lessons.length-1;
   lessonSources(l);practice(l);$('practice').open=false;
   $('transcript').replaceChildren();for(const beat of l.scenes){const b=document.createElement('button'),time=document.createElement('span'),body=document.createElement('span'),title=document.createElement('strong'),text=document.createElement('span');time.className='scene-time';time.textContent=clock(beat.start);body.className='scene-body';title.textContent=beat.headline;text.className='scene-copy';text.textContent=beat.narration;body.append(title,text);b.append(time,body);b.onclick=()=>jumpTo(beat.start);$('transcript').append(b);}
