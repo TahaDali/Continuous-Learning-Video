@@ -33,7 +33,7 @@ jobs:
         run: python3 scripts/check.py --render
       - name: Check validation regressions and the isolated skill
         run: python3 -m unittest discover -s tests -v
-      - name: Check player recovery and saved-state contracts
+      - name: Check player recovery, saved-state and accessibility contracts
         run: node tests/player-contract.test.cjs
       - name: Scan repository changes for secrets
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2

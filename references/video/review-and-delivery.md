@@ -33,6 +33,10 @@ A minimal acceptance report distinguishes:
 
 The user may accept working audio and request release while perceptual review is incomplete. Do not repeat a permission gate; deliver the accepted edition with the limit recorded accurately. Never upgrade playback confirmation into a fabricated listening certificate.
 
+## Player usability
+
+Use [mobile and accessibility review](player-accessibility.md) for the player and any browser-facing reference material. Record actual responsive, keyboard and assistive-technology coverage separately from media review.
+
 ## Delivery and hosting
 
 Provide one unmistakable latest edition. Typical output: player and MP4 archive, captions, transcripts, visual beat sheet, editable production source and a short review record. A separate full local source archive can retain original documents when appropriate; the hosted/player package should exclude them by default. Test archive integrity and link to actual existing deliverables.
