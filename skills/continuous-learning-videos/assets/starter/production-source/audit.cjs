@@ -26,11 +26,15 @@ for(const l of course.lessons) {
   for(let frame=0;frame<n;frame++) {
     const t=frame/course.fps,s=draw(g,l,t,course);
     for(const item of s.items)if(!Number.isFinite(item.alpha)||!['x','y','w','h'].every(k=>Number.isFinite(item.bounds?.[k]))||item.bounds.w<0||item.bounds.h<0)throw Error('Invalid registered geometry '+l.id+' / frame '+frame+' / '+item.id);
+    const byId=new Map(s.items.map(i=>[i.id,i]));
+    const ownedBy=(child,parent)=>{const visited=new Set([child.id]);let next=child.owner;while(next){if(visited.has(next))throw Error('Cyclic audit ownership: '+child.id);visited.add(next);if(next===parent.id)return true;next=byId.get(next)?.owner;}return false;};
+    // Explicit ancestors describe nested illustrated composites. Shared ownership
+    // does not exempt sibling collisions; every descendant must fit its ancestor.
     const items=s.items.filter(i=>i.alpha>.1&&intersects(i.bounds,s.viewport)),problems=[];
     for(const a of items)if(a.kind==='label'&&!inside(a.bounds,s.safe))problems.push({type:'safe-zone',a:a.id});
     for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++) {
       const a=items[i],b=items[j];
-      if((a.owner===b.id&&inside(a.bounds,b.bounds))||(b.owner===a.id&&inside(b.bounds,a.bounds)))continue;
+      if((ownedBy(a,b)&&inside(a.bounds,b.bounds))||(ownedBy(b,a)&&inside(b.bounds,a.bounds)))continue;
       if(intersects(a.bounds,b.bounds))problems.push({type:'intersection',a:a.id,b:b.id});
     }
     if(s.invariants?.expectedTotal!==undefined&&Math.abs(s.invariants.totalUnits-s.invariants.expectedTotal)>1e-6)problems.push({type:'conservation',a:'displayed-total',actual:s.invariants.totalUnits,expected:s.invariants.expectedTotal});

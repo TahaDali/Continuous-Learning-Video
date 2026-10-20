@@ -190,6 +190,33 @@ for(const item of labels)if(item.bounds.x<550||item.bounds.x+item.bounds.w>730||
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn('Invalid registered geometry', result.stderr)
 
+    def test_explicit_nested_owners_preserve_sibling_and_escape_findings(self):
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
+            if not module.exists():
+                self.skipTest('Canvas dependency not installed')
+            env['CANVAS_MODULE'] = str(module)
+        self.data['lessons'] = [dict(id='01', duration=1 / self.data['fps'])]
+        self.save()
+        base = [dict(id='shell',kind='actor',bounds=dict(x=100,y=100,w=400,h=400),alpha=1),
+                dict(id='panel',kind='actor',owner='shell',bounds=dict(x=150,y=150,w=250,h=250),alpha=1),
+                dict(id='a',kind='label',owner='panel',bounds=dict(x=180,y=180,w=60,h=24),alpha=1),
+                dict(id='b',kind='label',owner='panel',bounds=dict(x=180,y=240,w=60,h=24),alpha=1)]
+        for mode in ['nested', 'siblings', 'escaped']:
+            with self.subTest(mode=mode):
+                items = copy.deepcopy(base)
+                if mode == 'siblings': items[-1]['bounds']['y'] = 190
+                if mode == 'escaped': items[-1]['bounds'].update(x=390,y=240,w=60)
+                result = dict(items=items,viewport=dict(x=0,y=0,w=1280,h=720),safe=dict(x=0,y=0,w=1280,h=720))
+                (self.root / 'production-source/world.cjs').write_text('exports.draw=()=>('+json.dumps(result)+');')
+                run = subprocess.run(['node', str(self.root / 'production-source/audit.cjs')], env=env, capture_output=True, text=True)
+                self.assertEqual(run.returncode, 0 if mode == 'nested' else 1, run.stderr)
+                findings = json.loads((self.root / 'review/frame-audit.json').read_text())['lessons'][0]['unresolved']
+                if mode == 'nested': self.assertEqual(findings, [])
+                if mode == 'siblings': self.assertTrue(any({x.get('a'),x.get('b')} == {'a','b'} for x in findings))
+                if mode == 'escaped': self.assertTrue(any({x.get('a'),x.get('b')} == {'panel','b'} for x in findings))
+
     def test_complete_audio_stream_passes(self):
         self.media_fixture(12)
         report = VALIDATOR.validate(self.root, media=True)
