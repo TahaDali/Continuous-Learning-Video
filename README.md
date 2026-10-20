@@ -6,6 +6,14 @@ Turn a job posting into a sourced learning journey: understand the organization,
 
 Created and maintained by **[TahaDali](https://github.com/TahaDali)**. Developed with AI assistance. Licensed under [Apache-2.0](LICENSE), with preserved [prior MIT notices](LICENSES/Legacy-MIT.txt).
 
+## Live course example
+
+**[Watch The Axios Story — 25 lessons, 43 minutes](https://tahadali.github.io/Continuous-Learning-Video/examples/axios/#lesson-01)**
+
+Explore the original course interface with all 25 narrated videos, optional captions, transcripts, practice questions, source notes and lesson navigation. This historical example demonstrates the storytelling and video approach that informed the combined skill; it predates the v1.0.0 release and is separate from the five private validation courses below. Teaching characters and business scenarios are fictional. This independent educational course is not affiliated with Axios.
+
+The example is served from the separate `gh-pages` branch. Its media are not included in the installable skill bundle.
+
 ![A frame from the bundled mechanical transfer demonstration](docs/images/mechanical-demo.png)
 
 *Actual rendered mechanical example: an identifiable amount moves while the total stays constant. It is a silent tooling demonstration, not a finished job-specific course.*
