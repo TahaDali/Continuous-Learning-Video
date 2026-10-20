@@ -24,6 +24,8 @@ The example is served from the separate `gh-pages` branch. Its media are not inc
 
 A complete authorized run produces a substantial organization-to-role narrative, authored lesson videos, measured narration, captions, transcripts, source links, explanatory practice feedback and a static player. With supported hosting, delivery includes a confirmed course URL. Without hosting, the agent supplies the local export and identifies hosted delivery as unfinished.
 
+The reusable player includes responsive touch controls, readable transcripts, a transcript shortcut, keyboard-operable single-choice exercises with explanatory feedback, and a course drawer that contains focus and returns it on close. See [mobile and accessibility review](references/video/player-accessibility.md) for the checks and their limits.
+
 The workflow preserves the relationship between claims, sources, objectives, manuscript, narration and visual mechanisms. New projects start empty: the renderer refuses to draw until the actual subject is authored. The sample is available only through `--demo`.
 
 The owner reviewed and accepted five private sample courses spanning software engineering, design, hardware, finance and sales, and approved this public skill release. Those course media and audiences remain private. See [validation and acceptance](docs/validation.md) for evidence and limits.
@@ -42,12 +44,14 @@ Use the actual posting URL. A link alone requests the whole workflow within exis
 
 For a repository-scoped installation, use `.agents/skills/continuous-learning-video/` instead. This repository contains exactly one `SKILL.md`; no other learning skill needs to be installed.
 
+The mobile and accessibility improvements described above are in the current repository source and are not included in the older v1.0.1 ZIP. Build from `main` to use them in future courses. Existing installations need to be updated; existing course media are not rebuilt.
+
 ### Build from reviewed source
 
 Check out a chosen tag or full commit, inspect it, then build to new paths **outside the repository**:
 
 ```sh
-git clone --branch v1.0.1 https://github.com/TahaDali/Continuous-Learning-Video.git
+git clone --branch main https://github.com/TahaDali/Continuous-Learning-Video.git
 cd Continuous-Learning-Video
 python3 scripts/build_skill.py --output /absolute/work/continuous-learning-video --archive /absolute/work/continuous-learning-video.zip
 ```

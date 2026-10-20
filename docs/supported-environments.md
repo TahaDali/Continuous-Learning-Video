@@ -18,4 +18,6 @@ Browsing and hosting are supplied by the current environment. The optional speec
 
 Serve local players over HTTP. The bundled server uses loopback and byte ranges. Seeking fallback buffers only the active chapter when the host exposes no usable range; it is not an offline cache for an entire course. Large chapters can consume memory. Native media/caption controls differ by browser.
 
-Desktop browser smoke and controlled player tests are bounded evidence. Physical mobile and screen-reader testing remain unverified. No universal accessibility, browser, codec, provider or learner-readiness guarantee is made.
+The reusable starter includes 44px authored controls, responsive wrapping, 16px transcript reading text, keyboard radio selection, modal focus containment, live feedback, and a transcript shortcut. Generated HTML beat sheets expose labelled keyboard-scrollable tables. Per-course review follows [the player accessibility guide](../references/video/player-accessibility.md).
+
+Desktop browser smoke, viewport emulation and controlled player tests are bounded evidence. Physical mobile and screen-reader testing remain unverified. No universal accessibility, browser, codec, provider or learner-readiness guarantee is made.

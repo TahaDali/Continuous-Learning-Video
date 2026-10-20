@@ -19,3 +19,9 @@ Complete independent listening and whole-course synchronized/silent viewing were
 The owner accepted the sample courses and authorized this release with the recorded limits. Future course deliveries must keep their own truthful review records. A hash, passing schema or playback confirmation does not establish full perceptual review.
 
 The [earlier Axios trial](e2e-axios-8229298.md) is historical evidence. Its counts and private-release wording describe its original snapshot, not the current repository visibility or a new acceptance certificate.
+
+## Reusable player mobile update
+
+The starter now carries the touch, transcript, radio-group, focus, and modal behavior checked in the historical example. A fresh package-generated mechanical course was checked in Chrome at 320 × 640, 375 × 812, 390 × 844, 768 × 1024, 568 × 320 and 1280 × 720. Those checks found no page-wide overflow, no visible authored control below 44px in height, and 16px transcript reading text. Keyboard checks covered radio selection/feedback, transcript focus, drawer focus containment, Escape return, landscape reset actions and horizontal scrolling of the generated HTML beat sheet.
+
+Player contracts also exercise those interactions while retaining asynchronous media recovery, saved-state and transcript-download checks. The HTML plan regression checks canonical text, escaped markup, names and column-header relationships. These are bounded browser and automated checks: physical phones, spoken screen readers and complete accessibility conformance remain unverified. The separate 25-lesson Pages branch is unchanged by this skill-source update.

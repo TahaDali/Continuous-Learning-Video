@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Bring the historical example’s mobile controls, transcript shortcut, keyboard exercise selection, visible focus, modal focus handling and accessibility labels into the reusable player.
+- Generate a responsive HTML beat sheet with named keyboard-scrollable tables and column headers alongside the existing Markdown output.
+- Add player accessibility regressions and per-course mobile/keyboard review guidance. Preserve existing content and media during interface-only repairs; the separate 25-lesson Pages example is unchanged by this update.
+
 ## 1.0.1 - 2026-10-20
 
 - Record the owner's confirmation and retained compilation trail for the historical AI-chat teaching story, closing its previously unrecorded conversation origin.
