@@ -8,6 +8,10 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'assets/starter/production-source'))
+from text_checks import check_words, exact_text, finite
 
 
 def require(condition, message):
@@ -16,7 +20,7 @@ def require(condition, message):
 
 
 def norm(text):
-    return re.sub(r'[^\w]', '', text).casefold()
+    return exact_text(text)
 
 
 def parse_stamp(s):
@@ -27,7 +31,8 @@ def parse_stamp(s):
 def validate(root, media=False):
     data = json.loads((root / 'course.json').read_text())
     sheet = json.loads((root / 'visual-beat-sheet/beat-sheet.json').read_text())
-    require(data['fps'] > 0 and data['width'] > 0 and data['height'] > 0, 'Invalid output dimensions/rate')
+    require(finite(data['fps']) and data['fps'] > 0
+            and all(type(data[k]) is int and data[k] > 0 for k in ('width', 'height')), 'Invalid output dimensions/rate')
     lessons = data['lessons']
     require(bool(lessons), 'No lessons')
     require(len({l['id'] for l in lessons}) == len(lessons), 'Duplicate lesson IDs')
@@ -36,32 +41,46 @@ def validate(root, media=False):
     for lesson, plan in zip(lessons, sheet['lessons'], strict=True):
         require(re.fullmatch(r'[a-zA-Z0-9_-]+', lesson['id']), 'Unsafe lesson ID')
         require(lesson['id'] == plan['id'], 'Lesson order/IDs differ')
-        require(lesson['duration'] > 0 and lesson['scenes'], 'Empty lesson')
+        require(finite(lesson['duration']) and lesson['duration'] > 0 and lesson['scenes'], 'Empty lesson')
+        require(isinstance(lesson.get('coverage'), str) and lesson['coverage'].strip(), 'Missing source coverage note')
         require(len(lesson['scenes']) == len(plan['beats']), 'Beat coverage differs')
         require(len({s['id'] for s in lesson['scenes']}) == len(lesson['scenes']), 'Duplicate beat IDs')
         previous = 0.
         for beat, planned in zip(lesson['scenes'], plan['beats'], strict=True):
             require(re.fullmatch(r'[a-zA-Z0-9_-]+', beat['id']), 'Unsafe beat ID')
             require(beat['id'] == planned['id'], 'Beat order/IDs differ')
-            require(previous <= beat['start'] < beat['end'] <= lesson['duration'] + .01, 'Invalid beat timing')
+            require(finite(beat['start']) and finite(beat['end'])
+                    and previous <= beat['start'] < beat['end'] <= lesson['duration'] + .01, 'Invalid beat timing')
             previous = beat['end']
             cues = planned['cues']
             require(bool(cues), 'No sentence cues')
             require(norm(' '.join(c['text'] for c in cues)) == norm(beat['narration']), 'Sentence cues differ from narration')
+            previous_cue_end = beat['start']
             for cue in cues:
                 for field in ['text', 'concept', 'metaphor', 'elements', 'behavior', 'camera', 'next', 'silentMeaning', 'timingMethod', 'risks']:
                     require(bool(cue.get(field)), f'Missing cue field: {field}')
-                require(beat['start'] - .01 <= cue['start'] < cue['end'] <= beat['end'] + .01, 'Cue outside beat')
+                require(finite(cue['start']) and finite(cue['end'])
+                        and previous_cue_end <= cue['start'] < cue['end'] <= beat['end'] + .01, 'Sentence cues overlap, are unordered, or outside beat')
+                previous_cue_end = cue['end']
                 rows += 1
             if media:
                 words = beat.get('wordTimings', [])
                 require(bool(words), 'Final narration needs measured word boundaries')
-                require(norm(''.join(w['text'] for w in words)) == norm(beat['narration']), 'Measured words differ from narration')
+                check_words(beat['narration'], words)
                 for w in words:
                     require(beat['start'] <= w['start'] < w['end'] <= beat['end'] + .01, 'Word outside beat')
                     require(beat['narration'][w['charStart']:w['charEnd']].casefold() == w['text'].casefold(), 'Word source positions differ')
                 require(all(a['end'] <= b['start'] + .01 for a, b in zip(words, words[1:])), 'Word boundaries overlap')
                 require(all(c['timingMethod'].startswith('measured') for c in cues), 'Final cue timing remains estimated')
+                cursor = 0
+                for cue in cues:
+                    at = beat['narration'].find(cue['text'], cursor)
+                    require(at >= cursor, 'Cue is not an exact ordered source span')
+                    end = at + len(cue['text'])
+                    chosen = [w for w in words if w['charEnd'] > at and w['charStart'] < end]
+                    require(chosen and abs(cue['start'] - chosen[0]['start']) <= .01
+                            and abs(cue['end'] - chosen[-1]['end']) <= .01, 'Cue timing differs from measured words')
+                    cursor = end
         if not media:
             continue
         expected = norm(' '.join(b['narration'] for b in lesson['scenes']))
@@ -94,14 +113,20 @@ def validate(root, media=False):
         n, d = map(float, vs['r_frame_rate'].split('/'))
         require(abs(n / d - data['fps']) < .001, 'Video frame rate differs')
         require(vs['codec_name'] == 'h264' and audio['codec_name'] == 'aac', 'Unexpected final codecs')
-        require(abs(float(result['format']['duration']) - lesson['duration']) < 1 / data['fps'] + .15, 'Video duration differs')
+        tolerance = 1 / data['fps'] + .15
+        for stream, label in ((vs, 'Video'), (audio, 'Audio')):
+            require(abs(float(stream['duration']) - lesson['duration']) < tolerance, f'{label} stream duration differs')
+            require(abs(float(stream.get('start_time', 0))) < tolerance, f'{label} stream starts late')
+        require(abs(float(result['format']['duration']) - lesson['duration']) < tolerance, 'Container duration differs')
         decoded = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(video), '-f', 'null', '-'], capture_output=True)
         require(decoded.returncode == 0 and not decoded.stderr, 'Full media decode failed')
         videos.append({'id': lesson['id'], 'sha256': hashlib.sha256(video.read_bytes()).hexdigest(), 'decoded': True})
     js = (root / 'player/course-data.js').read_text().strip()
     require(js.startswith('window.COURSE = ') and js.endswith(';'), 'Malformed player data')
     require(json.loads(js[len('window.COURSE = '):-1]) == data, 'Player data is stale')
-    report = {'status': 'passed', 'lessons': len(lessons), 'sentenceCues': rows, 'sourceAndBeatCoverage': 'passed',
+    report = {'status': 'passed', 'lessons': len(lessons), 'sentenceCues': rows,
+              'textAndBeatCoverage': 'passed', 'sourceCoverageNotesPresent': True,
+              'factualSourceVerification': 'not evaluated by this tool',
               'mediaChecked': media, 'videos': videos,
               'sourceHashes': {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
                                for name in ['course.json', 'visual-beat-sheet/beat-sheet.json']},

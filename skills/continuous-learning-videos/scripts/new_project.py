@@ -16,7 +16,7 @@ def main():
     if target.exists():
         p.error(f'Refusing to overwrite existing path: {target}')
     source = Path(__file__).resolve().parent.parent / 'assets' / 'starter'
-    shutil.copytree(source, target)
+    shutil.copytree(source, target, ignore=shutil.ignore_patterns('node_modules', '__pycache__', '.DS_Store', '.env', '.env.*'))
     for folder in ['audio', 'transcripts', 'review', 'player/videos',
                    'player/posters', 'player/captions']:
         (target / folder).mkdir(parents=True, exist_ok=True)

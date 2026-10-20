@@ -26,3 +26,5 @@ jobs:
           npm install --prefix skills/continuous-learning-videos/assets/starter/production-source
       - name: Check resources and render the silent demonstration
         run: python3 scripts/check.py --render
+      - name: Check validation regressions and the isolated combined skill
+        run: python3 -m unittest discover -s tests -v

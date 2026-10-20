@@ -1,8 +1,8 @@
 # Learning Skills
 
-Two Codex skills for understanding organizations through stories and turning source material into narrated visual lessons.
+A combined Codex skill for turning a job URL into a sourced, narrated video learning course, built from the organization-first storyteller and continuous-video production methods.
 
-This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserves the installed skills as of October 20, 2026.
+This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow is now a private development draft; see [current scope and remaining release work](docs/combined-skill-status.md).
 
 | Skill | Purpose | Entry point |
 | --- | --- | --- |
@@ -11,7 +11,27 @@ This repository starts as a private development workspace. Changing its visibili
 
 The skills work independently. They can also form a workflow: research and write the learning series, then adapt the approved content into videos. Producing a series does not automatically authorize uploading its text to a speech service or publishing its videos.
 
-## Install and use
+## Combined skill draft
+
+The intended user experience is one installed **`$job-to-learning-videos`** skill: paste a job URL, then receive a hosted course with videos, captions, transcripts, sources, and practice questions. Narration and hosting need one-time service setup and applicable authorization. An inaccessible posting may require its text.
+
+Build the self-contained skill folder from the repository root, choosing a new output path:
+
+```sh
+python3 scripts/build_skill.py --output /absolute/path/job-to-learning-videos
+```
+
+Copy that complete generated folder into your personal Codex skills directory, reviewing any existing installation before replacement. It contains both methods and all bundled helpers; the original two skills do not need to be installed. The `packages/job-to-learning-videos/` folder is the source template and must be assembled before installation.
+
+Example invocation after installation:
+
+```text
+$job-to-learning-videos https://example.org/company/jobs/position
+```
+
+The agent performs research and creative authoring. The scripts maintain project evidence and checkpoints, validate media, and export the player; they do not independently research jobs, create bespoke animation, or deploy a site. Hosted completion requires a real successful hosting result. See the [entry point](packages/job-to-learning-videos/SKILL.md) and [workflow contract](packages/job-to-learning-videos/references/workflow.md).
+
+## Original standalone skills
 
 Clone this repository, then copy either complete folder from `skills/` into your personal Codex skills directory. In the environment where these skills were developed, that directory is `~/.codex/skills/`. Keep the folder name and all its references, scripts, assets, and metadata together. Review and back up an existing installation before replacing it.
 
@@ -56,6 +76,7 @@ Run the offline checks with Python and Node available:
 
 ```sh
 python3 scripts/check.py
+python3 -m unittest discover -s tests -v
 ```
 
 For the rendering check, install the starter's canvas dependency first, then run:

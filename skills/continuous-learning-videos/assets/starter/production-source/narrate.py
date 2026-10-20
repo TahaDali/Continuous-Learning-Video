@@ -8,16 +8,18 @@ import asyncio
 import hashlib
 import html
 import json
+import inspect
 from pathlib import Path
 import re
 import subprocess
 import wave
+from text_checks import check_words, exact_text
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def norm(text):
-    return re.sub(r'[^\w]', '', text).casefold()
+    return exact_text(text)
 
 
 def stamp(seconds, vtt=True):
@@ -41,8 +43,7 @@ def align(text, events):
                       'start': event['offset'] / 1e7,
                       'end': (event['offset'] + event['duration']) / 1e7})
         pos = at + len(token)
-    if not words or norm(''.join(w['text'] for w in words)) != norm(text):
-        raise ValueError('Measured word boundaries do not cover exact narration')
+    check_words(text, words)
     return words
 
 
@@ -52,6 +53,8 @@ def stem_for(lesson, beat):
 
 async def request(text, voice, rate, output):
     import edge_tts
+    if 'boundary' not in inspect.signature(edge_tts.Communicate).parameters:
+        raise ValueError('This edge-tts client lacks the required boundary option; use a compatible WordBoundary client before generating narration.')
     events = []
     temporary = output.with_suffix('.part.mp3')
     try:
@@ -100,6 +103,7 @@ def finalize(data, sheet, root, voice):
                 raw = f.readframes(f.getnframes())
             dur, head, tail = len(raw) / 48000, .18, .48
             measured = json.loads((cache / (stem + '.words.json')).read_text())['words']
+            check_words(beat['narration'], measured)
             if measured[-1]['end'] > dur + .03:
                 raise ValueError('Measured speech extends past decoded audio')
             beat.update(start=round(cur, 4), end=round(cur + head + dur + tail, 4),
@@ -187,10 +191,11 @@ async def main(args):
         signature = hashlib.sha256(json.dumps([args.voice, rate, beat['narration']]).encode()).hexdigest()
         async with sem:
             cached = json.loads(manifest.read_text()) if manifest.exists() else {}
-            if not mp3.exists() or mp3.stat().st_size < 100 or cached.get('signature') != signature:
+            regenerated = not mp3.exists() or mp3.stat().st_size < 100 or cached.get('signature') != signature
+            if regenerated:
                 words = await request(beat['narration'], args.voice, rate, mp3)
                 manifest.write_text(json.dumps({'signature': signature, 'voice': args.voice, 'rate': rate, 'words': words}, indent=2))
-            if not wav.exists() or wav.stat().st_mtime < mp3.stat().st_mtime:
+            if regenerated or not wav.exists() or wav.stat().st_mtime < mp3.stat().st_mtime:
                 subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(mp3), '-ar', '24000', '-ac', '1', '-c:a', 'pcm_s16le', str(wav)], check=True)
             print('Narration ready: ' + stem, flush=True)
     await asyncio.gather(*(make(l, s) for l in data['lessons'] for s in l['scenes']))
