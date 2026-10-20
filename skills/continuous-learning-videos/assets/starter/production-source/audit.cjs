@@ -7,7 +7,15 @@ for(const a of allowances)if(!a.lesson||!a.a||!a.b||!Number.isFinite(a.start)||!
 const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const report={method:'All output-frame timestamps; visible registered axis-aligned actor and label bounds after camera transform, plus label safe zones. Fully offscreen actors are ignored and actors may cross the clipped viewport. Excludes connector paths, glyph internals and raster/perceptual effects. Owner-contained labels are intentional.',fps:course.fps,sourceHashes:{},lessons:[],unresolvedPairs:0,totalFrames:0};
 for(const name of ['course.json','production-source/world.cjs','production-source/motion.cjs','production-source/intentional-overlaps.json'])report.sourceHashes[name]=sha(path.join(root,name));
-const framesDir=path.join(root,'review/flagged');fs.mkdirSync(framesDir,{recursive:true});
+const framesDir=path.join(root,'review/flagged');
+if(fs.existsSync(framesDir)&&fs.readdirSync(framesDir).length){
+  const history=fs.mkdtempSync(path.join(root,'review/audit-history-'));
+  const previous=path.join(root,'review/frame-audit.json');
+  if(fs.existsSync(previous))fs.copyFileSync(previous,path.join(history,'frame-audit.json'));
+  fs.renameSync(framesDir,path.join(history,'flagged'));
+  report.previousFindingsArchived=path.basename(history);
+}
+fs.mkdirSync(framesDir,{recursive:true});
 const intersects=(a,b)=>Math.min(a.x+a.w,b.x+b.w)>Math.max(a.x,b.x)&&Math.min(a.y+a.h,b.y+b.h)>Math.max(a.y,b.y);
 const inside=(a,b)=>a.x>=b.x&&a.y>=b.y&&a.x+a.w<=b.x+b.w&&a.y+a.h<=b.y+b.h;
 const c=createCanvas(course.width,course.height),g=c.getContext('2d');

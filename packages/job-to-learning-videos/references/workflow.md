@@ -16,7 +16,7 @@ One job URL initiates the full course after service setup. Give concise progress
 8. **package:** export a portable course player. Only explicit export assets belong in the hosted source, not the entire project directory.
 9. **delivery:** deploy through the available hosting provider and record its confirmed version, URL, audience, and package hash.
 
-`workflow.py record` requires the previous stages to be current. The status command checks the saved fingerprints and marks descendants stale after an upstream change. Script and visual-plan fingerprints ignore timing fields that narration legitimately updates; changing their wording or visual design still invalidates downstream work. Re-record from the changed stage after doing the affected work. Fingerprints describe file identity, not truth or comprehension.
+`workflow.py record` requires the previous stages to be current. The status command checks the saved fingerprints and marks descendants stale after an upstream change. The readable beat sheet is regenerated from canonical JSON when visuals and narration are checkpointed. Script and visual-plan fingerprints ignore timing fields that narration legitimately updates; changing their wording or visual design still invalidates downstream work. Re-record from the changed stage after doing the affected work. Fingerprints describe file identity, not truth or comprehension.
 
 ## Learning page
 

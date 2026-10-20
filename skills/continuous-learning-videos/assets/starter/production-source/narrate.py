@@ -182,7 +182,7 @@ async def main(args):
         await request(data['lessons'][0]['scenes'][0]['narration'], args.voice, args.rate, output)
         print(output)
         return
-    sem = asyncio.Semaphore(2)
+    sem = asyncio.Semaphore(args.concurrency)
 
     async def make(lesson, beat):
         stem = stem_for(lesson, beat)
@@ -193,7 +193,10 @@ async def main(args):
             cached = json.loads(manifest.read_text()) if manifest.exists() else {}
             regenerated = not mp3.exists() or mp3.stat().st_size < 100 or cached.get('signature') != signature
             if regenerated:
-                words = await request(beat['narration'], args.voice, rate, mp3)
+                try:
+                    words = await request(beat['narration'], args.voice, rate, mp3)
+                except Exception as error:
+                    raise RuntimeError(f'Narration failed for {stem} after bounded retries: {type(error).__name__}') from error
                 manifest.write_text(json.dumps({'signature': signature, 'voice': args.voice, 'rate': rate, 'words': words}, indent=2))
             if regenerated or not wav.exists() or wav.stat().st_mtime < mp3.stat().st_mtime:
                 subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(mp3), '-ar', '24000', '-ac', '1', '-c:a', 'pcm_s16le', str(wav)], check=True)
@@ -207,4 +210,6 @@ if __name__ == '__main__':
     parser.add_argument('--voice', required=True)
     parser.add_argument('--rate', default='-3%')
     parser.add_argument('--sample', action='store_true')
+    parser.add_argument('--concurrency', type=int, choices=range(1, 5), default=2,
+                        help='Bound simultaneous speech requests; cached blocks are reused')
     asyncio.run(main(parser.parse_args()))

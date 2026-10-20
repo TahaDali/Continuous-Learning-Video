@@ -9,7 +9,7 @@
 <nav id="lesson-list" aria-label="Lessons" hidden></nav>
 <article><p id="lesson-number"></p><h2 id="lesson-title" tabindex="-1"></h2><p id="goal"></p>
 <div class="video-wrap"><video id="video" controls playsinline preload="metadata" aria-label="Lesson video"></video></div>
-<p id="error" hidden>Playback could not start. Try the MP4 download or another browser.</p>
+<p id="error" role="alert" hidden>Playback could not start. Try the MP4 download or another browser.</p>
 <div class="controls"><button id="previous">← Previous</button><button id="next">Next →</button><label>Speed <select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label><button id="captions" aria-pressed="false">Captions off</button><button id="complete" aria-pressed="false">Mark complete</button></div>
 <p><a id="download-video" download>Download MP4</a> · <a id="download-captions" download>Download captions</a></p>
 <section id="practice" aria-label="Practice question" hidden><h3 id="question"></h3><div id="answers"></div><p id="feedback" role="status" aria-live="polite"></p></section>

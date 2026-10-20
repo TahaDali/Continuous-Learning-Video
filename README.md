@@ -2,7 +2,7 @@
 
 A combined Codex skill for turning a job URL into a sourced, narrated video learning course, built from the organization-first storyteller and continuous-video production methods.
 
-This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow is now a private development draft; see [current scope and remaining release work](docs/combined-skill-status.md).
+This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow has completed one real job-to-private-course trial and remains a private development draft; see [current scope and remaining release work](docs/combined-skill-status.md).
 
 | Skill | Purpose | Entry point |
 | --- | --- | --- |

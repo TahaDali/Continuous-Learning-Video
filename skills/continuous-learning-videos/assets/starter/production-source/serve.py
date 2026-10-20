@@ -30,8 +30,10 @@ class RangeHandler(http.server.SimpleHTTPRequestHandler):
                 if remaining is not None:remaining-=len(data)
         except (BrokenPipeError,ConnectionResetError):pass
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--port',type=int,default=8766);ap.add_argument('--open',action='store_true');a=ap.parse_args()
-    server=http.server.ThreadingHTTPServer(('127.0.0.1',a.port),functools.partial(RangeHandler,directory=str(P)))
+    ap=argparse.ArgumentParser();ap.add_argument('--port',type=int,default=8766);ap.add_argument('--open',action='store_true');ap.add_argument('--directory',type=pathlib.Path,default=P);a=ap.parse_args()
+    directory=a.directory.expanduser().resolve()
+    if not (directory/'index.html').is_file():ap.error('Player directory must contain index.html')
+    server=http.server.ThreadingHTTPServer(('127.0.0.1',a.port),functools.partial(RangeHandler,directory=str(directory)))
     url=f'http://127.0.0.1:{server.server_address[1]}'
     print(f'Course player: {url}',flush=True)
     if a.open:webbrowser.open(url)

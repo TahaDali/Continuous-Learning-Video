@@ -18,16 +18,24 @@ The validation defects demonstrated in review have been corrected: comparisons r
 
 Regression tests use explicitly synthetic fixtures and silent PCM; they make no speech, research, or hosting requests. They exercise changed quantities, missing signs, permitted sentence punctuation, overlapping cues, missing coverage, complete and truncated audio, isolated skill assembly, missing upstream stages, changed research, uncovered requirements, export privacy, and changed-package detection. The 12-second mechanical visual example is separately rendered, audited at all 288 output-frame timestamps, and decoded.
 
-These tests do not establish the factual accuracy of a real employer course, voice quality, engaging motion design, learner understanding, service availability, or hosted delivery. The earlier Chamber and Axios course acceptance limits remain unchanged. The installed personal skills have not been overwritten by these repository changes.
+These synthetic tests do not establish factual accuracy, voice quality, engaging motion design, learner understanding, service availability, or hosted delivery. A separate real Axios trial is now recorded below. Earlier course acceptance limits remain unchanged. The installed personal skills have not been overwritten by these repository changes.
 
 A local browser spot check of the silent synthetic fixture confirmed the job context, visible review limitation, practice-question feedback, source link and fiction label, and caption-control state. This was a desktop interaction check, not a full mobile accessibility audit, listening review, or synchronized course viewing.
 
+## Real job-to-private-course trial
+
+The combined bundle was exercised on Axios Staff Software Engineer posting 8229298 on October 20, 2026. The resulting owner-private Site contains 18 narrated lessons in six sections, 30:35 of measured runtime, captions, transcripts, lesson sources, and practice questions. Research maps 32 posting requirements to 18 objectives. All workflow stages, including package identity and confirmed private deployment, are recorded. The authenticated desktop browser played a captioned video from the deployed Site. Access remained one owner, zero groups and zero external visitors.
+
+The run found and fixed stale readable timing sheets, false upstream invalidation after measured timings, text wrapping and shape-interior collisions, stale audit screenshots, insufficient speech-failure context, and exported-player preview support. Fifteen regression tests pass. All 18 final media files decode and pass duration checks; all 44,052 registered output-frame timestamps pass the geometry audit without overlap exemptions. Source and actual encoded-frame review remain distinct from that mechanical audit.
+
+Full perceptual listening is unavailable in this review environment. Full synchronized viewing, complete silent viewing, mobile-device checks and learner testing remain pending. The hosted page visibly identifies itself as a review edition. See the [sanitized trial report](e2e-axios-8229298.md) for exact coverage and limitations; private course media and Site identity are kept outside this repository.
+
 ## Remaining before public release
 
-- Run the combined skill from a clean installation on contrasting real job postings, including an internship and an inaccessible-posting recovery case. Capture research, output artifacts, interruptions, and actual completion.
-- Expand the authored mechanism examples beyond the single conserved transfer, while allowing bespoke subject-specific worlds. Assess explanation quality rather than counting decorative motion.
-- Configure and exercise the intended narration provider with explicit authorization. The optional bundled Edge client is distinct from Azure Speech. Complete perceptual listening and synchronized viewing of representative courses.
-- Exercise native private hosting with the exported package, confirm the deployed version, and test mobile and desktop playback, captions, sources, questions, keyboard operation, and resume behavior.
-- Validate source support and role coverage editorially, review all public-facing example provenance and repository history, and select a license.
+- Run from a clean machine or installation with contrasting roles, including an internship and an inaccessible-posting recovery case. This trial reused working local rendering and speech dependencies.
+- Complete full perceptual listening and synchronized viewing of the real course, then correct any pronunciation, pacing, timing or instructional problems found. The speech endpoint required a cached retry during this run.
+- Assess whether the 18 authored graphical mechanisms explain the subject without narration. Complete silent viewing and learner comprehension checks; geometry and frame samples cannot establish this.
+- Test mobile-device playback, fullscreen diagram legibility and a full accessibility pass. Desktop navigation, captions, transcript jumps, source presentation, question feedback, keyboard activation and saved completion were spot checked.
+- Review example provenance and complete repository history, choose a license, and specify supported tool/service environments before promising reliable job-link-only completion to new users.
 
-The combined bundle is a usable development draft for agent-driven authoring. It is not yet a validated promise that every job URL automatically yields a production-quality hosted course. A skill coordinates available tools and authored work; the current bundle does not include a general animation compiler, speech-service account, or hosting service.
+The combined bundle is a usable private development draft with one confirmed real hosted trial. It is not yet a validated promise that every job URL automatically yields a production-quality hosted course. A skill coordinates available tools and authored work; the current bundle does not include a general animation compiler, speech-service account, or hosting service.

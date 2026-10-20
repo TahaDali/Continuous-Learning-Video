@@ -92,6 +92,8 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.assertEqual(self.workflow.state(self.root)[1]['script'], 'completed')
         self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'completed')
         self.workflow.record(self.root, 'narration')
+        self.assertIn('measured synthetic fixture', (self.root / 'visual-beat-sheet/beat-sheet.md').read_text())
+        self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'completed')
         env = dict(os.environ)
         if not env.get('CANVAS_MODULE'):
             env['CANVAS_MODULE'] = str(ROOT / 'skills/continuous-learning-videos/assets/starter/production-source/node_modules/@napi-rs/canvas')

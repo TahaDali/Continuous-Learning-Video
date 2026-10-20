@@ -35,6 +35,18 @@ function createStage(g,course,camera={x:640,y:340,zoom:1}) {
     g.save();g.strokeStyle=color;g.lineWidth=width;g.lineCap='round';g.beginPath();
     points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();g.restore();
   }
-  return {g,actor,label,edge,finish(invariants={}){g.restore();return {items,safe,viewport,invariants};}};
+  function wrappedLabel(id,text,x,y,{maxWidth,size=24,lineHeight=size*1.4+2,weight=600,...options}={}) {
+    if(!Number.isFinite(maxWidth)||maxWidth<=0||lineHeight<size*1.3)throw new Error('Invalid label width or line spacing');
+    const lines=[];let line='';g.save();g.font=`${weight} ${size}px Arial`;
+    for(const word of String(text).split(/\s+/)) {
+      if(g.measureText(word).width>maxWidth){g.restore();throw new Error('Label word exceeds authored width: '+id);}
+      const candidate=(line+' '+word).trim();
+      if(line&&g.measureText(candidate).width>maxWidth){lines.push(line);line=word;}else line=candidate;
+    }
+    if(line)lines.push(line);g.restore();
+    lines.forEach((value,i)=>label(id+'-'+i,value,x,y+(i-(lines.length-1)/2)*lineHeight,{size,weight,...options}));
+    return {lines,height:Math.max(0,lines.length-1)*lineHeight+size*1.3};
+  }
+  return {g,actor,label,wrappedLabel,edge,finish(invariants={}){g.restore();return {items,safe,viewport,invariants};}};
 }
 module.exports={palette,clamp,mix,smooth,progress,createStage};

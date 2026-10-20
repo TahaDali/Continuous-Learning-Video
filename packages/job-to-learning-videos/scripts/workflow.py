@@ -139,6 +139,9 @@ def strip_timing(value):
 
 
 def digest(path, stage=None):
+    if stage == 'visuals' and path.name == 'beat-sheet.md':
+        # This companion is derived from canonical JSON, including measured timing.
+        return digest(path.with_name('beat-sheet.json'), stage)
     if stage in {'script', 'visuals'} and path.name in {'course.json', 'beat-sheet.json'}:
         payload = json.dumps(strip_timing(read(path)), sort_keys=True, ensure_ascii=False).encode()
     else:
@@ -193,7 +196,9 @@ def record(root, stage):
         require([l['id'] for l in course['lessons']] == [l['id'] for l in plan['lessons']], 'Runtime lessons differ from curriculum')
     if stage == 'visuals':
         validator(root)
+        refresh_sheet(root)
     if stage == 'narration':
+        refresh_sheet(root)
         for lesson in course['lessons']:
             require(all(beat.get('wordTimings') for beat in lesson['scenes']), 'Narration needs measured words')
             artifacts += [f"audio/{lesson['id']}.wav", f"player/captions/{lesson['id']}.srt", f"player/captions/{lesson['id']}.vtt"]
@@ -229,6 +234,13 @@ def record(root, stage):
     data['stages'][stage] = {'recordedAt': now(), 'fingerprints': {name: digest(root / name, stage) for name in artifacts}}
     write(root / 'project.json', data)
     return state(root)[1]
+
+
+def refresh_sheet(root):
+    spec = importlib.util.spec_from_file_location('readable_beat_sheet', SKILL / 'scripts/write_beat_sheet.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.write_sheet(root)
 
 
 def acceptance(root):

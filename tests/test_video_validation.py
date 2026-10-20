@@ -74,6 +74,51 @@ class VideoValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'source coverage'):
             VALIDATOR.validate(self.root)
 
+    def test_wrapped_labels_use_measured_nonoverlapping_lines(self):
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
+            if not module.exists():
+                self.skipTest('Canvas dependency not installed')
+            env['CANVAS_MODULE'] = str(module)
+        script = """
+const {createCanvas}=require(process.env.CANVAS_MODULE);
+const {createStage}=require(process.argv[1]);
+const g=createCanvas(1280,720).getContext('2d'),s=createStage(g,{width:1280,height:720});
+s.actor('owner',{x:550,y:290,w:180,h:100},()=>{});
+s.wrappedLabel('wrapped','Reliable correction delivery',640,340,{maxWidth:156,size:23,owner:'owner'});
+const result=s.finish(),labels=result.items.filter(x=>x.kind==='label');
+if(labels.length!==3)throw Error('Unexpected measured wrapping');
+for(let i=1;i<labels.length;i++)if(labels[i-1].bounds.y+labels[i-1].bounds.h>labels[i].bounds.y)throw Error('Lines overlap');
+for(const item of labels)if(item.bounds.x<550||item.bounds.x+item.bounds.w>730||item.bounds.y<290||item.bounds.y+item.bounds.h>390)throw Error('Label escaped authored bounds');
+"""
+        subprocess.run(['node', '-e', script, str(self.root / 'production-source/motion.cjs')], env=env, check=True, capture_output=True)
+
+    def test_fresh_audit_archives_previous_flagged_findings(self):
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
+            if not module.exists():
+                self.skipTest('Canvas dependency not installed')
+            env['CANVAS_MODULE'] = str(module)
+        self.data['lessons'] = [dict(id='01', duration=1 / self.data['fps'])]
+        self.save()
+        (self.root / 'production-source/world.cjs').write_text(
+            "exports.draw=()=>({items:[],viewport:{x:0,y:0,w:1280,h:720},safe:{x:0,y:0,w:1280,h:720}});")
+        flagged = self.root / 'review/flagged'
+        flagged.mkdir(parents=True)
+        (flagged / 'previous.png').write_bytes(b'previous evidence')
+        (self.root / 'review/frame-audit.json').write_text('{"unresolvedPairs": 1}')
+        subprocess.run(['node', str(self.root / 'production-source/audit.cjs')],
+                       env=env, check=True, capture_output=True)
+        report = json.loads((self.root / 'review/frame-audit.json').read_text())
+        self.assertEqual(report['unresolvedPairs'], 0)
+        self.assertEqual(report['totalFrames'], 1)
+        history = self.root / 'review' / report['previousFindingsArchived']
+        self.assertEqual((history / 'flagged/previous.png').read_bytes(), b'previous evidence')
+        self.assertEqual(json.loads((history / 'frame-audit.json').read_text())['unresolvedPairs'], 1)
+        self.assertEqual(list(flagged.iterdir()), [])
+
     def media_fixture(self, audio_seconds):
         from media_fixture import media_fixture
         media_fixture(self, audio_seconds)
