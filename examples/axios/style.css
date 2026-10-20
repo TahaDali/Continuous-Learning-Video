@@ -4,3 +4,5 @@
 
 /* Preserve the original course's title treatment inside the newer player. */
 #course-title span{color:#637a7b}.notes p,.notes li{max-width:88ch}.notes p{color:var(--muted)}
+
+#answers button[aria-pressed="true"]{border-color:var(--green);background:var(--soft);box-shadow:inset 3px 0 var(--green)}.reflection{margin-top:20px;padding-top:6px;border-top:1px solid var(--line);color:var(--muted)}

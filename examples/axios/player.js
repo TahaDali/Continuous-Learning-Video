@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const originalCourse=window.COURSE;
-const D={...originalCourse,language:'en',storageKey:'axios-motion-v1',lessons:originalCourse.lessons.map(l=>({...l,part:`Chapter ${l.module} · ${l.moduleTitle}`}))},$=id=>document.getElementById(id),v=$('video');
+const D={...originalCourse,language:'en',storageKey:'axios-motion-v1',lessons:originalCourse.lessons.map(l=>({...l,...window.COURSE_PRACTICE?.[l.id],part:`Chapter ${l.module} · ${l.moduleTitle}`}))},$=id=>document.getElementById(id),v=$('video');
 document.documentElement.lang=D.language;
 if($('skip-lesson'))$('skip-lesson').onclick=event=>{event.preventDefault();$('lesson-title').focus({preventScroll:true});$('lesson-title').scrollIntoView({block:'start'});};
 let state={done:[],positions:{},lesson:D.lessons[0].id,speed:1,captions:false};
@@ -62,7 +62,17 @@ if(D.objectives?.length){$('objectives-panel').hidden=false;for(const text of D.
 if(Array.isArray(D.glossary)&&$('glossary')){for(const item of D.glossary){if(!item||typeof item.term!=='string'||!item.term.trim()||typeof item.definition!=='string'||!item.definition.trim())continue;const term=document.createElement('dt'),definition=document.createElement('dd');term.textContent=item.term;definition.textContent=item.definition;$('glossary').append(term,definition);}if($('glossary').children.length)$('glossary-panel').hidden=false;}
 if(D.reviewVersion||Object.values(D.review||{}).some(r=>r.status==='failed')){const names={content:'Content review',listening:'Full listening',synchronizedViewing:'Audio and video review',silentInspection:'Silent visual review'},short={content:'content',listening:'listening',synchronizedViewing:'audio/video',silentInspection:'silent review'},entries=Object.entries(D.review||{}),limits=entries.filter(([,r])=>r.status!=='completed'),failed=entries.some(([,r])=>r.status==='failed');$('review-band').hidden=false;$('review-band').dataset.failed=String(failed);$('review-status').textContent=(failed?'Review issue':'Review edition')+(limits.length?' · '+limits.map(([key,r])=>`${short[key]||key} ${r.status}`).join(' · '):' · see coverage');for(const [key,r] of entries){const li=document.createElement('li');li.textContent=`${names[key]||key}: ${r.status}. ${r.coverage||'No coverage recorded.'}`+(r.reviewer?` Reviewer: ${r.reviewer}.`:'');$('review-coverage').append(li);}}
 function lessonSources(l){$('evidence-kinds').textContent=l.module===1?'Company context and conceptual explanation. Atlantic Technology and all teaching characters are fictional.':l.module===2?'Illustrative advertiser case. All customer names, prices, campaign figures, and results are invented for teaching.':l.module===3?'Conceptual Salesforce examples. These are fictional records and configurations, not Axios screens or disclosed internal procedures.':l.module===4?'Published role requirements plus simulated candidates, interviews, and assessments. No hiring outcome is promised.':'Illustrative first-year journey. Dates, colleagues, projects, results, and reviews are not an official Axios schedule or career ladder.';$('evidence-kinds').hidden=false;}
-function practice(l){$('practice').hidden=!l.check;if(!l.check)return;$('question').textContent=l.check.question;$('reflection-prompt').textContent=l.check.prompt;}
+function practice(l){
+ const valid=typeof l.question==='string'&&Array.isArray(l.options)&&l.options.length>1&&Number.isInteger(l.answer)&&l.answer>=0&&l.answer<l.options.length;
+ $('practice').hidden=!valid&&!l.check;$('question').textContent=valid?l.question:'';$('answers').replaceChildren();$('feedback').textContent='';
+ $('reflection-question').textContent=l.check?.question||'';$('reflection-prompt').textContent=l.check?.prompt||'';
+ if(!valid)return;
+ for(const [i,text] of l.options.entries()){
+  const b=document.createElement('button');b.type='button';b.textContent=text;b.setAttribute('aria-pressed','false');
+  b.onclick=()=>{for(const option of $('answers').children)option.setAttribute('aria-pressed',String(option===b));const correct=i===l.answer,detail=l.optionFeedback?.[i]||l.explanation||'';$('feedback').textContent=(correct?'Correct. ':'Try again. ')+detail;};
+  $('answers').append(b);
+ }
+}
 function cc(){for(const t of v.textTracks)t.mode=state.captions?'showing':'hidden';$('captions').textContent=state.captions?'Captions on':'Captions off';$('captions').setAttribute('aria-pressed',String(state.captions));}
 function progress(){const done=state.done.includes(D.lessons[current].id),summary=`${state.done.length} / ${D.lessons.length} complete`;$('complete').textContent=done?'Completed ✓':'Mark complete';$('complete').setAttribute('aria-pressed',String(done));$('completion').textContent=summary;$('completion-summary').textContent=summary;$('course-progress').max=D.lessons.length;$('course-progress').value=state.done.length;for(const [id,row] of lessonRows){const complete=state.done.includes(id);row.button.dataset.done=String(complete);row.button.setAttribute('aria-current',String(id===D.lessons[current].id));row.button.setAttribute('aria-label',row.description+(complete?', completed':''));row.check.textContent=complete?'✓':'';}}
 function load(index,focus=false,remember=true){
