@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2026-10-20
 
 - Bring the historical example’s mobile controls, transcript shortcut, keyboard exercise selection, visible focus, modal focus handling and accessibility labels into the reusable player.
 - Generate a responsive HTML beat sheet with named keyboard-scrollable tables and column headers alongside the existing Markdown output.
