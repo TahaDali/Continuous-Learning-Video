@@ -4,7 +4,7 @@
 
 The starter uses Python 3, Node.js, FFmpeg/FFprobe and `@napi-rs/canvas`. Use available bundled runtimes first. Otherwise install dependencies within the task workspace, not into unrelated global environments. `CANVAS_MODULE` may point to a known local canvas package. The package records a tested canvas version; check installed interfaces before changing versions.
 
-`new_project.py` refuses to overwrite an existing directory. By default it creates an empty authoring project with a world that throws until subject scenes are implemented. Pass `--demo` only to create the separate 12-second mechanical example for learning the tooling or running tests. It creates:
+`new_project.py` refuses to overwrite an existing directory. By default it creates an empty authoring project with a world that throws until subject scenes are implemented. Pass `--demo` only to create the separate 12-second mechanical example for learning the tooling or running tests. Pass `--design-demo` to install the fictional design-system example: a 70-second lesson with its world, full beat sheet and scene-scoped overlap rules. It creates:
 
 ```text
 course.json                  Adapted narration and measured timing
@@ -28,6 +28,8 @@ node production-source/audit.cjs
 Silent previews deliberately go to `review/silent/`, not final `player/videos/`. They are not final narrated deliverables. The example is 12 seconds for inexpensive mechanical testing; production lesson lengths follow the user's brief.
 
 The renderer calls `world.draw(context, lesson, time, course)` at each actual frame timestamp. It uses backpressure while streaming pixels to FFmpeg and fails when an unsupported visual is requested. Extend the authored world with subject-specific functions; do not silently fall back to the sample for unimplemented lessons. `motion.cjs` provides camera transforms, object/label bounds and simple primitives. The stage includes `wrappedLabel` with measured font widths and explicit line spacing; its returned height helps choose an owner box before rendering. Extend those helpers when shapes, clipping or typography require it. The sample preserves objects across time and transfers a visible quantity between containers.
+
+`design.cjs` and `templates.cjs` provide the shared design system described in [design system](design-system.md): tokens, type roles, cue lookup, camera keyframes, an auditable stage, annotation strokes, transitions and teaching templates. When a world imports `design.cjs`, the renderer, posters and audit install the loaded canvas module into it with `installDesignRuntime`, which registers the bundled fonts; drawing fails if that has not happened rather than falling back to system fonts. Source discovery adds `production-source/fonts/*.ttf` to the render identity whenever `design.cjs` is discovered, so fonts need no `renderSources` entry. Frames drawn inside `S.transition(...)` are counted in the audit's per-lesson `transitionFrames`. An intentional-overlap rule may name a `scene` instead of `start` and `end`, so it follows narration-driven re-timing.
 
 `illustrations.cjs` supplies original parameterized people, publications, browsers, phones, envelopes, buildings and clocks. Call `createIllustration(stage)` to register their glyphs and labels with the existing geometry audit. These conventional forms are a starting vocabulary; author the real subject's missing objects and causal behavior. They do not constitute a complete lesson world, and glyph internals and connector paths still require visual inspection.
 

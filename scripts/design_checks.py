@@ -2,8 +2,16 @@
 import hashlib
 import json
 import math
+import re
 import subprocess
 from pathlib import Path
+
+# Shared system modules own their palettes and faces; authored modules use their tokens and roles.
+SYSTEM_MODULES = {'production-source/design.cjs', 'production-source/templates.cjs', 'production-source/motion.cjs',
+                  'production-source/illustrations.cjs', 'production-source/finite-canvas.cjs',
+                  'production-source/render-sources.cjs'}
+HEX_COLOUR = re.compile(r'''['"`]#[0-9a-fA-F]{3,8}['"`]''')
+FONT_CHOICE = re.compile(r'''\.font\s*=|registerFromPath|font-family|\d+px\s+['"]?[A-Za-z]''')
 
 
 def need(value, message):
@@ -99,6 +107,33 @@ def script(root, lessons):
     return ['narrative-map.json', 'review/editorial.json']
 
 
+def render_sources(root):
+    helper = Path(__file__).resolve().parent.parent / 'assets/starter/production-source/render-sources.cjs'
+    result = subprocess.run(['node', str(helper), str(root)], capture_output=True, text=True)
+    need(result.returncode == 0, 'Render dependency discovery failed: ' + result.stderr.strip())
+    return set(json.loads(result.stdout))
+
+
+def design_token_findings(root, sources=None):
+    """List authored lines that bypass design.cjs tokens or type roles.
+
+    Applies only when the render sources include design.cjs; worlds built directly on
+    motion.cjs keep their own palette. This is a guardrail for literal hex colours and font
+    choices, not a style analyser: computed colours and rgba() shadows are not inspected.
+    """
+    sources = render_sources(root) if sources is None else sources
+    if 'production-source/design.cjs' not in sources:
+        return []
+    findings = []
+    for name in sorted(sources):
+        if name in SYSTEM_MODULES or not name.endswith(('.cjs', '.js')):
+            continue
+        for number, line in enumerate((root / name).read_text().splitlines(), 1):
+            if not line.lstrip().startswith('//') and (HEX_COLOUR.search(line) or FONT_CHOICE.search(line)):
+                findings.append(f'{name}:{number}')
+    return findings
+
+
 def visuals(root, lessons):
     design = read(root, 'visual-design.json')
     mechanisms = named(design.get('mechanisms'), 'visual mechanisms')
@@ -122,11 +157,11 @@ def visuals(root, lessons):
     prose(review.get('reviewer'), 'prototype reviewer')
     world = root / 'production-source/world.cjs'
     need(review.get('worldSha256') == hashlib.sha256(world.read_bytes()).hexdigest(), 'Prototype review is stale after a world change')
-    helper = Path(__file__).resolve().parent.parent / 'assets/starter/production-source/render-sources.cjs'
-    result = subprocess.run(['node', str(helper), str(root)], capture_output=True, text=True)
-    need(result.returncode == 0, 'Render dependency discovery failed: ' + result.stderr.strip())
-    expected = set(json.loads(result.stdout))
+    expected = render_sources(root)
     need(set(review.get('sourceHashes', {})) == expected, 'Prototype review needs the complete discovered render source identity')
+    findings = design_token_findings(root, expected)
+    need(not findings, 'Design-system world hard-codes colour or type; use T tokens (extendTheme for subject colours) '
+         'and TYPE roles: ' + ', '.join(findings[:8]))
     for name, value in review['sourceHashes'].items():
         source = root / name
         need(root.resolve() in source.resolve().parents and source.is_file() and not source.is_symlink(), 'Invalid render dependency')

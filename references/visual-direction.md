@@ -25,6 +25,10 @@ The starter's `production-source/illustrations.cjs` provides original parameteri
 
 Use a hierarchy of context, active mechanism and outcome. Scale and position encode relationships. Keep enough context to understand why the active detail matters, and zoom only when it reveals something. Empty travel, excessive text containers and crowded detail are different failures; filling space is not the objective. A sparse two-object explanation can be right when it teaches the complete relationship, but it cannot replace a richer operating scene that the narration actually requires.
 
+## Stage it with the design system
+
+[The design system](video/design-system.md) supplies the shared typographic hierarchy, colour meaning, motion timing, camera language and transitions; the subject supplies the objects and the mechanism. Frame the consequential scene with its templates: an opener with an agenda, one kinetic claim whose emphasised value is carried into the mechanism, a compare or line story that isolates what changed against what held, a stepper for a procedure, and a question on the night background. Keep templates subordinate to the scene they frame. Adapting to a user's reference changes the tokens and roles in one place; it does not justify per-scene fonts, colours or ad hoc easing.
+
 ## Animate the cause
 
 Construction, movement and transformations must respond to the explanation. Draw a path as a relationship becomes relevant; send the same identifiable object across it; show the actual blocked transition, changed value, split obligation or failed hypothesis. Retain the rejected state or relevant history when it explains the correction. Do not color a unit as failed before the test occurs or replace an unresolved obligation with a success label.

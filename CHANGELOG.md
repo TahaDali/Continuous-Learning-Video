@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Add a shared design system for explanatory motion: `design.cjs` provides colour tokens, type roles, easing, narration cue lookup, camera keyframes, an auditable stage, hand-drawn annotations, rolling counters, focus dimming and motivated pan, iris and wipe transitions.
+- Add `templates.cjs` teaching templates: opener with agenda, kinetic statement, carry, compare, line story, stepper, retrieval question and progress rail. Templates take narration cue times and report a `fit-<template>` audit failure when the spoken span is too short.
+- Bundle Inter, Instrument Serif and JetBrains Mono under the SIL Open Font License; the renderer, posters and audit register them, and source discovery includes them in the render identity.
+- Add `new_project.py --design-demo`, a fictional cue-driven 70-second example with a complete beat sheet; `check.py --render` renders, audits and decodes it alongside the mechanical example.
+- Report per-lesson transition frames in the frame audit, allow scene-scoped intentional-overlap rules, and reject hard-coded colours and fonts in design-system worlds during visual checks.
+- Document the system in `references/video/design-system.md` and connect it to the skill, visual direction, beat-sheet and production guidance.
+
 ## 1.1.0 - 2026-10-20
 
 - Bring the historical example’s mobile controls, transcript shortcut, keyboard exercise selection, visible focus, modal focus handling and accessibility labels into the reusable player.

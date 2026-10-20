@@ -1,0 +1,73 @@
+{
+  "id": "01",
+  "title": "A conserved transfer — design-system demonstration",
+  "goal": "See how a transfer changes balances while conserving the total, staged with the design system.",
+  "coverage": "Self-contained fictional demonstration; replace for production.",
+  "visual": "designed-transfer",
+  "duration": 71.543,
+  "scenes": [
+    {
+      "id": "open",
+      "headline": "Money moves",
+      "narration": "Money moves. It doesn't vanish. To see why, we will find the total, follow the quantity, and check the balance.",
+      "start": 0.0,
+      "end": 8.352,
+      "speechStart": 0.18,
+      "speechEnd": 7.872
+    },
+    {
+      "id": "claim",
+      "headline": "One fixed total",
+      "narration": "Two accounts share one fixed total of 150 units. Hold on to that number.",
+      "start": 8.352,
+      "end": 14.397,
+      "speechStart": 8.532,
+      "speechEnd": 13.917
+    },
+    {
+      "id": "transfer",
+      "headline": "Follow the quantity",
+      "narration": "Account A holds 100 units, and Account B holds 50. Now ten units leave Account A. While they travel, they are still counted: ten in transit. Then they arrive in Account B, and the total never changed. It is still 150.",
+      "start": 14.397,
+      "end": 30.826,
+      "speechStart": 14.577,
+      "speechEnd": 30.346
+    },
+    {
+      "id": "contrast",
+      "headline": "Changed and conserved",
+      "narration": "Compare before and after. The balances changed: A fell to 90, and B rose to 60. The total did not. Check the total before you trust the movement.",
+      "start": 30.826,
+      "end": 42.255,
+      "speechStart": 31.006,
+      "speechEnd": 41.775
+    },
+    {
+      "id": "series",
+      "headline": "Four transfers later",
+      "narration": "Repeat that four times. Four transfers later, the balances have swung up and down, but the total line stays flat at 150.",
+      "start": 42.255,
+      "end": 51.377,
+      "speechStart": 42.435,
+      "speechEnd": 50.897
+    },
+    {
+      "id": "method",
+      "headline": "Three steps",
+      "narration": "Here is the method. Read any transfer in three steps. First, find the total. Next, follow the moving quantity. Last, check the balance.",
+      "start": 51.377,
+      "end": 60.883,
+      "speechStart": 51.557,
+      "speechEnd": 60.403
+    },
+    {
+      "id": "check",
+      "headline": "Check yourself",
+      "narration": "Check yourself. If 25 units move from B to A, what is the total? Pause and think. Still 150. Moving units changes balances, not the total.",
+      "start": 60.883,
+      "end": 71.543,
+      "speechStart": 61.063,
+      "speechEnd": 71.063
+    }
+  ]
+}

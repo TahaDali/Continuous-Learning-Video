@@ -1,0 +1,640 @@
+{
+  "lessons": [
+    {
+      "id": "01",
+      "beats": [
+        {
+          "id": "open",
+          "design": {
+            "template": "opener",
+            "region": "R1",
+            "transitionIn": "none (cold open)",
+            "emphasis": "It doesn't vanish.",
+            "focus": "Display title, then the serif accent; agenda chips become the progress rail.",
+            "triggers": {
+              "title": "Money",
+              "accent": "It",
+              "agenda": [
+                "find",
+                "follow",
+                "check"
+              ]
+            }
+          },
+          "cues": [
+            {
+              "text": "Money moves.",
+              "concept": "A transfer is a movement of an existing quantity.",
+              "metaphor": "A heavy display headline that rises into place.",
+              "elements": [
+                "Kicker",
+                "Display title"
+              ],
+              "behavior": "The title words rise on their spoken cues.",
+              "camera": "Locked wide frame on R1 with a slow push-in.",
+              "next": "The serif accent qualifies the claim.",
+              "silentMeaning": "Something moves.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Display title must clear the kicker above it."
+              ],
+              "start": 0.18,
+              "end": 1.042
+            },
+            {
+              "text": "It doesn't vanish.",
+              "concept": "Movement does not destroy the quantity.",
+              "metaphor": "A serif-italic accent line in the accent colour, underlined by hand.",
+              "elements": [
+                "Accent line",
+                "Hand-drawn underline"
+              ],
+              "behavior": "The accent resolves from blur, then an underline draws under the last word.",
+              "camera": "Hold the wide frame.",
+              "next": "The agenda turns the promise into three steps.",
+              "silentMeaning": "Whatever moves still exists.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Underline must not touch the agenda chips."
+              ],
+              "start": 1.042,
+              "end": 2.272
+            },
+            {
+              "text": "To see why, we will find the total, follow the quantity, and check the balance.",
+              "concept": "The lesson has three checkable steps.",
+              "metaphor": "Agenda chips that later persist as a progress rail.",
+              "elements": [
+                "Three agenda chips"
+              ],
+              "behavior": "Each chip pops on its spoken verb.",
+              "camera": "Hold; the opener lifts away at the scene end.",
+              "next": "The first step, the total, becomes a full-screen claim.",
+              "silentMeaning": "There are three steps in order.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Chips must fit the safe zone on one row."
+              ],
+              "start": 2.272,
+              "end": 7.872
+            }
+          ]
+        },
+        {
+          "id": "claim",
+          "design": {
+            "template": "statement + carry",
+            "region": "R1",
+            "transitionIn": "opener lift-out",
+            "emphasis": "150",
+            "focus": "Ghost sentence fills as spoken; a gold highlighter marks 150, which then travels into the total badge.",
+            "triggers": {
+              "mark": "150",
+              "carry": "hold"
+            }
+          },
+          "cues": [
+            {
+              "text": "Two accounts share one fixed total of 150 units.",
+              "concept": "Two balances contribute to one conserved total.",
+              "metaphor": "A ghosted sentence that fills in as it is spoken.",
+              "elements": [
+                "Ghost sentence",
+                "Highlighter on 150"
+              ],
+              "behavior": "Words fill on their cues; the highlighter sweeps under 150.",
+              "camera": "Centred, still frame.",
+              "next": "The highlighted number is carried into the next scene.",
+              "silentMeaning": "The important number is 150.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Highlighter must contain its word."
+              ],
+              "start": 8.532,
+              "end": 12.143
+            },
+            {
+              "text": "Hold on to that number.",
+              "concept": "The total is the reference for everything that follows.",
+              "metaphor": "The emphasised number physically travels to its new home.",
+              "elements": [
+                "Carried 150",
+                "Total badge"
+              ],
+              "behavior": "The sentence fades while 150 flies to the badge; the badge pops when it lands.",
+              "camera": "Slight push-in releases as the badge lands.",
+              "next": "The badge stays on screen above the accounts.",
+              "silentMeaning": "150 becomes the persistent total.",
+              "timingMethod": "estimated",
+              "risks": [
+                "The carried number must not cross remaining sentence words."
+              ],
+              "start": 12.143,
+              "end": 13.917
+            }
+          ]
+        },
+        {
+          "id": "transfer",
+          "design": {
+            "template": "world mechanism",
+            "region": "R1",
+            "transitionIn": "hero carry into the total badge",
+            "emphasis": "in transit",
+            "focus": "B dims while the quantity leaves A; focus hands to B before A dims on landing.",
+            "triggers": {
+              "build": [
+                "account",
+                "account"
+              ],
+              "route": "now",
+              "depart": "leave",
+              "highlight": "counted",
+              "land": "arrive",
+              "annotate": "never"
+            }
+          },
+          "cues": [
+            {
+              "text": "Account A holds 100 units, and Account B holds 50.",
+              "concept": "The starting balances.",
+              "metaphor": "Two cards holding measured vessels.",
+              "elements": [
+                "Account A card",
+                "Account B card",
+                "Vessels",
+                "Rolling counters"
+              ],
+              "behavior": "Each card pops and its vessel fills on its spoken name.",
+              "camera": "Hold on the badge and both accounts.",
+              "next": "A route draws between the vessels.",
+              "silentMeaning": "A holds more than B; together they make the badge.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Kickers stay on the outer corners so the route remains clear."
+              ],
+              "start": 14.577,
+              "end": 18.298
+            },
+            {
+              "text": "Now ten units leave Account A.",
+              "concept": "A transfer begins at its origin.",
+              "metaphor": "A gold token rises out of A while A drains.",
+              "elements": [
+                "Route",
+                "Token",
+                "Equation"
+              ],
+              "behavior": "The route draws, the equation appears, and the token departs as A drains to 90.",
+              "camera": "Push in toward A.",
+              "next": "The token rides the route.",
+              "silentMeaning": "Ten left A.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Token crossing the A card is intentional and documented."
+              ],
+              "start": 18.298,
+              "end": 20.569
+            },
+            {
+              "text": "While they travel, they are still counted: ten in transit.",
+              "concept": "An in-flight quantity remains part of the total.",
+              "metaphor": "The equation opens an in-transit term while the token travels.",
+              "elements": [
+                "Token trail",
+                "In-transit term",
+                "Accent marker"
+              ],
+              "behavior": "The token travels with a trail; the transit term opens and is highlighted on its cue.",
+              "camera": "Track the token toward B.",
+              "next": "The token reaches B.",
+              "silentMeaning": "The ten is still counted while moving.",
+              "timingMethod": "estimated",
+              "risks": [
+                "The opening term registers its exact visible width."
+              ],
+              "start": 20.569,
+              "end": 24.732
+            },
+            {
+              "text": "Then they arrive in Account B, and the total never changed.",
+              "concept": "Arrival completes the transfer and the total survives it.",
+              "metaphor": "The token sinks into B and a ring confirms the landing; the badge is circled.",
+              "elements": [
+                "Landing ring",
+                "Scribble on badge",
+                "Note"
+              ],
+              "behavior": "B fills to 60, the transit term closes, the badge is circled and annotated.",
+              "camera": "Release the push-in back to the wide frame.",
+              "next": "The badge annotation holds.",
+              "silentMeaning": "B gained what A lost; the total did not move.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Token crossing the B card is intentional and documented."
+              ],
+              "start": 24.732,
+              "end": 29.084
+            },
+            {
+              "text": "It is still 150.",
+              "concept": "The invariant is restated as a number.",
+              "metaphor": "The circled badge and its note hold on screen.",
+              "elements": [
+                "Circled badge",
+                "Note"
+              ],
+              "behavior": "No new motion: the annotation is given reading time.",
+              "camera": "Hold the wide frame, then pan at the scene end.",
+              "next": "The camera pans to a before-and-after comparison.",
+              "silentMeaning": "The total is still 150.",
+              "timingMethod": "estimated",
+              "risks": [
+                "The pan must not start before the note is readable."
+              ],
+              "start": 29.084,
+              "end": 30.346
+            }
+          ]
+        },
+        {
+          "id": "contrast",
+          "design": {
+            "template": "compare",
+            "region": "R2",
+            "transitionIn": "camera pan R1 -> R2 with motion blur",
+            "emphasis": "The total did not.",
+            "focus": "The changed column dims when the total is named.",
+            "triggers": {
+              "rows": [
+                "fell",
+                "rose",
+                "total"
+              ],
+              "focus": "did",
+              "takeaway": "check"
+            }
+          },
+          "cues": [
+            {
+              "text": "Compare before and after.",
+              "concept": "Comparing states isolates what changed.",
+              "metaphor": "Two columns separated by a drawn divider.",
+              "elements": [
+                "Divider",
+                "Column headings"
+              ],
+              "behavior": "The divider draws as the scene opens.",
+              "camera": "Arrive on R2 after the pan.",
+              "next": "The changed column fills first.",
+              "silentMeaning": "This is a before/after comparison.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Headings must clear the title."
+              ],
+              "start": 31.006,
+              "end": 32.865
+            },
+            {
+              "text": "The balances changed: A fell to 90, and B rose to 60.",
+              "concept": "Both balances changed by the same amount in opposite directions.",
+              "metaphor": "Old values are struck through; new values pop as chips.",
+              "elements": [
+                "A row",
+                "B row",
+                "Strike marks",
+                "Arrows"
+              ],
+              "behavior": "Each row appears on its spoken verb; old values are struck before new values pop.",
+              "camera": "Hold.",
+              "next": "The conserved column answers.",
+              "silentMeaning": "A went down and B went up.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Strikes and arrows are unregistered strokes; keep them off numerals."
+              ],
+              "start": 32.865,
+              "end": 36.903
+            },
+            {
+              "text": "The total did not.",
+              "concept": "The total is unchanged.",
+              "metaphor": "The conserved column receives a drawn check mark.",
+              "elements": [
+                "Total row",
+                "Check mark"
+              ],
+              "behavior": "The total row appears and the changed column dims.",
+              "camera": "Hold; focus moves by contrast, not camera.",
+              "next": "The takeaway states the habit.",
+              "silentMeaning": "The total stayed 150.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Dimmed column must stay legible."
+              ],
+              "start": 36.903,
+              "end": 38.314
+            },
+            {
+              "text": "Check the total before you trust the movement.",
+              "concept": "A practical habit for reading transfers.",
+              "metaphor": "A serif takeaway line.",
+              "elements": [
+                "Takeaway"
+              ],
+              "behavior": "The takeaway resolves from blur word by word.",
+              "camera": "Hold, then pan to the series.",
+              "next": "Repeated transfers extend the same idea over time.",
+              "silentMeaning": "Check the total first.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Takeaway must stay above the caption band."
+              ],
+              "start": 38.314,
+              "end": 41.775
+            }
+          ]
+        },
+        {
+          "id": "series",
+          "design": {
+            "template": "line story",
+            "region": "R3",
+            "transitionIn": "camera pan R2 -> R3 with motion blur",
+            "emphasis": "flat",
+            "focus": "Series dim when the flat total is named.",
+            "triggers": {
+              "title": "four (after \"times\")",
+              "series": "balances",
+              "invariant": "total",
+              "focus": "line"
+            }
+          },
+          "cues": [
+            {
+              "text": "Repeat that four times.",
+              "concept": "The same rule holds across many transfers.",
+              "metaphor": "A time axis for repeated transfers.",
+              "elements": [
+                "Kicker",
+                "Axis",
+                "Period labels"
+              ],
+              "behavior": "The axis draws and period labels fade in.",
+              "camera": "Arrive on R3 after the pan.",
+              "next": "Balances trace across the periods.",
+              "silentMeaning": "Several periods follow.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Labels must not collide with the axis line."
+              ],
+              "start": 42.435,
+              "end": 44.079
+            },
+            {
+              "text": "Four transfers later, the balances have swung up and down, but the total line stays flat at 150.",
+              "concept": "Balances vary while the total is invariant.",
+              "metaphor": "Two swinging series and one flat accent line.",
+              "elements": [
+                "Series A",
+                "Series B",
+                "Total line",
+                "Note and arrow"
+              ],
+              "behavior": "Series trace with dots; the total line lands last; series dim and a note names the contrast.",
+              "camera": "Slow push-in.",
+              "next": "An iris opens from the end of the total line into the method.",
+              "silentMeaning": "Balances move; the total does not.",
+              "timingMethod": "estimated",
+              "risks": [
+                "End chips must not overlap each other at the last period."
+              ],
+              "start": 44.079,
+              "end": 50.897
+            }
+          ]
+        },
+        {
+          "id": "method",
+          "design": {
+            "template": "stepper",
+            "region": "R4",
+            "transitionIn": "two-phase accent iris from the total line",
+            "emphasis": "in three steps.",
+            "focus": "Completed steps settle to half strength; the gold token marks the active step.",
+            "triggers": {
+              "steps": [
+                "find",
+                "follow",
+                "check"
+              ]
+            }
+          },
+          "cues": [
+            {
+              "text": "Here is the method.",
+              "concept": "The lesson turns into a reusable procedure.",
+              "metaphor": "A rail with three stations.",
+              "elements": [
+                "Title",
+                "Rail"
+              ],
+              "behavior": "The title rises and the rail draws.",
+              "camera": "Arrive inside the iris.",
+              "next": "The steps light in order.",
+              "silentMeaning": "A procedure follows.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Title must clear the rail."
+              ],
+              "start": 51.557,
+              "end": 52.904
+            },
+            {
+              "text": "Read any transfer in three steps.",
+              "concept": "The procedure has three steps.",
+              "metaphor": "A serif accent names the count.",
+              "elements": [
+                "Accent line"
+              ],
+              "behavior": "The accent resolves from blur.",
+              "camera": "Hold.",
+              "next": "The first step activates.",
+              "silentMeaning": "Three steps.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Accent must not touch the first step."
+              ],
+              "start": 52.904,
+              "end": 55.189
+            },
+            {
+              "text": "First, find the total.",
+              "concept": "Step one: identify the conserved total.",
+              "metaphor": "The token appears at step one.",
+              "elements": [
+                "Step 1",
+                "Token"
+              ],
+              "behavior": "Step one activates on its verb.",
+              "camera": "Hold with a slow push-in.",
+              "next": "The token moves on.",
+              "silentMeaning": "Start with the total.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Token must not cover step text."
+              ],
+              "start": 55.189,
+              "end": 56.654
+            },
+            {
+              "text": "Next, follow the moving quantity.",
+              "concept": "Step two: track what is in transit.",
+              "metaphor": "The token travels down the rail.",
+              "elements": [
+                "Step 2"
+              ],
+              "behavior": "The token travels and step two activates.",
+              "camera": "Hold.",
+              "next": "The token moves to the last step.",
+              "silentMeaning": "Then follow the moving part.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Same as above."
+              ],
+              "start": 56.654,
+              "end": 58.821
+            },
+            {
+              "text": "Last, check the balance.",
+              "concept": "Step three: verify the sum.",
+              "metaphor": "The token lands on the last step; earlier steps are ticked.",
+              "elements": [
+                "Step 3",
+                "Ticks"
+              ],
+              "behavior": "Step three activates; earlier steps settle.",
+              "camera": "Hold, then wipe to the check.",
+              "next": "A question tests the method.",
+              "silentMeaning": "Finish by checking the sum.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Mono details must remain readable at small size."
+              ],
+              "start": 58.821,
+              "end": 60.403
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "design": {
+            "template": "question (night mode)",
+            "region": "R5",
+            "transitionIn": "slanted wipe to the night background",
+            "emphasis": "150",
+            "focus": "Wrong options dim and are struck; the right option turns gold.",
+            "triggers": {
+              "kicker": "check",
+              "reveal": "still"
+            }
+          },
+          "cues": [
+            {
+              "text": "Check yourself.",
+              "concept": "The viewer applies the rule.",
+              "metaphor": "A different mode: the night background.",
+              "elements": [
+                "Kicker"
+              ],
+              "behavior": "The kicker fades in.",
+              "camera": "Arrive after the wipe.",
+              "next": "The prompt fills.",
+              "silentMeaning": "This is a question.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Kicker must clear the prompt."
+              ],
+              "start": 61.063,
+              "end": 62.139
+            },
+            {
+              "text": "If 25 units move from B to A, what is the total?",
+              "concept": "A new transfer in the opposite direction.",
+              "metaphor": "A ghosted prompt and three option chips.",
+              "elements": [
+                "Prompt",
+                "Options 125, 150, 175"
+              ],
+              "behavior": "The prompt fills as spoken; options pop after it.",
+              "camera": "Slow push-in.",
+              "next": "A pause invites an answer.",
+              "silentMeaning": "Pick the total.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Options must keep equal spacing when they scale in."
+              ],
+              "start": 62.139,
+              "end": 65.873
+            },
+            {
+              "text": "Pause and think.",
+              "concept": "Give the viewer time to answer.",
+              "metaphor": "Nothing new appears; the options wait.",
+              "elements": [
+                "Options"
+              ],
+              "behavior": "Hold the options without decoration.",
+              "camera": "Hold.",
+              "next": "The answer resolves.",
+              "silentMeaning": "Think before the answer.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Do not fill the pause with motion."
+              ],
+              "start": 65.873,
+              "end": 67.076
+            },
+            {
+              "text": "Still 150.",
+              "concept": "The answer: the total is unchanged.",
+              "metaphor": "The correct chip turns gold while the others are struck.",
+              "elements": [
+                "Correct option",
+                "Strikes"
+              ],
+              "behavior": "Wrong options dim and are struck; the correct one turns gold.",
+              "camera": "Hold.",
+              "next": "The reason names the rule.",
+              "silentMeaning": "The total is still 150.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Strikes must stay inside their chips."
+              ],
+              "start": 67.076,
+              "end": 67.835
+            },
+            {
+              "text": "Moving units changes balances, not the total.",
+              "concept": "The general rule.",
+              "metaphor": "A serif reason line.",
+              "elements": [
+                "Reason"
+              ],
+              "behavior": "The reason resolves from blur on its words.",
+              "camera": "Hold to the end.",
+              "next": "End of the lesson.",
+              "silentMeaning": "Movement changes balances, not totals.",
+              "timingMethod": "estimated",
+              "risks": [
+                "Reason must stay above the caption band."
+              ],
+              "start": 67.835,
+              "end": 71.063
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

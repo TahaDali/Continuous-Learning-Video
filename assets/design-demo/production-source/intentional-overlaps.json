@@ -1,0 +1,44 @@
+[
+  {
+    "lesson": "01",
+    "a": "token",
+    "b": "card-a",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically leaves Account A; crossing the container boundary is the mechanism being taught."
+  },
+  {
+    "lesson": "01",
+    "a": "token",
+    "b": "a-vessel",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically leaves Account A; crossing the container boundary is the mechanism being taught."
+  },
+  {
+    "lesson": "01",
+    "a": "token-v",
+    "b": "card-a",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically leaves Account A; crossing the container boundary is the mechanism being taught."
+  },
+  {
+    "lesson": "01",
+    "a": "token",
+    "b": "card-b",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically enters Account B; crossing the container boundary is the mechanism being taught."
+  },
+  {
+    "lesson": "01",
+    "a": "token",
+    "b": "b-vessel",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically enters Account B; crossing the container boundary is the mechanism being taught."
+  },
+  {
+    "lesson": "01",
+    "a": "token-v",
+    "b": "card-b",
+    "scene": "transfer",
+    "reason": "The transferred quantity physically enters Account B; crossing the container boundary is the mechanism being taught."
+  }
+]
