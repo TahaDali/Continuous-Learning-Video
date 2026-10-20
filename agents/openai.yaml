@@ -1,0 +1,4 @@
+interface:
+  display_name: "Continuous-Learning-Video"
+  short_description: "Turn a job link into a hosted video learning course"
+  default_prompt: "Use $continuous-learning-video to turn this job link into a sourced, narrated video learning course and hosted course page."

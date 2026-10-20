@@ -17,6 +17,7 @@ node_modules/
 /courses/
 /review/
 /audio/
+/dist/
 *.mp4
 *.mov
 *.mp3

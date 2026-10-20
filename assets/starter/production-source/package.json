@@ -1,0 +1,11 @@
+{
+  "name": "continuous-learning-local-renderer",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.100"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this workflow in teaching or research, please cite this project."
+title: "Continuous-Learning-Video"
+authors:
+  - name: "TahaDali"
+    website: "https://github.com/TahaDali"
+version: "1.0.0"
+date-released: "2026-10-20"
+url: "https://github.com/TahaDali/Continuous-Learning-Video"
+license: "Apache-2.0"
+type: software
