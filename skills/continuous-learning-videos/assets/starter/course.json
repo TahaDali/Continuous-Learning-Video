@@ -1,0 +1,41 @@
+{
+  "title": "Continuous learning course",
+  "storageKey": "motion-course-starter",
+  "language": "en",
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "lessons": [
+    {
+      "id": "01",
+      "title": "A conserved transfer — demonstration",
+      "goal": "See how a transfer changes balances while conserving the total.",
+      "coverage": "Self-contained fictional demonstration; replace for production.",
+      "visual": "conserved-transfer",
+      "duration": 12,
+      "scenes": [
+        {
+          "id": "initial",
+          "headline": "One total, two accounts",
+          "narration": "These two accounts hold a total of one hundred fifty units.",
+          "start": 0,
+          "end": 3
+        },
+        {
+          "id": "move",
+          "headline": "Follow the quantity",
+          "narration": "Ten units move from the left account to the right.",
+          "start": 3,
+          "end": 8
+        },
+        {
+          "id": "result",
+          "headline": "The total is conserved",
+          "narration": "The balances change, while the total stays the same.",
+          "start": 8,
+          "end": 12
+        }
+      ]
+    }
+  ]
+}

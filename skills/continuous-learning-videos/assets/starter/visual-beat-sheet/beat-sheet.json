@@ -1,0 +1,66 @@
+{
+  "lessons": [
+    {
+      "id": "01",
+      "beats": [
+        {
+          "id": "initial",
+          "cues": [
+            {
+              "text": "These two accounts hold a total of one hundred fifty units.",
+              "concept": "Two balances contribute to one conserved total.",
+              "metaphor": "Two transparent containers holding measured quantities.",
+              "elements": ["Left container", "Right container", "Balances", "Total marker"],
+              "behavior": "Construct the containers and fill them to 100 and 50 units.",
+              "camera": "Establish both containers and the relationship between them.",
+              "next": "A portion of the left balance becomes a traveling quantity.",
+              "silentMeaning": "The two quantities together make 150.",
+              "start": 0,
+              "end": 3,
+              "timingMethod": "estimated",
+              "risks": ["Keep balance labels clear of container outlines."]
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "cues": [
+            {
+              "text": "Ten units move from the left account to the right.",
+              "concept": "A transfer has an origin, an in-flight state and a destination.",
+              "metaphor": "An extracted portion travels along the connection.",
+              "elements": ["Persistent containers", "Ten-unit portion", "Transfer path", "In-flight value"],
+              "behavior": "Remove ten from the left, show ten in transit, then add ten to the right.",
+              "camera": "Track the quantity while retaining both endpoints.",
+              "next": "The arriving portion changes the right balance.",
+              "silentMeaning": "The same quantity moves rather than being created twice.",
+              "start": 3,
+              "end": 8,
+              "timingMethod": "estimated",
+              "risks": ["Moving portion must clear both container outlines and labels."]
+            }
+          ]
+        },
+        {
+          "id": "result",
+          "cues": [
+            {
+              "text": "The balances change, while the total stays the same.",
+              "concept": "A conserved total survives redistribution.",
+              "metaphor": "The same total marker spans the changed container levels.",
+              "elements": ["Final balances 90 and 60", "Total 150", "Comparison equation"],
+              "behavior": "Settle the arriving portion and connect final balances to the unchanged total.",
+              "camera": "Reframe the whole relationship without resetting the world.",
+              "next": "Retain the two balances as anchors for a subsequent explanation if needed.",
+              "silentMeaning": "The distribution changed but the total did not.",
+              "start": 8,
+              "end": 12,
+              "timingMethod": "estimated",
+              "risks": ["Allow reading time for the final quantitative relationship."]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

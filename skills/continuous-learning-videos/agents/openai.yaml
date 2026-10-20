@@ -1,0 +1,4 @@
+interface:
+  display_name: "Continuous Learning Videos"
+  short_description: "Create narrated lessons with continuous semantic motion"
+  default_prompt: "Use $continuous-learning-videos to turn my source material into visually taught lessons with a beat sheet, continuous animation, natural narration, and a checked final delivery."

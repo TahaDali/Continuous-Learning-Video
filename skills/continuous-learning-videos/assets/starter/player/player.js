@@ -1,0 +1,34 @@
+(()=>{'use strict';
+const D=window.COURSE,$=id=>document.getElementById(id),v=$('video');
+document.title=D.title;$('course-title').textContent=D.title;document.documentElement.lang=D.language;
+let state={done:[],positions:{},lesson:D.lessons[0].id,speed:1,captions:false};
+try{Object.assign(state,JSON.parse(localStorage.getItem(D.storageKey)||'{}'));}catch{}
+if(!Array.isArray(state.done))state.done=[];
+if(!state.positions||typeof state.positions!=='object')state.positions={};
+state.done=state.done.filter(id=>D.lessons.some(l=>l.id===id));
+let current=0,lastSave=0,pending=0;
+const save=()=>{try{localStorage.setItem(D.storageKey,JSON.stringify(state));}catch{}};
+const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+function cc(){for(const t of v.textTracks)t.mode=state.captions?'showing':'hidden';$('captions').textContent=state.captions?'Captions on':'Captions off';$('captions').setAttribute('aria-pressed',String(state.captions));}
+function progress(){const done=state.done.includes(D.lessons[current].id);$('complete').textContent=done?'Completed ✓':'Mark complete';$('complete').setAttribute('aria-pressed',String(done));$('completion').textContent=`${state.done.length} / ${D.lessons.length} complete`;}
+function load(index,focus=false){
+  current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];v.pause();state.lesson=l.id;pending=Number(state.positions[l.id])||0;
+  $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=l.coverage;$('lesson-number').textContent=`Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
+  v.innerHTML='';v.poster=`posters/${l.id}.png`;v.src=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);v.load();$('error').hidden=true;
+  $('download-video').href=v.getAttribute('src');$('download-captions').href=track.getAttribute('src');$('previous').disabled=current===0;$('next').disabled=current===D.lessons.length-1;
+  $('transcript').replaceChildren();for(const beat of l.scenes){const b=document.createElement('button'),title=document.createElement('strong'),text=document.createElement('span');title.textContent=`${clock(beat.start)} · ${beat.headline}`;text.textContent=beat.narration;b.append(title,text);b.onclick=()=>{v.currentTime=beat.start;v.play().catch(()=>{});};$('transcript').append(b);}
+  document.querySelectorAll('[data-lesson]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.lesson===l.id)));history.replaceState(null,'','#lesson-'+l.id);progress();save();if(focus)$('lesson-title').focus({preventScroll:true});
+}
+for(const [index,l] of D.lessons.entries()){const b=document.createElement('button');b.dataset.lesson=l.id;b.textContent=`${index+1}. ${l.title}`;b.onclick=()=>{load(index,true);$('lesson-list').hidden=true;$('browse').textContent='Show lessons';$('browse').setAttribute('aria-expanded','false');};$('lesson-list').append(b);}
+$('browse').onclick=()=>{const hidden=$('lesson-list').hidden=!$('lesson-list').hidden;$('browse').textContent=hidden?'Show lessons':'Hide lessons';$('browse').setAttribute('aria-expanded',String(!hidden));};
+$('runtime').textContent=`${D.lessons.length} lessons · ${clock(D.lessons.reduce((a,l)=>a+l.duration,0))} total`;
+$('previous').onclick=()=>load(current-1,true);$('next').onclick=()=>load(current+1,true);
+$('speed').value=String(state.speed);$('speed').onchange=e=>{state.speed=Number(e.target.value);v.playbackRate=state.speed;save();};
+$('captions').onclick=()=>{state.captions=!state.captions;cc();save();};
+$('complete').onclick=()=>{const id=D.lessons[current].id;state.done=state.done.includes(id)?state.done.filter(x=>x!==id):[...state.done,id];progress();save();};
+v.addEventListener('loadedmetadata',()=>{if(pending>0&&pending<v.duration-1)v.currentTime=pending;v.playbackRate=state.speed;cc();});
+v.addEventListener('timeupdate',()=>{if(Date.now()-lastSave>1500){state.positions[D.lessons[current].id]=v.currentTime;lastSave=Date.now();save();}});
+v.addEventListener('ended',()=>{const id=D.lessons[current].id;if(!state.done.includes(id))state.done.push(id);state.positions[id]=0;progress();save();});
+v.addEventListener('error',()=>{$('error').hidden=false;});
+const id=decodeURIComponent(location.hash.replace(/^#lesson-/,''))||state.lesson;load(Math.max(0,D.lessons.findIndex(l=>l.id===id)));
+})();
