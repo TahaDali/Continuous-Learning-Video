@@ -4,6 +4,7 @@ The maintainer approves the exact release commit and its artifact before publica
 
 - [ ] One root SKILL.md, correct name, complete references and UI metadata.
 - [ ] Reviewed payload manifest, explicit version and consistent ownership/license notices.
+- [ ] Supplied expression and public examples have a recorded origin, rights basis and required attribution. Narration has a service-specific distribution basis; code licenses are not treated as audio permission. Review all served branches and old releases, not only the skill ZIP.
 - [ ] No original transcripts, private source documents, course media, hosting IDs or credentials in source or ZIP.
 - [ ] History/current tree/final archive secret scans pass; prior sensitive reports stay private.
 - [ ] Fresh locked dependency installation, resource check, render/audit/full decode, Python regressions and player contracts pass.

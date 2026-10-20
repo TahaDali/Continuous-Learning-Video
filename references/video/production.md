@@ -47,6 +47,8 @@ Reuse a selected voice and existing consent when applicable. Otherwise prepare t
 
 After Microsoft speech processing is authorized, the optional bundled helper uses `edge-tts` with word boundaries. Its locally tested interface is version 7.3.1; verify the current installed interface and provider availability instead of pinning an obsolete broken client indefinitely. This is a speech-service client, not an Azure account credential or a guarantee of service availability. If the endpoint fails, inspect the current supported client and retry within the helper's bounded attempts. Do not switch to another service, incur charges or send content to a new provider without the applicable authorization.
 
+Check the actual service and voice terms for the intended distribution. The client's LGPL/MIT terms cover its software, not a blanket license to publish recordings or use the service. Do not substitute Azure Speech terms for Edge-generated audio because a voice name matches. For public delivery, retain evidence covering the generated recordings and audience; otherwise obtain permission or use an authorized provider with documented distribution terms. A replacement requires new measured timings, captions, synchronized renders and review.
+
 ```text
 python3 production-source/narrate.py --voice en-US-AvaMultilingualNeural --sample
 python3 production-source/narrate.py --voice en-US-AvaMultilingualNeural

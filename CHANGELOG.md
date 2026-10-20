@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-10-20
+
+- Record the owner's confirmation and retained compilation trail for the historical AI-chat teaching story, closing its previously unrecorded conversation origin.
+- Distinguish the Apache-2.0 skill from the separate Pages demo and its unresolved Edge-audio redistribution evidence.
+- Require service-specific narration distribution evidence and a source-rights check before course publication; preserve existing provider choices and approval boundaries.
+- Preserve historical commits, existing attribution, prior MIT grants and the private original reading document.
+
 ## 1.0.0 - 2026-10-20
 
 - Publish the owner-approved combined workflow as **Continuous-Learning-Video**, invoked as `$continuous-learning-video`.
