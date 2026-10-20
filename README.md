@@ -12,6 +12,8 @@ Created and maintained by **[TahaDali](https://github.com/TahaDali)**. Developed
 
 Explore the original course interface with all 25 narrated videos, optional captions, transcripts, practice questions, source notes and lesson navigation. This historical example demonstrates the storytelling and video approach that informed the combined skill; it predates the v1.0.0 release and is separate from the five private validation courses below. Teaching characters and business scenarios are fictional. This independent educational course is not affiliated with Axios.
 
+The [rights review](docs/rights-review.md) records the owner's confirmation that the source story came from their own AI chat. The demo's Edge-generated narration still has an unverified provider-specific redistribution basis; the skill license is not an audio license.
+
 The example is served from the separate `gh-pages` branch. Its media are not included in the installable skill bundle.
 
 ![A frame from the bundled mechanical transfer demonstration](docs/images/mechanical-demo.png)
@@ -28,7 +30,7 @@ The owner reviewed and accepted five private sample courses spanning software en
 
 ## Install
 
-Use the ZIP attached to the [v1.0.0 release](https://github.com/TahaDali/Continuous-Learning-Video/releases/tag/v1.0.0). Inspect its `release-manifest.json` and the published SHA-256 checksum. Extract its complete `continuous-learning-video` folder into your Codex user skills directory, normally `~/.agents/skills/`. Keep every file together. Back up an existing installation before replacing it.
+Use the ZIP attached to the [v1.0.1 release](https://github.com/TahaDali/Continuous-Learning-Video/releases/tag/v1.0.1). Inspect its `release-manifest.json` and the published SHA-256 checksum. Extract its complete `continuous-learning-video` folder into your Codex user skills directory, normally `~/.agents/skills/`. Keep every file together. Back up an existing installation before replacing it.
 
 [Current official Codex skill guidance](https://learn.chatgpt.com/docs/build-skills) describes discovery locations; managed or older installations may use another directory. Confirm the skill appears in the selector, then invoke:
 
@@ -45,7 +47,7 @@ For a repository-scoped installation, use `.agents/skills/continuous-learning-vi
 Check out a chosen tag or full commit, inspect it, then build to new paths **outside the repository**:
 
 ```sh
-git clone --branch v1.0.0 https://github.com/TahaDali/Continuous-Learning-Video.git
+git clone --branch v1.0.1 https://github.com/TahaDali/Continuous-Learning-Video.git
 cd Continuous-Learning-Video
 python3 scripts/build_skill.py --output /absolute/work/continuous-learning-video --archive /absolute/work/continuous-learning-video.zip
 ```
