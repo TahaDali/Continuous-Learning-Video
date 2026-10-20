@@ -6,7 +6,7 @@ import re
 import subprocess
 import wave
 
-SKILL = Path(__file__).resolve().parent.parent / 'skills/continuous-learning-videos'
+SKILL = Path(__file__).resolve().parent.parent
 
 
 def media_fixture(fixture, audio_seconds):

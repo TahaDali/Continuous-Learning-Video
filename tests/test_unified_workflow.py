@@ -23,7 +23,7 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='unified-skill-test-')
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name)
-        self.skill = build(self.base / 'job-to-learning-videos')
+        self.skill = build(self.base / 'continuous-learning-video')
         spec = importlib.util.spec_from_file_location('unified_workflow', self.skill / 'scripts/workflow.py')
         self.workflow = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.workflow)
@@ -338,7 +338,7 @@ module.exports={};
         self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'completed')
         env = dict(os.environ)
         if not env.get('CANVAS_MODULE'):
-            env['CANVAS_MODULE'] = str(ROOT / 'skills/continuous-learning-videos/assets/starter/production-source/node_modules/@napi-rs/canvas')
+            env['CANVAS_MODULE'] = str(ROOT / 'assets/starter/production-source/node_modules/@napi-rs/canvas')
         for script, argument in [('render.cjs', 'posters'), ('audit.cjs', None)]:
             command = ['node', str(self.root / 'production-source' / script)]
             if argument:

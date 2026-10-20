@@ -12,13 +12,13 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class IllustrationTests(unittest.TestCase):
     def canvas_environment(self):
-        module = os.environ.get('CANVAS_MODULE') or str(ROOT / 'skills/continuous-learning-videos/assets/starter/production-source/node_modules/@napi-rs/canvas')
+        module = os.environ.get('CANVAS_MODULE') or str(ROOT / 'assets/starter/production-source/node_modules/@napi-rs/canvas')
         if not shutil.which('node') or not Path(module).is_dir():
             self.skipTest('Canvas runtime is not configured')
         return dict(os.environ, CANVAS_MODULE=module)
 
     def test_numeric_canvas_guard_reaches_bad_clock_internals_with_finite_registry_bounds(self):
-        production = ROOT / 'skills/continuous-learning-videos/assets/starter/production-source'
+        production = ROOT / 'assets/starter/production-source'
         code = """
 const assert=require('node:assert/strict');
 const {createCanvas}=require(process.env.CANVAS_MODULE),{createStage}=require('./motion.cjs'),{createIllustration,P}=require('./illustrations.cjs'),{install}=require('./finite-canvas.cjs');
@@ -39,7 +39,7 @@ assert.throws(()=>g.ellipse(100,100,10,5,0,Math.PI*2),/Non-finite\/non-numeric C
                        check=True, capture_output=True, text=True)
 
     def test_degenerate_illustration_paths_remain_finite(self):
-        production = ROOT / 'skills/continuous-learning-videos/assets/starter/production-source'
+        production = ROOT / 'assets/starter/production-source'
         code = """
 const assert=require('node:assert/strict');
 const {createCanvas}=require(process.env.CANVAS_MODULE),{createStage}=require('./motion.cjs'),{createIllustration}=require('./illustrations.cjs'),{install}=require('./finite-canvas.cjs');
@@ -59,7 +59,7 @@ for(const completion of [0,.01,.5,1]) {
         env = self.canvas_environment()
         with tempfile.TemporaryDirectory(prefix='numeric-canvas-test-') as folder:
             project = Path(folder) / 'course'
-            subprocess.run(['python3', str(ROOT / 'skills/continuous-learning-videos/scripts/new_project.py'),
+            subprocess.run(['python3', str(ROOT / 'scripts/new_project.py'),
                             str(project), '--demo'], check=True, capture_output=True)
             (project / 'production-source/world.cjs').write_text("""
 module.exports={draw(g){g.lineTo(NaN,10);return {items:[],safe:{x:0,y:0,w:1280,h:720},viewport:{x:0,y:0,w:1280,h:720},invariants:{}};}};
@@ -72,10 +72,10 @@ module.exports={draw(g){g.lineTo(NaN,10);return {items:[],safe:{x:0,y:0,w:1280,h
                     self.assertIn('Non-finite/non-numeric Canvas lineTo argument', result.stderr)
 
     def test_glyphs_register_actual_camera_transformed_bounds_and_owned_labels(self):
-        module = os.environ.get('CANVAS_MODULE') or str(ROOT / 'skills/continuous-learning-videos/assets/starter/production-source/node_modules/@napi-rs/canvas')
+        module = os.environ.get('CANVAS_MODULE') or str(ROOT / 'assets/starter/production-source/node_modules/@napi-rs/canvas')
         if not shutil.which('node') or not Path(module).is_dir():
             self.skipTest('Canvas runtime is not configured')
-        production = ROOT / 'skills/continuous-learning-videos/assets/starter/production-source'
+        production = ROOT / 'assets/starter/production-source'
         code = """
 const {createCanvas}=require(process.env.CANVAS_MODULE),{createStage}=require('./motion.cjs'),{createIllustration}=require('./illustrations.cjs');
 const c=createCanvas(1280,720),g=c.getContext('2d'),stage=createStage(g,{width:1280,height:720},{x:640,y:340,zoom:.9}),v=createIllustration(stage);

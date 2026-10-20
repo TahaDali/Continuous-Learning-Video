@@ -12,7 +12,7 @@ import unittest
 import wave
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILL = ROOT / 'skills/continuous-learning-videos'
+SKILL = ROOT
 SPEC = importlib.util.spec_from_file_location('video_validator', SKILL / 'scripts/validate_project.py')
 VALIDATOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(VALIDATOR)

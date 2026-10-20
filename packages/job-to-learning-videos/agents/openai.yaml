@@ -1,4 +1,0 @@
-interface:
-  display_name: "Job to Learning Videos"
-  short_description: "Turn a job link into a hosted video learning course"
-  default_prompt: "Use $job-to-learning-videos to turn this job link into a sourced, narrated video learning course and hosted course page."

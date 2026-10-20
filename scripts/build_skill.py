@@ -1,88 +1,102 @@
 #!/usr/bin/env python3
-"""Assemble one self-contained skill from maintained research and video modules."""
+"""Build the reviewed, self-contained skill using an explicit payload manifest."""
 import argparse
-from pathlib import Path
-import shutil
-import json
 import hashlib
+import json
+from pathlib import Path, PurePosixPath
+import shutil
 import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
-NAME = 'job-to-learning-videos'
-IGNORE = shutil.ignore_patterns('node_modules', '__pycache__', '.DS_Store', '.env', '.env.*')
+NAME = 'continuous-learning-video'
+FORBIDDEN_SUFFIXES = {'.key', '.pem', '.p12', '.pfx', '.log', '.mp3', '.mp4', '.wav', '.zip'}
+CACHE_PARTS = {'__pycache__', 'node_modules', '.DS_Store'}
 
 
-def safe_ignore(directory, names):
-    excluded = set(IGNORE(directory, names))
-    for name in set(names) - excluded:
-        entry = Path(directory) / name
-        if entry.is_symlink():
-            raise ValueError(f'Skill sources must not contain symlinks: {entry}')
-        if not entry.is_file() and not entry.is_dir():
-            raise ValueError(f'Unsupported skill source: {entry}')
-    return excluded
-
-
-def copy_sources(source, target, **kwargs):
-    if source.is_symlink():
-        raise ValueError(f'Skill sources must not contain symlinks: {source}')
-    return shutil.copytree(source, target, ignore=safe_ignore, **kwargs)
-
-
-def destination(path):
+def destination(path, source=None):
     path = path.expanduser().absolute()
     if path.is_symlink():
         raise ValueError(f'Refusing a symlink destination: {path}')
-    # Canonicalize ordinary parent aliases such as macOS /var -> /private/var,
-    # while keeping a dangling leaf symlink from redirecting a new output.
     path = path.parent.resolve() / path.name
+    for root in [ROOT, source] if source else [ROOT]:
+        root = root.resolve()
+        if path == root or root in path.parents:
+            raise ValueError('Output must be outside the source tree')
     if path.exists():
         raise ValueError(f'Refusing to overwrite existing path: {path}')
     return path
 
 
+def payload_sources(root):
+    """Only reviewed manifest paths may enter a release, regardless of Git ignores."""
+    root = root.absolute()
+    manifest_path = root / 'skill-files.json'
+    if manifest_path.is_symlink():
+        raise ValueError('Skill sources must not contain symlinks')
+    manifest = json.loads(manifest_path.read_text())
+    names = manifest['files']
+    if not isinstance(names, list) or len(names) != len(set(names)):
+        raise ValueError('Invalid or duplicate release manifest paths')
+    if not {'SKILL.md', 'LICENSE', 'NOTICE', 'THIRD_PARTY_NOTICES.md', 'VERSION', 'skill-files.json'} <= set(names):
+        raise ValueError('Release manifest omits required skill or ownership files')
+    files = []
+    for name in names:
+        relative = PurePosixPath(name)
+        if (not isinstance(name, str) or not name or relative.is_absolute()
+                or relative.as_posix() != name or any(p in {'..', '.'} for p in relative.parts)
+                or '\\' in name or any(p.startswith('.env') or p in CACHE_PARTS for p in relative.parts)
+                or relative.suffix.lower() in FORBIDDEN_SUFFIXES):
+            raise ValueError('Unsafe release manifest path')
+        source = root
+        for part in relative.parts:
+            source = source / part
+            if source.is_symlink():
+                raise ValueError(f'Skill sources must not contain symlinks: {name}')
+        if not source.is_file():
+            raise ValueError(f'Missing regular release file: {name}')
+        files.append((name, source))
+    return sorted(files)
+
+
 def build(output):
     output = destination(output)
+    files = payload_sources(ROOT)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='skill-build-', dir=output.parent) as temporary:
         assembled = Path(temporary) / NAME
-        copy_sources(ROOT / 'packages' / NAME, assembled)
-        research = ROOT / 'skills/company-role-storyteller/references'
-        video = ROOT / 'skills/continuous-learning-videos'
-        copy_sources(research, assembled / 'references/research')
-        copy_sources(video / 'references', assembled / 'references/video')
-        copy_sources(video / 'assets', assembled / 'assets')
-        copy_sources(video / 'scripts', assembled / 'scripts', dirs_exist_ok=True)
-        for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
-            source = ROOT / name
-            if source.is_symlink():
-                raise ValueError(f'Skill sources must not contain symlinks: {source}')
-            shutil.copyfile(source, assembled / name)
+        assembled.mkdir()
+        for name, source in files:
+            target = assembled / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
         assembled.rename(output)
     return output
 
 
 def archive(skill, output):
-    """Create a reproducible, non-overwriting ZIP with per-file checksums."""
-    output = destination(output)
-    skill = skill.expanduser().absolute()
+    """Write a reproducible non-overwriting ZIP with exact payload checksums."""
     if skill.is_symlink():
-        raise ValueError(f'Skill archive must not contain symlinks: {skill}')
-    skill = skill.resolve()
-    files = []
-    for path in sorted(skill.rglob('*')):
+        raise ValueError('Skill archive must not contain symlinks')
+    skill = skill.expanduser().resolve()
+    output = destination(output, skill)
+    files = payload_sources(skill)
+    expected = {name for name, _ in files}
+    for path in skill.rglob('*'):
+        relative = path.relative_to(skill)
         if path.is_symlink():
-            raise ValueError(f'Skill archive must not contain symlinks: {path}')
-        if path.is_file():
-            files.append((path.relative_to(skill).as_posix(), path.read_bytes()))
-    if not any(name == 'SKILL.md' for name, _ in files):
-        raise ValueError('Archive source must be an assembled skill containing SKILL.md.')
-    manifest = {'skill': NAME, 'files': {name: hashlib.sha256(data).hexdigest() for name, data in files}}
-    files.append(('release-manifest.json', (json.dumps(manifest, indent=2, sort_keys=True) + '\n').encode()))
+            raise ValueError('Skill archive must not contain symlinks')
+        if any(part in CACHE_PARTS for part in relative.parts):
+            continue
+        if path.is_file() and relative.as_posix() not in expected:
+            raise ValueError(f'Unlisted release file: {relative.as_posix()}')
+    payload = [(name, path.read_bytes()) for name, path in files]
+    manifest = {'skill': NAME, 'version': (skill / 'VERSION').read_text().strip(),
+                'files': {name: hashlib.sha256(data).hexdigest() for name, data in payload}}
+    payload.append(('release-manifest.json', (json.dumps(manifest, indent=2, sort_keys=True) + '\n').encode()))
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, 'x', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as bundle:
-        for name, data in files:
+        for name, data in payload:
             info = zipfile.ZipInfo(NAME + '/' + name, date_time=(2026, 1, 1, 0, 0, 0))
             info.create_system = 3
             info.compress_type = zipfile.ZIP_DEFLATED
@@ -93,14 +107,14 @@ def archive(skill, output):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--archive', type=Path, help='Also write a reproducible ZIP with a checksum manifest.')
+    parser.add_argument('--output', type=Path, required=True, help='New directory outside this repository')
+    parser.add_argument('--archive', type=Path)
     args = parser.parse_args()
     try:
         if args.archive:
-            destination(args.archive)
+            destination(args.archive, args.output)
         print(build(args.output))
         if args.archive:
             print(archive(args.output, args.archive))
-    except ValueError as error:
-        parser.exit(1, f'{error}\n')
+    except (ValueError, KeyError, TypeError, OSError) as error:
+        parser.exit(1, f'Build failed: {error}\n')

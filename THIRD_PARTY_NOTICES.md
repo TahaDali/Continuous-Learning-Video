@@ -1,17 +1,19 @@
 # Provenance and external components
 
-The repository's original instructions, helpers, player and mechanical example are proposed for release under MIT. This choice is part of the private release candidate and awaits the owner's final approval. It does not grant rights to third-party source material, names, trademarks, services or generated courses. Repository visibility and course audience remain separate decisions.
+Continuous-Learning-Video was created and is maintained by [TahaDali](https://github.com/TahaDali), with AI-assisted development. It combines the organization-first teaching method and continuous explanatory-video workflow developed in the earlier Learning Skills project. Existing contributor attribution and history are preserved.
 
-The research method was distilled from a user-supplied teaching conversation. Its Axios reference is a condensed historical method example with fictional people and transactions, incomplete original source lineage and explicit factual limitations. The original conversation, personal biography, job snapshots, private courses and private hosting identity are excluded from the repository and release bundle. Employer facts need new verification in each course. No employer logos or proprietary design documents are bundled.
+The owner approved **Apache-2.0** for this release on October 20, 2026. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Earlier portions were offered under MIT; their [original notice and permission text](LICENSES/Legacy-MIT.txt) remain included, and prior grants are not revoked. The current license does not grant rights to third-party source material, names, trademarks, services or every generated course.
 
-External dependencies are installed separately; their code and binaries are not included in this skill bundle:
+The current [teaching case](references/research/teaching-case.md) is a newly authored fictional example. It replaces the adapted employer-specific historical case in the release payload. Earlier private development used a user-supplied teaching conversation; its full original source lineage was not independently established. That development history is retained in Git, without claiming legal clearance of all historical expression. No original transcript, personal biography, real job snapshot, private course or hosting identity is part of the current payload. The owner authorized public release after the audit and review of five private sample courses.
 
-| Component | Use | Upstream license/source |
+External dependencies are installed separately; their code and binaries are not included in the skill ZIP:
+
+| Component | Use | License and boundary |
 | --- | --- | --- |
-| `@napi-rs/canvas` | Procedural raster rendering | [Upstream license](https://github.com/Brooooooklyn/canvas/blob/main/LICENSE): MIT with additional notices for incorporated components. Preserve the installed package's notices when distributing it. The starter records the tested version. |
-| `edge-tts` (optional) | Client for authorized Microsoft speech requests | [Upstream license](https://github.com/rany2/edge-tts/blob/master/LICENSE): LGPLv3 for most files, MIT for its SRT composer. It is not vendored here. Check the installed distribution's complete license and notices; the client license does not grant rights to Microsoft's service or voice output. |
-| FFmpeg / FFprobe | Encoding and media checks | [Upstream licensing](https://ffmpeg.org/legal.html). Build configuration affects licensing. No encoder binary is bundled. |
-| Python and Node.js | Local execution | Installed runtimes retain their own licenses and notices. |
-| Browsing, speech and hosting providers | Research, narration and delivery | External services retain their own terms, availability, credentials and permissions. A skill installation is not service authorization. |
+| `@napi-rs/canvas` | Procedural raster rendering | [MIT and incorporated-component notices](https://github.com/Brooooooklyn/canvas/blob/main/LICENSE). Preserve the installed distribution's complete notices if redistributing it. The committed lockfile records package identity. |
+| `edge-tts` (optional) | Authorized Microsoft speech requests | [LGPLv3 for most files; MIT for the SRT composer](https://github.com/rany2/edge-tts/blob/master/LICENSE). Not vendored. The client license does not establish service entitlement or rights to every voice output. |
+| FFmpeg / FFprobe | Encoding and media checks | [Build-dependent LGPL/GPL terms](https://ffmpeg.org/legal.html). No binary is bundled. |
+| Python and Node.js | Local execution | Separately installed runtimes retain their own licenses. |
+| Browsing, speech and hosting providers | Research, narration and delivery | Their own terms, availability, credentials and permissions apply. Installing this skill does not authorize a new data transfer or public course audience. |
 
-The canvas world requests a system sans-serif font; no font file is bundled. Research links identify sources rather than redistributing complete pages. A source's public availability does not establish permission to redistribute its text, assets or private details. Course authors must review the actual material and intended audience before export.
+No font file, employer logo or proprietary design document is bundled. The renderer uses a system sans-serif font. Source links are references, not redistribution permission. Review the actual source rights and audience before exporting or publishing a course. No employer endorsement or learner-effectiveness certification is implied.

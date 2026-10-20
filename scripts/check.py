@@ -13,8 +13,8 @@ import tempfile
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILLS = ROOT / 'skills'
-VIDEO = SKILLS / 'continuous-learning-videos'
+VIDEO = ROOT
+from build_skill import payload_sources
 
 
 def run(*args, **kwargs):
@@ -29,8 +29,13 @@ def require(condition, message):
 def check(render=False):
     node = shutil.which('node')
     require(node, 'Node.js is required for JavaScript syntax checks.')
-    files = [p for p in SKILLS.rglob('*') if p.is_file()
-             and not any(part in {'node_modules', '__pycache__'} for part in p.parts)]
+    files = [path for _, path in payload_sources(ROOT)]
+    files += [ROOT / name for name in ('README.md', 'CONTRIBUTING.md', 'SECURITY.md', 'CHANGELOG.md')]
+    files += list((ROOT / 'docs').glob('*.md'))
+    entry = (ROOT / 'SKILL.md').read_text()
+    require(re.search(r'^name: continuous-learning-video$', entry, re.M), 'Incorrect skill name')
+    require(re.search(r'^description: .+', entry, re.M), 'Missing skill description')
+    require(len([p for p in ROOT.rglob('SKILL.md') if not any(part in {'dist', 'node_modules', '.git'} for part in p.relative_to(ROOT).parts)]) == 1, 'Repository must expose exactly one skill')
     links = 0
     for path in files:
         if path.suffix == '.py':

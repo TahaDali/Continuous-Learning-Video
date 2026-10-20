@@ -1,4 +1,0 @@
-interface:
-  display_name: "Company & Role Storyteller"
-  short_description: "Deep company and career learning through connected stories"
-  default_prompt: "Use $company-role-storyteller to research this organization or opportunity and begin a substantial Part I about the organization, using expert storytelling; develop the role and career journey in later parts."
