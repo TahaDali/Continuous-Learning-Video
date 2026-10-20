@@ -1,0 +1,14 @@
+{
+  "scriptCoverage": "150/150 narration blocks preserved verbatim",
+  "sentenceCoverage": "443/443 sentences paired with action cues",
+  "lessonCoverage": "25/25 lessons have environment, entry, spatial blocking, hierarchy",
+  "requiredFields": "150/150 beats include concept, metaphor, graphics, actions, next connection, silent inference, precision risk",
+  "timing": "Existing beat windows retained; sentence times estimated by word share",
+  "viewerComprehension": "UNTESTED",
+  "animaticPacing": "UNTESTED",
+  "newVideoProduction": "NOT STARTED",
+  "sourceSha256": "c100b18c78589ed374ccbe4160d5044e5bc753137618a5b1ed6d842e45412231",
+  "documentStructure": "Unique anchors, lesson navigation targets, local downloads, required beat and cue counts checked",
+  "browserPreview": "Not completed: local file protocol refused by browser policy. No workaround attempted.",
+  "interactiveControls": "JavaScript syntax checked separately; browser interactions not verified"
+}

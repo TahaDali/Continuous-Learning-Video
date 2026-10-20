@@ -1,0 +1,119 @@
+1
+00:00:00,257 --> 00:00:02,270
+Olivia needs complete handoffs.
+
+2
+00:00:02,616 --> 00:00:06,922
+Michael needs to close legitimate deals before every operational detail
+
+3
+00:00:06,946 --> 00:00:07,734
+is final.
+
+4
+00:00:08,054 --> 00:00:12,026
+Define a separate readiness state and acceptance criteria together.
+
+5
+00:00:12,358 --> 00:00:15,698
+The business problem comes before the choice of Salesforce tool.
+
+6
+00:00:16,746 --> 00:00:19,826
+A Flow can respond to an approved state change, check
+
+7
+00:00:19,826 --> 00:00:23,218
+prerequisites, and create a task for the correct owner.
+
+8
+00:00:23,524 --> 00:00:26,695
+A validation rule can block an invalid save with a
+
+9
+00:00:26,695 --> 00:00:28,102
+useful explanation.
+
+10
+00:00:28,409 --> 00:00:30,563
+Each serves a different part of the design.
+
+11
+00:00:31,626 --> 00:00:34,381
+Check whether the record entered the ready state rather than
+
+12
+00:00:34,381 --> 00:00:36,783
+merely being edited while already ready.
+
+13
+00:00:37,085 --> 00:00:43,109
+Plan duplicate prevention, ownership changes, reopening, failures, and permissions.
+
+14
+00:00:43,412 --> 00:00:47,140
+Repeated events should not accidentally multiply the same work.
+
+15
+00:00:48,197 --> 00:00:50,816
+Build and test in an appropriate sandbox.
+
+16
+00:00:51,136 --> 00:00:56,638
+Test missing data, repeated updates, multiple users, bulk behavior, and
+
+17
+00:00:56,638 --> 00:00:57,942
+connected workflows.
+
+18
+00:00:58,275 --> 00:01:04,228
+Sandboxes can contain sensitive information or external connections, so isolation
+
+19
+00:01:04,228 --> 00:01:05,636
+still needs to be checked.
+
+20
+00:01:06,716 --> 00:01:10,078
+Michael and Olivia perform user acceptance testing.
+
+21
+00:01:10,414 --> 00:01:16,312
+Investigate dependencies, document changes, obtain required approval, and plan recovery
+
+22
+00:01:16,312 --> 00:01:17,408
+before release.
+
+23
+00:01:17,758 --> 00:01:22,224
+After deployment, check important behavior again and teach users the
+
+24
+00:01:22,224 --> 00:01:23,268
+new process.
+
+25
+00:01:24,319 --> 00:01:28,378
+The source’s fictional handoff completeness rises from sixty two to
+
+26
+00:01:28,378 --> 00:01:29,747
+ninety three percent.
+
+27
+00:01:30,079 --> 00:01:32,992
+That is a thirty one percentage point difference, not an
+
+28
+00:01:32,992 --> 00:01:34,103
+Axios result.
+
+29
+00:01:34,435 --> 00:01:39,474
+Comparable periods, stable definitions, and other possible influences matter when
+
+30
+00:01:39,474 --> 00:01:40,739
+judging the improvement.

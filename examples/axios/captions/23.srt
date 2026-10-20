@@ -1,0 +1,111 @@
+1
+00:00:00,270 --> 00:00:03,172
+Maya assigns migration validation work.
+
+2
+00:00:03,492 --> 00:00:06,378
+You support the team rather than assume authority over the
+
+3
+00:00:06,378 --> 00:00:07,567
+entire transition.
+
+4
+00:00:07,886 --> 00:00:11,275
+Commercial staff still need to sell and serve customers while
+
+5
+00:00:11,275 --> 00:00:12,747
+the new system is prepared.
+
+6
+00:00:13,794 --> 00:00:17,418
+Match source and target through stable identifiers.
+
+7
+00:00:17,738 --> 00:00:24,995
+Investigate missing relationships, excluded records, errors, currencies, and stage definitions.
+
+8
+00:00:25,328 --> 00:00:28,343
+The purpose is evidence that the information is complete and
+
+9
+00:00:28,343 --> 00:00:30,730
+correct under the agreed migration scope.
+
+10
+00:00:31,794 --> 00:00:37,164
+Show which counts, totals, relationships, permissions, historical records, and workflows
+
+11
+00:00:37,164 --> 00:00:39,463
+passed or remain unresolved.
+
+12
+00:00:39,792 --> 00:00:42,270
+Document exceptions and ownership.
+
+13
+00:00:42,610 --> 00:00:46,683
+A migration milestone should advance through the designated approval process,
+
+14
+00:00:46,845 --> 00:00:49,527
+not because most records seem to have arrived.
+
+15
+00:00:50,586 --> 00:00:55,370
+At a fictional six-month review, consider platform reliability, support quality,
+
+16
+00:00:55,548 --> 00:01:01,633
+data integrity, adoption, automation outcomes, analytics use, and stakeholder trust.
+
+17
+00:01:02,055 --> 00:01:06,079
+Faster ticket closure is unhelpful if problems remain unsolved.
+
+18
+00:01:06,411 --> 00:01:08,991
+Combine speed with quality and impact.
+
+19
+00:01:10,026 --> 00:01:14,675
+Explain a few substantiated outcomes, your own role, limitations, and
+
+20
+00:01:14,675 --> 00:01:15,692
+what remains.
+
+21
+00:01:16,003 --> 00:01:19,050
+A short summary of important risks and decisions can serve
+
+22
+00:01:19,050 --> 00:01:22,552
+a senior leader better than an exhaustive activity list or
+
+23
+00:01:22,552 --> 00:01:24,234
+a long technical report.
+
+24
+00:01:25,303 --> 00:01:30,277
+By this stage, growing independence means anticipating issues and recommending
+
+25
+00:01:30,277 --> 00:01:31,723
+improvements with evidence.
+
+26
+00:01:32,056 --> 00:01:34,932
+It still includes technical development and feedback.
+
+27
+00:01:35,252 --> 00:01:38,180
+The timeline and review categories are illustrative;
+
+28
+00:01:38,718 --> 00:01:41,917
+actual expectations must be agreed with the manager.

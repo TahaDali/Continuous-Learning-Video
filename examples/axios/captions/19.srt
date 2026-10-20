@@ -1,0 +1,111 @@
+1
+00:00:00,270 --> 00:00:04,703
+Our fictional assessment starts with one thousand opportunities, twenty possible
+
+2
+00:00:04,703 --> 00:00:08,891
+duplicates, forty missing dates, and a two hundred fifty thousand
+
+3
+00:00:08,891 --> 00:00:10,428
+dollar difference in totals.
+
+4
+00:00:10,747 --> 00:00:15,386
+Ask for scope, definitions, and acceptance criteria before approving or
+
+5
+00:00:15,386 --> 00:00:16,613
+fixing the migration.
+
+6
+00:00:17,658 --> 00:00:22,645
+Match stable identifiers, examine apparent duplicates, and determine which dates
+
+7
+00:00:22,645 --> 00:00:24,388
+are required at each stage.
+
+8
+00:00:24,694 --> 00:00:30,635
+Reconcile monetary differences at record level, considering currency, filters, statuses,
+
+9
+00:00:30,635 --> 00:00:31,669
+and mappings.
+
+10
+00:00:31,988 --> 00:00:34,877
+Do not invent values just to make an error disappear.
+
+11
+00:00:35,948 --> 00:00:40,900
+For a handoff task, explain the trigger, prerequisites, owner, permissions,
+
+12
+00:00:41,101 --> 00:00:44,841
+duplicate prevention, failures, and unusual cases.
+
+13
+00:00:45,182 --> 00:00:48,362
+Show how you would test, document, and deploy it.
+
+14
+00:00:48,690 --> 00:00:52,443
+The solution’s behavior matters more than reciting tool names.
+
+15
+00:00:53,490 --> 00:00:58,686
+Use a Salesforce learning environment to model advertisers, contacts, opportunities,
+
+16
+00:00:59,006 --> 00:01:03,660
+an internal task automation, access, validation, and a dashboard.
+
+17
+00:01:03,993 --> 00:01:07,356
+Standard Playgrounds should not be assumed to include the specialized
+
+18
+00:01:07,356 --> 00:01:09,794
+Media Cloud features used by an employer.
+
+19
+00:01:10,855 --> 00:01:12,953
+The source proposes a learning sequence:
+
+20
+00:01:13,498 --> 00:01:18,538
+objects and security, reporting and Flow, migration and testing, then
+
+21
+00:01:18,538 --> 00:01:20,427
+media concepts and interviews.
+
+22
+00:01:20,777 --> 00:01:23,993
+Treat this as a focused practice plan, not a guarantee
+
+23
+00:01:23,993 --> 00:01:27,589
+of certification, independent readiness, or employment.
+
+24
+00:01:28,626 --> 00:01:33,394
+Present the problem, data model, design decisions, tests, failures, and
+
+25
+00:01:33,394 --> 00:01:34,363
+limitations.
+
+26
+00:01:34,696 --> 00:01:38,152
+Be ready to change a requirement and predict the consequence.
+
+27
+00:01:38,472 --> 00:01:43,484
+A convincing work sample demonstrates understanding, while honest boundaries distinguish
+
+28
+00:01:43,484 --> 00:01:46,309
+practice experience from running a live platform.

@@ -1,0 +1,115 @@
+1
+00:00:00,257 --> 00:00:05,154
+Leaders may track pipeline, conversion, deal size, sales cycle, and
+
+2
+00:00:05,154 --> 00:00:05,801
+renewal.
+
+3
+00:00:06,134 --> 00:00:11,149
+Specify eligible records, periods, milestones, and denominators.
+
+4
+00:00:11,482 --> 00:00:16,237
+A polished chart cannot repair inconsistent definitions or missing commercial
+
+5
+00:00:16,237 --> 00:00:16,729
+data.
+
+6
+00:00:17,778 --> 00:00:21,374
+Our fictional pipeline contains one hundred fifty thousand at eighty
+
+7
+00:00:21,374 --> 00:00:25,639
+percent, one hundred thousand at forty percent, and fifty thousand
+
+8
+00:00:25,639 --> 00:00:26,827
+at twenty percent.
+
+9
+00:00:27,160 --> 00:00:31,064
+The weighted total is one hundred seventy thousand dollars, against
+
+10
+00:00:31,064 --> 00:00:33,657
+three hundred thousand of potential deals.
+
+11
+00:00:34,709 --> 00:00:38,463
+That arithmetic is not automatically a reliable forecast.
+
+12
+00:00:38,765 --> 00:00:43,629
+Probabilities need meaningful definitions and historical calibration.
+
+13
+00:00:43,944 --> 00:00:47,978
+Leaders may add forecast categories, context, and judgment.
+
+14
+00:00:48,306 --> 00:00:52,583
+Track model performance so the calculation earns trust over time.
+
+15
+00:00:53,647 --> 00:00:56,289
+A win rate falling from thirty to twenty two percent
+
+16
+00:00:56,289 --> 00:01:00,735
+may reflect a real problem, different customer mix, timing, or
+
+17
+00:01:00,735 --> 00:01:03,495
+earlier-stage opportunities entering the denominator.
+
+18
+00:01:03,802 --> 00:01:09,049
+Compare consistent definitions before prescribing sales training or blaming individuals.
+
+19
+00:01:10,124 --> 00:01:15,814
+A Quarterly Business Review connects results, explanations, limitations, and next
+
+20
+00:01:15,814 --> 00:01:16,610
+decisions.
+
+21
+00:01:16,921 --> 00:01:20,892
+Lead with a few meaningful findings rather than fifteen disconnected
+
+22
+00:01:20,892 --> 00:01:21,519
+charts.
+
+23
+00:01:21,830 --> 00:01:27,209
+Identify proposed actions, owners, and measures while leaving business decisions
+
+24
+00:01:27,273 --> 00:01:28,733
+with the responsible leaders.
+
+25
+00:01:29,802 --> 00:01:34,648
+An overstated bookings report and misrouted campaign tasks usually warrant
+
+26
+00:01:34,648 --> 00:01:37,782
+investigation before cosmetic dashboard changes.
+
+27
+00:01:38,114 --> 00:01:44,135
+Assess actual impact, urgency, risk, dependencies, and available workarounds.
+
+28
+00:01:44,480 --> 00:01:49,106
+The same principles guide a week balancing support, migration, reporting,
+
+29
+00:01:49,106 --> 00:01:50,179
+and improvements.

@@ -1,0 +1,115 @@
+1
+00:00:00,270 --> 00:00:03,131
+A fictional win rate drops from thirty to twenty two
+
+2
+00:00:03,131 --> 00:00:03,791
+percent.
+
+3
+00:00:04,136 --> 00:00:08,930
+Before recommending training, ask whether earlier-stage inquiries now enter the
+
+4
+00:00:08,930 --> 00:00:09,796
+denominator.
+
+5
+00:00:10,103 --> 00:00:14,600
+Compare consistent cohorts and definitions to distinguish a real change
+
+6
+00:00:14,600 --> 00:00:15,917
+from a measurement change.
+
+7
+00:00:17,012 --> 00:00:21,316
+For a Quarterly Business Review, reduce disconnected charts to meaningful
+
+8
+00:00:21,316 --> 00:00:25,326
+findings, supporting evidence, limitations, and decisions.
+
+9
+00:00:25,646 --> 00:00:29,641
+Explain what should be investigated or changed and who should
+
+10
+00:00:29,641 --> 00:00:30,752
+own the next action.
+
+11
+00:00:31,756 --> 00:00:35,522
+Employees submit vague messages saying Salesforce is broken.
+
+12
+00:00:35,825 --> 00:00:39,502
+A short structured intake form may gather the record, action,
+
+13
+00:00:39,587 --> 00:00:41,262
+and error more reliably.
+
+14
+00:00:41,590 --> 00:00:45,697
+Simplify the request process before deciding an AI classifier is
+
+15
+00:00:45,697 --> 00:00:46,517
+necessary.
+
+16
+00:00:47,599 --> 00:00:51,568
+If a substantial problem remains, an approved assistant might summarize
+
+17
+00:00:51,568 --> 00:00:54,406
+requests or suggest relevant documentation.
+
+18
+00:00:54,738 --> 00:01:00,759
+Evaluate benefit, error behavior, privacy, permissions, and human responsibility.
+
+19
+00:01:01,091 --> 00:01:03,978
+Keep the simplest effective process when it already meets the
+
+20
+00:01:03,978 --> 00:01:04,509
+need.
+
+21
+00:01:05,551 --> 00:01:07,884
+A new colleague should not depend on your memory.
+
+22
+00:01:08,220 --> 00:01:14,757
+Document recurring issues, workflow behavior, metric definitions, owners, dependencies, and
+
+23
+00:01:14,757 --> 00:01:15,957
+release decisions.
+
+24
+00:01:16,280 --> 00:01:19,965
+Test whether someone else can use the instructions and recognize
+
+25
+00:01:19,965 --> 00:01:21,048
+when to escalate.
+
+26
+00:01:22,085 --> 00:01:25,619
+Being the only person who knows the system creates fragility.
+
+27
+00:01:25,951 --> 00:01:29,846
+Helping others operate it reliably expands your contribution.
+
+28
+00:01:30,178 --> 00:01:35,101
+Influence grows through useful judgment, clear communication, and a system
+
+29
+00:01:35,101 --> 00:01:37,488
+that continues working when you are unavailable.

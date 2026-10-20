@@ -1,0 +1,111 @@
+1
+00:00:00,270 --> 00:00:04,061
+Our fictional campaign records one million ad impressions.
+
+2
+00:00:04,394 --> 00:00:07,938
+An impression is an instance of an advertisement being served
+
+3
+00:00:07,938 --> 00:00:09,951
+or shown under the measurement method.
+
+4
+00:00:10,257 --> 00:00:13,762
+It does not necessarily establish unique reach or a person’s
+
+5
+00:00:13,762 --> 00:00:14,422
+attention.
+
+6
+00:00:15,474 --> 00:00:19,546
+Twelve thousand recorded clicks divided by one million impressions gives
+
+7
+00:00:19,546 --> 00:00:21,946
+a one point two percent click-through rate.
+
+8
+00:00:22,225 --> 00:00:24,251
+The arithmetic is straightforward.
+
+9
+00:00:24,585 --> 00:00:28,299
+Whether that result is useful depends on the objective, format,
+
+10
+00:00:28,631 --> 00:00:30,541
+audience, and measurement quality.
+
+11
+00:00:31,576 --> 00:00:35,253
+Suppose there are one hundred eighty attributed qualified inquiries.
+
+12
+00:00:35,582 --> 00:00:39,973
+Ask how qualification and attribution were defined, whether tracking worked,
+
+13
+00:00:40,046 --> 00:00:41,886
+and what the campaign cost.
+
+14
+00:00:42,202 --> 00:00:45,633
+Those counts alone do not prove commercial success or return
+
+15
+00:00:45,633 --> 00:00:46,529
+on investment.
+
+16
+00:00:47,549 --> 00:00:51,031
+The advertiser asks about delivery, reach, and inquiries.
+
+17
+00:00:51,364 --> 00:00:56,454
+Axios management asks about bookings, product demand, forecast quality, and
+
+18
+00:00:56,454 --> 00:00:57,243
+renewals.
+
+19
+00:00:57,536 --> 00:01:01,788
+Those reporting systems connect, but we cannot assume all ad-delivery
+
+20
+00:01:01,788 --> 00:01:03,982
+data lives inside Salesforce.
+
+21
+00:01:05,023 --> 00:01:09,218
+Imagine customers buying newsletters plus events renew more often.
+
+22
+00:01:09,541 --> 00:01:13,710
+Larger budgets or different customer types could explain both.
+
+23
+00:01:14,034 --> 00:01:18,825
+Compare similar groups and examine alternative explanations before claiming that
+
+24
+00:01:18,825 --> 00:01:21,054
+the product combination caused the renewal.
+
+25
+00:01:22,085 --> 00:01:26,701
+Our advertiser considers a two hundred thousand dollar follow-on campaign.
+
+26
+00:01:26,982 --> 00:01:30,773
+Renewal, upsell, and expansion can overlap.
+
+27
+00:01:31,106 --> 00:01:36,274
+Accurate history supports a relevant conversation, while migration and governance
+
+28
+00:01:36,274 --> 00:01:39,472
+protect that relationship knowledge for the next team member.

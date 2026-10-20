@@ -1,0 +1,119 @@
+1
+00:00:00,283 --> 00:00:03,933
+A genuine internal connection may help an application get noticed
+
+2
+00:00:04,226 --> 00:00:06,330
+and clarify the formal process.
+
+3
+00:00:06,649 --> 00:00:09,113
+It cannot create missing qualifications.
+
+4
+00:00:09,458 --> 00:00:15,170
+Ask for useful organizational context without expecting confidential candidate evaluations,
+
+5
+00:00:15,412 --> 00:00:18,675
+private configurations, or special guarantees.
+
+6
+00:00:19,735 --> 00:00:24,129
+Ask which Salesforce problems matter most immediately and how far
+
+7
+00:00:24,129 --> 00:00:25,498
+migration has progressed.
+
+8
+00:00:25,818 --> 00:00:29,403
+The answers reveal whether the near-term work centers on stability,
+
+9
+00:00:29,593 --> 00:00:33,681
+data transition, user support, analytics, or something else.
+
+10
+00:00:34,709 --> 00:00:37,426
+Ask whether you would be the primary administrator, who owns
+
+11
+00:00:37,426 --> 00:00:41,661
+architecture, who approves production changes, and what experienced help is
+
+12
+00:00:41,661 --> 00:00:42,340
+available.
+
+13
+00:00:42,656 --> 00:00:46,575
+An early-career title can still involve significant responsibility;
+
+14
+00:00:47,031 --> 00:00:49,598
+understand how that responsibility is supported.
+
+15
+00:00:50,671 --> 00:00:53,326
+Ask which initiatives will take the most time during the
+
+16
+00:00:53,326 --> 00:00:54,617
+first six months.
+
+17
+00:00:54,898 --> 00:00:59,485
+Routine permissions, layouts, troubleshooting, and reporting are real parts of
+
+18
+00:00:59,485 --> 00:01:00,094
+the role.
+
+19
+00:01:00,439 --> 00:01:03,442
+Interest in AI does not remove the need to enjoy
+
+20
+00:01:03,442 --> 00:01:04,836
+and perform that work.
+
+21
+00:01:05,887 --> 00:01:12,450
+Discuss six-month outcomes, training, certification expectations, and examples of expanded
+
+22
+00:01:12,450 --> 00:01:13,480
+responsibility.
+
+23
+00:01:13,804 --> 00:01:17,504
+Clarify compensation and location terms from the current offer.
+
+24
+00:01:17,853 --> 00:01:22,074
+No public promotion timetable or assumed future salary should replace
+
+25
+00:01:22,085 --> 00:01:23,597
+an actual conversation.
+
+26
+00:01:24,616 --> 00:01:27,944
+The employer evaluates your readiness, and you evaluate the work,
+
+27
+00:01:28,134 --> 00:01:30,637
+support, expectations, and direction.
+
+28
+00:01:30,957 --> 00:01:34,271
+The best fit depends on real constraints and priorities.
+
+29
+00:01:34,604 --> 00:01:40,235
+A referral, portfolio, or strong interview improves evidence without guaranteeing
+
+30
+00:01:40,235 --> 00:01:40,869
+an offer.

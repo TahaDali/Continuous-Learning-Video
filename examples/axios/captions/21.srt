@@ -1,0 +1,119 @@
+1
+00:00:00,257 --> 00:00:02,296
+You have accepted a fictional offer.
+
+2
+00:00:02,628 --> 00:00:04,642
+Maya explains the priorities.
+
+3
+00:00:04,961 --> 00:00:09,961
+Begin by learning the organization’s business processes, authorized access, system
+
+4
+00:00:09,961 --> 00:00:12,953
+owners, support channels, and release procedures.
+
+5
+00:00:13,273 --> 00:00:17,644
+Technical ability does not establish permission or context to change
+
+6
+00:00:17,654 --> 00:00:19,229
+an unfamiliar system.
+
+7
+00:00:20,287 --> 00:00:25,339
+Watch Sarah qualify prospects, Michael develop opportunities, and Olivia prepare
+
+8
+00:00:25,339 --> 00:00:26,230
+campaigns.
+
+9
+00:00:26,563 --> 00:00:30,934
+Record where information is created, lost, or misunderstood.
+
+10
+00:00:31,228 --> 00:00:35,045
+A useful early contribution may be a clear process diagram
+
+11
+00:00:35,210 --> 00:00:36,823
+rather than a new automation.
+
+12
+00:00:37,840 --> 00:00:42,308
+Review migration scope, reporting definitions, and user pain points.
+
+13
+00:00:42,585 --> 00:00:46,361
+Suggest priorities based on evidence and ask for the support
+
+14
+00:00:46,361 --> 00:00:48,214
+needed to become independent.
+
+15
+00:00:48,542 --> 00:00:53,147
+The source’s day-by-day schedule is an educational scenario, not Axios’s
+
+16
+00:00:53,147 --> 00:00:54,592
+published onboarding plan.
+
+17
+00:00:55,652 --> 00:00:59,366
+For the handoff project, hear both Sales and Client Success.
+
+18
+00:00:59,673 --> 00:01:04,763
+Separate signed from ready, define required information and exceptions, then
+
+19
+00:01:04,763 --> 00:01:05,848
+agree the result.
+
+20
+00:01:06,168 --> 00:01:10,613
+Understanding why reasonable colleagues disagree can improve the design before
+
+21
+00:01:10,613 --> 00:01:12,317
+any configuration begins.
+
+22
+00:01:13,351 --> 00:01:17,856
+Build in the authorized test environment, involve users, test unusual
+
+23
+00:01:17,856 --> 00:01:21,530
+cases, document, and follow the approved release process.
+
+24
+00:01:21,854 --> 00:01:25,124
+Teach the workflow and measure its behavior after launch.
+
+25
+00:01:25,460 --> 00:01:28,900
+A working trigger alone is not a delivered business outcome.
+
+26
+00:01:29,933 --> 00:01:34,562
+Discuss completed work, limits, mistakes, and development needs honestly.
+
+27
+00:01:34,856 --> 00:01:40,075
+Routine reliability, systematic investigation, communication, and knowing when to seek
+
+28
+00:01:40,075 --> 00:01:42,243
+help can justify greater ownership.
+
+29
+00:01:42,549 --> 00:01:45,964
+A new responsibility is meaningful even when the title and
+
+30
+00:01:45,964 --> 00:01:47,397
+salary stay the same.

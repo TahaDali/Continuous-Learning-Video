@@ -1,0 +1,127 @@
+WEBVTT
+
+NOTE Microsoft Ava synthetic narration; service word timings.
+
+1
+00:00:00.283 --> 00:00:03.273 line:86% position:50% size:88% align:center
+A library can move every book and still lose its
+
+2
+00:00:03.273 --> 00:00:03.946 line:86% position:50% size:88% align:center
+catalog.
+
+3
+00:00:04.265 --> 00:00:07.206 line:86% position:50% size:88% align:center
+A CRM migration must preserve usable meaning:
+
+4
+00:00:07.757 --> 00:00:14.368 line:86% position:50% size:88% align:center
+organizations, people, relationships, ownership, history, access, and the commercial measures
+
+5
+00:00:14.368 --> 00:00:15.750 line:86% position:50% size:88% align:center
+employees rely on.
+
+6
+00:00:16.807 --> 00:00:20.905 line:86% position:50% size:88% align:center
+A legacy Contract Value field is not automatically equivalent to
+
+7
+00:00:20.905 --> 00:00:22.055 line:86% position:50% size:88% align:center
+Salesforce Amount.
+
+8
+00:00:22.361 --> 00:00:27.506 line:86% position:50% size:88% align:center
+Confirm gross or net values, currencies, stage meanings, ownership rules,
+
+9
+00:00:27.554 --> 00:00:29.104 line:86% position:50% size:88% align:center
+and the objects in scope.
+
+10
+00:00:29.436 --> 00:00:33.640 line:86% position:50% size:88% align:center
+Preserve stable legacy identifiers so records can be traced.
+
+11
+00:00:34.685 --> 00:00:38.792 line:86% position:50% size:88% align:center
+Clean data using agreed rules, then trial the migration in
+
+12
+00:00:38.792 --> 00:00:40.084 line:86% position:50% size:88% align:center
+a suitable environment.
+
+13
+00:00:40.360 --> 00:00:43.616 line:86% position:50% size:88% align:center
+Validate relationships and expected workflows.
+
+14
+00:00:43.958 --> 00:00:46.538 line:86% position:50% size:88% align:center
+Potential duplicates require investigation;
+
+15
+00:00:47.058 --> 00:00:51.267 line:86% position:50% size:88% align:center
+two campaigns for one advertiser may be entirely legitimate business
+
+16
+00:00:51.267 --> 00:00:51.921 line:86% position:50% size:88% align:center
+records.
+
+17
+00:00:52.975 --> 00:00:57.331 line:86% position:50% size:88% align:center
+In the source’s fictional trial, twenty thousand records become nineteen
+
+18
+00:00:57.331 --> 00:00:59.073 line:86% position:50% size:88% align:center
+thousand nine hundred forty.
+
+19
+00:00:59.393 --> 00:01:03.645 line:86% position:50% size:88% align:center
+Twenty five were excluded by scope, twenty failed relationships, and
+
+20
+00:01:03.645 --> 00:01:06.109 line:86% position:50% size:88% align:center
+fifteen had unresolved errors.
+
+21
+00:01:06.390 --> 00:01:10.619 line:86% position:50% size:88% align:center
+Reconciliation explains the sixty-record gap rather than hiding it.
+
+22
+00:01:11.658 --> 00:01:16.738 line:86% position:50% size:88% align:center
+Compare monetary totals at record level, accounting for filters, currencies,
+
+23
+00:01:17.075 --> 00:01:18.900 line:86% position:50% size:88% align:center
+statuses, and mappings.
+
+24
+00:01:19.249 --> 00:01:24.459 line:86% position:50% size:88% align:center
+Also check relationships, ownership, security, history, and workflows.
+
+25
+00:01:24.756 --> 00:01:29.053 line:86% position:50% size:88% align:center
+Record what changed or was excluded against acceptance criteria agreed
+
+26
+00:01:29.053 --> 00:01:31.242 line:86% position:50% size:88% align:center
+with business and technical owners.
+
+27
+00:01:32.298 --> 00:01:37.095 line:86% position:50% size:88% align:center
+Plan cutover, communications, training, recovery, and monitoring.
+
+28
+00:01:37.414 --> 00:01:39.956 line:86% position:50% size:88% align:center
+The posting says the analyst supports migration;
+
+29
+00:01:40.455 --> 00:01:43.149 line:86% position:50% size:88% align:center
+it does not reveal the legacy system or require this
+
+30
+00:01:43.149 --> 00:01:46.231 line:86% position:50% size:88% align:center
+employee to lead the entire technical project alone.
+
+31
+00:01:46.551 --> 00:01:48.809 line:86% position:50% size:88% align:center
+Authorized owners decide readiness.

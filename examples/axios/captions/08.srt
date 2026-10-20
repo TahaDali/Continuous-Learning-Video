@@ -1,0 +1,127 @@
+1
+00:00:00,257 --> 00:00:04,587
+Atlantic Technology signs our fictional one hundred fifty thousand dollar
+
+2
+00:00:04,587 --> 00:00:05,260
+agreement.
+
+3
+00:00:05,580 --> 00:00:06,910
+Michael celebrates.
+
+4
+00:00:07,216 --> 00:00:10,760
+That signature creates a commercial commitment, but it does not
+
+5
+00:00:10,760 --> 00:00:14,355
+tell us what has been invoiced, collected, or earned under
+
+6
+00:00:14,355 --> 00:00:15,363
+accounting rules.
+
+7
+00:00:16,423 --> 00:00:20,521
+A booking records a qualifying commercial commitment under the organization’s
+
+8
+00:00:20,521 --> 00:00:21,696
+reporting policy.
+
+9
+00:00:22,016 --> 00:00:24,918
+An invoice requests payment under the terms.
+
+10
+00:00:25,250 --> 00:00:28,397
+Cash collection records money actually received.
+
+11
+00:00:28,717 --> 00:00:33,820
+Recognized revenue follows satisfaction of obligations under the applicable accounting
+
+12
+00:00:33,820 --> 00:00:34,428
+rules.
+
+13
+00:00:35,492 --> 00:00:40,058
+For teaching, assume this campaign’s services qualify for equal recognition
+
+14
+00:00:40,058 --> 00:00:41,362
+over three months.
+
+15
+00:00:41,652 --> 00:00:45,227
+The illustration allocates fifty thousand dollars to each month.
+
+16
+00:00:45,555 --> 00:00:49,981
+Actual recognition can differ with the deliverables, service periods, contract
+
+17
+00:00:49,981 --> 00:00:52,064
+structure, and accounting policy.
+
+18
+00:00:53,106 --> 00:00:57,578
+The customer might pay before delivery, in installments, or later
+
+19
+00:00:57,578 --> 00:00:58,560
+under the agreement.
+
+20
+00:00:58,879 --> 00:01:02,488
+The invoice and cash dates can therefore move separately from
+
+21
+00:01:02,488 --> 00:01:03,702
+the revenue timeline.
+
+22
+00:01:04,021 --> 00:01:07,642
+A contract’s total value does not describe every clock at
+
+23
+00:01:07,642 --> 00:01:08,264
+once.
+
+24
+00:01:09,319 --> 00:01:12,863
+A bookings dashboard can show one hundred fifty thousand while
+
+25
+00:01:12,926 --> 00:01:16,626
+a monthly revenue report shows fifty thousand under our assumption.
+
+26
+00:01:16,962 --> 00:01:19,334
+A cash report may show another amount.
+
+27
+00:01:19,658 --> 00:01:23,369
+Compare the same concepts and periods before calling a difference
+
+28
+00:01:23,369 --> 00:01:23,982
+an error.
+
+29
+00:01:25,026 --> 00:01:30,828
+The analyst supports definitions, mappings, reconciliations, and approved integrations.
+
+30
+00:01:31,212 --> 00:01:34,874
+Finance determines accounting policy and recognition treatment.
+
+31
+00:01:35,194 --> 00:01:40,258
+Establishing that boundary helps commercial systems provide trustworthy information without
+
+32
+00:01:40,258 --> 00:01:43,869
+assigning the analyst responsibilities they do not hold.

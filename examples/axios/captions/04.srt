@@ -1,0 +1,123 @@
+1
+00:00:00,257 --> 00:00:02,386
+Our continuing case is invented.
+
+2
+00:00:02,706 --> 00:00:06,443
+Atlantic Technology wants business leaders to know about a software
+
+3
+00:00:06,443 --> 00:00:07,077
+launch.
+
+4
+00:00:07,396 --> 00:00:12,255
+Sarah researches the prospect, Michael develops the sale, Olivia coordinates
+
+5
+00:00:12,255 --> 00:00:15,582
+the campaign, and Maya manages the fictional analyst.
+
+6
+00:00:16,613 --> 00:00:19,657
+Business Development finds and qualifies interest.
+
+7
+00:00:20,002 --> 00:00:23,910
+Client Partnerships develops commercial relationships and agreements.
+
+8
+00:00:24,255 --> 00:00:28,897
+Client Success or Client Experience helps coordinate customers and delivery.
+
+9
+00:00:29,229 --> 00:00:31,023
+Exact responsibilities vary;
+
+10
+00:00:31,446 --> 00:00:35,827
+this is a functional teaching map, not Axios’s internal reporting
+
+11
+00:00:35,827 --> 00:00:36,655
+hierarchy.
+
+12
+00:00:37,709 --> 00:00:41,829
+Creative teams, Ad Operations, and Events contribute according to the
+
+13
+00:00:41,829 --> 00:00:42,547
+package.
+
+14
+00:00:42,964 --> 00:00:45,850
+Finance owns accounting policies and controls.
+
+15
+00:00:46,179 --> 00:00:51,765
+Revenue Operations supports dependable processes, shared information, reporting, and useful
+
+16
+00:00:51,765 --> 00:00:53,976
+automation across the commercial journey.
+
+17
+00:00:55,026 --> 00:00:58,596
+As the Salesforce Business Analyst, you affect several teams without
+
+18
+00:00:58,596 --> 00:01:00,171
+necessarily managing them.
+
+19
+00:01:00,490 --> 00:01:02,735
+You help their information move reliably.
+
+20
+00:01:03,042 --> 00:01:08,506
+You are not automatically the salesperson, advertising operator, accountant, migration
+
+21
+00:01:08,506 --> 00:01:11,717
+architect, or owner of every connected system.
+
+22
+00:01:12,855 --> 00:01:16,451
+Four hundred emails and fifty new records describe activity.
+
+23
+00:01:16,736 --> 00:01:18,378
+Leaders also need outcomes:
+
+24
+00:01:18,715 --> 00:01:23,352
+qualified pipeline, conversion, deal size, sales cycle, and retention.
+
+25
+00:01:23,702 --> 00:01:29,144
+Those measures require agreed definitions, useful comparisons, and reliable source
+
+26
+00:01:29,144 --> 00:01:29,667
+data.
+
+27
+00:01:30,688 --> 00:01:34,361
+Your leverage comes from understanding how the functions depend on
+
+28
+00:01:34,361 --> 00:01:35,008
+each other.
+
+29
+00:01:35,302 --> 00:01:38,797
+When a dashboard looks wrong, trace the process behind it.
+
+30
+00:01:39,116 --> 00:01:42,093
+A better picture of the business often comes before a
+
+31
+00:01:42,093 --> 00:01:43,745
+better system configuration.

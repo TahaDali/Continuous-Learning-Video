@@ -1,0 +1,123 @@
+WEBVTT
+
+NOTE Microsoft Ava synthetic narration; service word timings.
+
+1
+00:00:00.270 --> 00:00:04.203 line:86% position:50% size:88% align:center
+Sarah reports duplicate follow-up tasks after ordinary edits.
+
+2
+00:00:04.523 --> 00:00:06.922 line:86% position:50% size:88% align:center
+You helped implement the recent Flow change.
+
+3
+00:00:07.242 --> 00:00:11.275 line:86% position:50% size:88% align:center
+In this fictional incident, the automation responds while a record
+
+4
+00:00:11.275 --> 00:00:15.167 line:86% position:50% size:88% align:center
+remains ready, instead of only when it enters the intended
+
+5
+00:00:15.167 --> 00:00:15.750 line:86% position:50% size:88% align:center
+state.
+
+6
+00:00:16.831 --> 00:00:21.718 line:86% position:50% size:88% align:center
+Identify affected records, users, timing, and operational consequences.
+
+7
+00:00:22.037 --> 00:00:26.058 line:86% position:50% size:88% align:center
+Preserve useful evidence and notify Maya promptly with what is
+
+8
+00:00:26.058 --> 00:00:27.762 line:86% position:50% size:88% align:center
+known and uncertain.
+
+9
+00:00:28.107 --> 00:00:31.715 line:86% position:50% size:88% align:center
+Quietly changing production to hide embarrassment can make both the
+
+10
+00:00:31.715 --> 00:00:34.540 line:86% position:50% size:88% align:center
+technical problem and the trust problem worse.
+
+11
+00:00:35.572 --> 00:00:40.167 line:86% position:50% size:88% align:center
+Work with authorized owners on containment, rollback, or recovery.
+
+12
+00:00:40.470 --> 00:00:43.340 line:86% position:50% size:88% align:center
+A faulty automation might need to be paused, but the
+
+13
+00:00:43.340 --> 00:00:47.259 line:86% position:50% size:88% align:center
+choice depends on scope, alternatives, and the approved process.
+
+14
+00:00:47.587 --> 00:00:49.848 line:86% position:50% size:88% align:center
+Avoid deleting tasks indiscriminately;
+
+15
+00:00:50.342 --> 00:00:52.399 line:86% position:50% size:88% align:center
+some may represent legitimate work.
+
+16
+00:00:53.453 --> 00:00:58.366 line:86% position:50% size:88% align:center
+In a suitable test environment, recreate initial handoff, later edits,
+
+17
+00:00:58.505 --> 00:01:00.505 line:86% position:50% size:88% align:center
+repeated events, and reopening.
+
+18
+00:01:00.837 --> 00:01:04.397 line:86% position:50% size:88% align:center
+Compare the intended transition with the actual trigger behavior.
+
+19
+00:01:04.690 --> 00:01:09.809 line:86% position:50% size:88% align:center
+Correct the conditions and duplicate prevention, then verify connected workflows.
+
+20
+00:01:10.868 --> 00:01:14.475 line:86% position:50% size:88% align:center
+Add a regression case covering edits while the record remains
+
+21
+00:01:14.475 --> 00:01:15.701 line:86% position:50% size:88% align:center
+in the same state.
+
+22
+00:01:16.024 --> 00:01:18.982 line:86% position:50% size:88% align:center
+Document the gap, correction, and recovery.
+
+23
+00:01:19.319 --> 00:01:23.329 line:86% position:50% size:88% align:center
+Explain directly that the earlier tests missed this scenario and
+
+24
+00:01:23.329 --> 00:01:25.453 line:86% position:50% size:88% align:center
+how the testing process has changed.
+
+25
+00:01:26.503 --> 00:01:30.137 line:86% position:50% size:88% align:center
+Owning a mistake does not erase its consequences, especially for
+
+26
+00:01:30.137 --> 00:01:31.428 line:86% position:50% size:88% align:center
+serious incidents.
+
+27
+00:01:31.735 --> 00:01:38.372 line:86% position:50% size:88% align:center
+Transparent investigation, appropriate escalation, careful correction, and reduced recurrence are
+
+28
+00:01:38.372 --> 00:01:39.148 line:86% position:50% size:88% align:center
+essential.
+
+29
+00:01:39.467 --> 00:01:43.926 line:86% position:50% size:88% align:center
+The professional objective is dependable behavior when problems occur, not
+
+30
+00:01:43.926 --> 00:01:46.042 line:86% position:50% size:88% align:center
+a claim of perfect performance.
