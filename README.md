@@ -16,9 +16,9 @@ The [rights review](docs/rights-review.md) records the owner's confirmation that
 
 The example is served from the separate `gh-pages` branch. Its media are not included in the installable skill bundle.
 
-[![The Axios Story, lesson 2: Two companies, three financial ideas](docs/images/axios-course-example.png)](https://tahadali.github.io/Continuous-Learning-Video/examples/axios/#lesson-02)
+[![The Axios Story, lesson 2: Two companies, three financial ideas](docs/images/axios-course-example.png)](https://tahadali.github.io/Continuous-Learning-Video/examples/axios/#lesson-01)
 
-*Screenshot from lesson 2, “Two companies, three financial ideas.” Select the image to open that lesson in the live course.*
+*Screenshot from lesson 2, “Two companies, three financial ideas.” Select the image to start the live course at lesson 1.*
 
 ## What you receive
 
