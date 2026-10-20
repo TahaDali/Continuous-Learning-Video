@@ -60,6 +60,22 @@ def stem_for(lesson, beat):
     return lesson['id'] + '-' + beat['id']
 
 
+def caption_chunks(text, words, max_words=10):
+    """Split at source whitespace, retaining quotes and unsplit word tokens."""
+    chunks, chunk, cursor = [], [], 0
+    for index, word in enumerate(words):
+        chunk.append(word)
+        last = index + 1 == len(words)
+        gap = text[word['charEnd']:words[index + 1]['charStart']] if not last else ''
+        space = re.search(r'\s', gap)
+        punctuation = text[word['charEnd']:word['charEnd'] + 1] in '.!?;:'
+        if last or ((len(chunk) >= max_words or punctuation) and space):
+            cut = len(text) if last else word['charEnd'] + space.start()
+            chunks.append((chunk, text[cursor:cut].strip()))
+            chunk, cursor = [], cut
+    return chunks
+
+
 async def request(text, voice, rate, output):
     import edge_tts
     if 'boundary' not in inspect.signature(edge_tts.Communicate).parameters:
@@ -137,24 +153,12 @@ def finalize(data, sheet, root, voice):
             if norm(' '.join(c['text'] for c in planned['cues'])) != norm(beat['narration']):
                 raise ValueError('Sentence cues do not cover narration')
             planned.update(start=beat['start'], end=beat['end'])
-            chunks, chunk = [], []
-            for w in words:
-                chunk.append(w)
-                following = beat['narration'][w['charEnd']:w['charEnd'] + 1]
-                if len(chunk) >= 10 or (following and following in '.!?;:'):
-                    chunks.append(chunk)
-                    chunk = []
-            if chunk:
-                chunks.append(chunk)
-            for i, ch in enumerate(chunks):
+            chunks = caption_chunks(beat['narration'], words)
+            for i, (ch, text) in enumerate(chunks):
                 cue_number += 1
-                text = beat['narration'][ch[0]['charStart']:ch[-1]['charEnd']]
-                following = beat['narration'][ch[-1]['charEnd']:ch[-1]['charEnd'] + 1]
-                if following and following in '.!?,;:':
-                    text += following
                 start, end = ch[0]['start'], ch[-1]['end'] + .08
                 if i + 1 < len(chunks):
-                    end = min(end, chunks[i + 1][0]['start'])
+                    end = min(end, chunks[i + 1][0][0]['start'])
                 vtt.extend([str(cue_number), f'{stamp(start)} --> {stamp(end)} line:86% position:50% size:88% align:center', text, ''])
                 srt.extend([str(cue_number), f'{stamp(start, False)} --> {stamp(end, False)}', text, ''])
             pcm.extend(b'\0' * round(head * 24000) * 2)

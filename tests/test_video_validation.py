@@ -72,6 +72,23 @@ class VideoValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'timings overlap or are invalid'):
             module.align('They', [{'type': 'WordBoundary', 'text': 'They', 'offset': 10000000, 'duration': 0}])
 
+    def test_caption_chunks_keep_dialogue_quotes_and_compound_tokens(self):
+        spec = importlib.util.spec_from_file_location('fixture_caption_narrate', SKILL / 'assets/starter/production-source/narrate.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for source, tokens in [('"They share." "Yes."', ['They', 'share', 'Yes']),
+                               ('C-seventeen goes.', ['C', 'seventeen', 'goes'])]:
+            with self.subTest(source=source):
+                words, cursor = [], 0
+                for index, token in enumerate(tokens):
+                    at = source.index(token, cursor)
+                    words.append(dict(text=token, charStart=at, charEnd=at+len(token), start=index*.3, end=index*.3+.2))
+                    cursor = at+len(token)
+                chunks = module.caption_chunks(source, words, max_words=1)
+                self.assertEqual(' '.join(text for _, text in chunks), source)
+                if source.startswith('C-'):
+                    self.assertEqual(chunks[0][1], 'C-seventeen')
+
     def test_overlapping_sentence_cues_are_rejected(self):
         cue = self.sheet['lessons'][0]['beats'][0]['cues'][0]
         other = copy.deepcopy(cue)

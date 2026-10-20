@@ -184,7 +184,9 @@ def record(root, stage):
         'visuals': ['visual-beat-sheet/beat-sheet.json', 'visual-beat-sheet/beat-sheet.md', 'production-source/world.cjs'],
         'narration': ['course.json', 'player/course-data.js', 'settings.json'],
         'media': ['review/frame-audit.json', 'review/validation.json'],
-        'review': ['review/acceptance.json'], 'package': ['export-manifest.json'], 'delivery': ['delivery.json']
+        'review': ['review/acceptance.json'],
+        'package': ['export-manifest.json', 'player/index.html', 'player/style.css', 'player/player.js'],
+        'delivery': ['delivery.json']
     }
     artifacts = fixed[stage].copy()
     if data.get('reviewProfile') == 'narrative-motion-v2' and stage in {'script', 'visuals'}:
@@ -277,6 +279,8 @@ def export(root, output):
     report = acceptance(root)
     runtime = read(root / 'course.json')
     course = {k: runtime[k] for k in ('title', 'storageKey', 'language', 'width', 'height', 'fps')}
+    if isinstance(runtime.get('subtitle'), str):
+        course['subtitle'] = runtime['subtitle']
     lesson_keys = {'id', 'title', 'goal', 'coverage', 'duration', 'part', 'question', 'options', 'answer', 'explanation'}
     course['lessons'] = []
     for lesson in runtime['lessons']:

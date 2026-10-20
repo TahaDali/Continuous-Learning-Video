@@ -152,6 +152,7 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.seed_curriculum()
         self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
         self.data['privateNotes'] = 'PRIVATE_FIXTURE_MUST_NOT_EXPORT'
+        self.data['subtitle'] = 'Public course introduction'
         self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
         self.save()
         self.seed_design()
@@ -187,7 +188,13 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_FIXTURE_MUST_NOT_EXPORT', player)
         self.assertNotIn('Private fixture', player)
         self.assertIn('Synthetic public fixture', player)
+        self.assertIn('Public course introduction', player)
         self.assertIn('fiction', player)
+        source_player = self.root / 'player/player.js'
+        original = source_player.read_bytes()
+        source_player.write_bytes(original + b'\n// Player changed after export\n')
+        self.assertEqual(self.workflow.state(self.root)[1]['package'], 'stale')
+        source_player.write_bytes(original)
         self.workflow.write(self.root / 'delivery.json', {'status': 'deployed', 'url': 'https://example.org/fictional-fixture',
             'provider': 'test fixture only', 'version': 'fixture', 'audience': 'private', 'packageSha256': manifest['packageSha256']})
         (output / 'index.html').write_text('Changed after export')

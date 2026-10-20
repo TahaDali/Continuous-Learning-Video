@@ -7,6 +7,18 @@ if(!Array.isArray(state.done))state.done=[];
 if(!state.positions||typeof state.positions!=='object')state.positions={};
 state.done=state.done.filter(id=>D.lessons.some(l=>l.id===id));
 let current=0,lastSave=0,pending=0;
+let mediaEpoch=0,mediaObject=null,mediaRequest=null,mediaAbort=null,mediaURL='';
+function mediaStatus(text=''){const p=$('media-status');if(p){p.textContent=text;p.hidden=!text;}}
+function metadataReady(){return new Promise((resolve,reject)=>{const clean=()=>{v.removeEventListener('loadedmetadata',loaded);v.removeEventListener('error',failed);};const loaded=()=>{clean();resolve();};const failed=()=>{clean();reject(new Error('Video metadata unavailable'));};v.addEventListener('loadedmetadata',loaded,{once:true});v.addEventListener('error',failed,{once:true});});}
+async function prepareSeeking(){
+ if(mediaRequest)return mediaRequest;if(mediaObject)return;
+ const epoch=mediaEpoch;mediaAbort=new AbortController();mediaStatus('Preparing chapter navigation…');
+ mediaRequest=(async()=>{const response=await fetch(mediaURL,{credentials:'same-origin',signal:mediaAbort.signal});if(!response.ok)throw new Error('Video unavailable');const blob=await response.blob();if(epoch!==mediaEpoch)return;
+  const resume=!v.paused,position=pending>0?pending:v.currentTime;v.pause();mediaObject=URL.createObjectURL(new Blob([blob],{type:'video/mp4'}));pending=position;const ready=metadataReady();v.src=mediaObject;v.load();await ready;if(epoch!==mediaEpoch)return;if(position<v.duration)v.currentTime=position;mediaStatus();if(resume)v.play().catch(()=>{});
+ })().catch(error=>{if(epoch===mediaEpoch&&error.name!=='AbortError'){mediaRequest=null;mediaStatus('Chapter navigation could not be prepared. Try the jump again or download the MP4.');}throw error;});return mediaRequest;
+}
+async function jumpTo(time){const epoch=mediaEpoch;pending=time;try{if(v.readyState===0)await metadataReady();if(epoch!==mediaEpoch)return;const end=v.seekable.length?v.seekable.end(v.seekable.length-1):0;if(time>end+.01)await prepareSeeking();if(epoch!==mediaEpoch)return;v.currentTime=Math.min(time,Math.max(0,v.duration-.01));pending=0;v.play().catch(()=>{});}catch{}}
+v.addEventListener('loadeddata',()=>{if(!mediaObject&&v.duration>0&&(!v.seekable.length||v.seekable.end(v.seekable.length-1)<v.duration-.1))prepareSeeking().catch(()=>{});});
 const save=()=>{try{localStorage.setItem(D.storageKey,JSON.stringify(state));}catch{}};
 const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 const date=value=>/^\d{4}-\d{2}-\d{2}/.test(String(value))?String(value).slice(0,10):String(value);
@@ -20,12 +32,13 @@ function cc(){for(const t of v.textTracks)t.mode=state.captions?'showing':'hidde
 function progress(){const done=state.done.includes(D.lessons[current].id);$('complete').textContent=done?'Completed ✓':'Mark complete';$('complete').setAttribute('aria-pressed',String(done));$('completion').textContent=`${state.done.length} / ${D.lessons.length} complete`;}
 function load(index,focus=false){
   if(v.currentSrc&&!v.ended)state.positions[D.lessons[current].id]=v.currentTime;
+  mediaEpoch++;mediaAbort?.abort();mediaRequest=null;if(mediaObject)URL.revokeObjectURL(mediaObject);mediaObject=null;mediaStatus();
   current=Math.max(0,Math.min(D.lessons.length-1,index));const l=D.lessons[current];v.pause();state.lesson=l.id;pending=Number(state.positions[l.id])||0;
   $('lesson-title').textContent=l.title;$('goal').textContent=l.goal;$('coverage').textContent=l.coverage;$('lesson-number').textContent=`${l.part?l.part+' · ':''}Lesson ${current+1} / ${D.lessons.length} · ${clock(l.duration)}`;
-  v.innerHTML='';v.poster=`posters/${l.id}.png`;v.src=`videos/${l.id}.mp4`;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);v.load();$('error').hidden=true;
+  v.innerHTML='';v.poster=`posters/${l.id}.png`;mediaURL=`videos/${l.id}.mp4`;v.src=mediaURL;const track=document.createElement('track');track.kind='captions';track.label=D.language;track.srclang=D.language;track.src=`captions/${l.id}.vtt`;track.addEventListener('load',cc);v.append(track);v.load();$('error').hidden=true;
   $('download-video').href=v.getAttribute('src');$('download-captions').href=track.getAttribute('src');$('previous').disabled=current===0;$('next').disabled=current===D.lessons.length-1;
   lessonSources(l);practice(l);
-  $('transcript').replaceChildren();for(const beat of l.scenes){const b=document.createElement('button'),title=document.createElement('strong'),text=document.createElement('span');title.textContent=`${clock(beat.start)} · ${beat.headline}`;text.textContent=beat.narration;b.append(title,text);b.onclick=()=>{v.currentTime=beat.start;v.play().catch(()=>{});};$('transcript').append(b);}
+  $('transcript').replaceChildren();for(const beat of l.scenes){const b=document.createElement('button'),title=document.createElement('strong'),text=document.createElement('span');title.textContent=`${clock(beat.start)} · ${beat.headline}`;text.textContent=beat.narration;b.append(title,text);b.onclick=()=>jumpTo(beat.start);$('transcript').append(b);}
   document.querySelectorAll('[data-lesson]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.lesson===l.id)));history.replaceState(null,'','#lesson-'+l.id);progress();save();if(focus)$('lesson-title').focus({preventScroll:true});
 }
 let lastPart=null;for(const [index,l] of D.lessons.entries()){if(l.part&&l.part!==lastPart){const heading=document.createElement('h3');heading.className='chapter-heading';heading.textContent=l.part;$('lesson-list').append(heading);lastPart=l.part;}const b=document.createElement('button');b.dataset.lesson=l.id;b.textContent=`${index+1}. ${l.title}`;b.onclick=()=>{load(index,true);$('lesson-list').hidden=true;$('browse').textContent='Show lessons';$('browse').setAttribute('aria-expanded','false');};$('lesson-list').append(b);}
