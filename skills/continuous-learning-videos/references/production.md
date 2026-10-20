@@ -37,6 +37,8 @@ For layout, use explicit foreground/midground/background relationships. Connecto
 
 The starter geometry is conservative axis-aligned bounding boxes. Transparent enclosures, crossing connectors, glyph internals, partial occlusion and alpha blending may need better per-shape handling. It does not claim raster or perceptual completeness. The starter supports pan and zoom; rotate or skew only after extending the camera and audit together.
 
+`finite-canvas.cjs` also checks finite numeric arguments at wrapped Canvas method calls in the default audit, video renderer and posters. This reaches malformed glyph paths that can retain valid outer actor bounds while native Canvas silently ignores a NaN endpoint. The audit records operation counts. It covers common paths, text positions, image coordinates, transforms, gradients and dash arguments; direct state-property assignments, Path2D internals and unwrapped methods remain outside that check. Finite geometry still does not establish correct shape, color, causal behavior or readable final pixels.
+
 Inspect actual encoded frames even after a clean audit. Owner-contained labels are excluded from intersection findings, so a label can still cross an internal border such as a database cylinder's ellipse. Size the usable interior for the measured wrapped text and inspect the result at full resolution. A fresh audit archives previous flagged images with their report, so stale failures do not appear to be current findings.
 
 ## Narration

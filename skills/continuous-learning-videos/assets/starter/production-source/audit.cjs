@@ -21,6 +21,7 @@ fs.mkdirSync(framesDir,{recursive:true});
 const intersects=(a,b)=>Math.min(a.x+a.w,b.x+b.w)>Math.max(a.x,b.x)&&Math.min(a.y+a.h,b.y+b.h)>Math.max(a.y,b.y);
 const inside=(a,b)=>a.x>=b.x&&a.y>=b.y&&a.x+a.w<=b.x+b.w&&a.y+a.h<=b.y+b.h;
 const c=createCanvas(course.width,course.height),g=c.getContext('2d');
+report.numericCanvas={scope:'Finite numeric arguments to wrapped Canvas methods, including calls inside glyph callbacks. Excludes direct state-property assignments, Path2D internals, unwrapped methods and raster/semantic correctness.',operations:require('./finite-canvas.cjs').install(g)};
 for(const l of course.lessons) {
   const issues=new Map(),accepted=new Map(),n=Math.ceil(l.duration*course.fps);
   for(let frame=0;frame<n;frame++) {

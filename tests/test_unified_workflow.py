@@ -70,13 +70,16 @@ class UnifiedWorkflowTests(unittest.TestCase):
         w.write(self.root / 'visual-design.json', {'mechanisms': [{'id': 'transfer', 'lessonIds': ['01'],
             'question': 'Does the total stay fixed?', 'states': [{'id': 'a', 'meaning': 'Before'}, {'id': 'b', 'meaning': 'After'}],
             'transitions': [{'from': 'a', 'to': 'b', 'trigger': 'Transfer', 'change': 'Amount moves', 'invariant': 'Total remains fixed'}]}]})
-        clip = self.root / 'review/fixture-clip.bin'
-        clip.write_bytes(b'Synthetic file-presence fixture; not an actual inspected clip')
+        clip = self.root / 'review/fixture-clip.mp4'
+        subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=teal:s=32x24:r=8',
+                        '-frames:v', '4', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-threads', '1',
+                        '-an', '-y', str(clip)], check=True, capture_output=True)
         hashes = {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest()
                   for name in w.renderer_sources(self.root)}
         w.write(self.root / 'review/prototypes.json', {'status': 'completed', 'reviewer': 'Synthetic fixture',
             'worldSha256': hashes['production-source/world.cjs'], 'sourceHashes': hashes,
-            'clips': [{'mechanismId': 'transfer', 'path': 'review/fixture-clip.bin', 'observation': 'Schema fixture only.'}]})
+            'clips': [{'mechanismId': 'transfer', 'path': 'review/fixture-clip.mp4',
+                       'observation': 'Generated silent media/schema fixture only; no perceptual review.'}]})
 
     def design_checks(self):
         spec = importlib.util.spec_from_file_location('fixture_design_checks', self.skill / 'scripts/design_checks.py')
@@ -95,10 +98,41 @@ class UnifiedWorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'leaves lessons unassigned'):
             self.design_checks().script(self.root, {'01', '02'})
 
+    def test_real_positive_duration_video_prototype_is_accepted(self):
+        self.seed_design()
+        paths = self.design_checks().visuals(self.root, {'01'})
+        self.assertIn('review/fixture-clip.mp4', paths)
+
+    def test_nonvideo_disguised_as_prototype_is_rejected(self):
+        self.seed_design()
+        (self.root / 'review/fixture-clip.mp4').write_bytes(b'Not video: a saved review form is not a clip.')
+        with self.assertRaisesRegex(ValueError, 'positive-duration video stream'):
+            self.design_checks().visuals(self.root, {'01'})
+
+    def test_audio_only_prototype_is_rejected(self):
+        self.seed_design()
+        clip = self.root / 'review/fixture-audio.wav'
+        subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'anullsrc=r=8000:cl=mono',
+                        '-t', '0.5', '-y', str(clip)], check=True, capture_output=True)
+        review = self.workflow.read(self.root / 'review/prototypes.json')
+        review['clips'][0]['path'] = 'review/fixture-audio.wav'
+        self.workflow.write(self.root / 'review/prototypes.json', review)
+        with self.assertRaisesRegex(ValueError, 'positive-duration video stream'):
+            self.design_checks().visuals(self.root, {'01'})
+
     def test_changed_motion_invalidates_prototype_review(self):
         self.seed_design()
         with (self.root / 'production-source/motion.cjs').open('a') as handle:
             handle.write('\n// Changed after prototype inspection\n')
+        with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
+            self.design_checks().visuals(self.root, {'01'})
+
+    def test_changed_canvas_guard_invalidates_prototype_review(self):
+        self.seed_design()
+        guard = self.root / 'production-source/finite-canvas.cjs'
+        report = self.workflow.read(self.root / 'review/prototypes.json')
+        self.assertIn('production-source/finite-canvas.cjs', report['sourceHashes'])
+        guard.write_text(guard.read_text() + '\n// Guard contract changed after review.\n')
         with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
             self.design_checks().visuals(self.root, {'01'})
 

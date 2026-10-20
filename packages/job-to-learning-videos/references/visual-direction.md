@@ -32,6 +32,8 @@ Physical forms must behave consistently with their stated model. A clamp must at
 
 Create a short encoded scene with representative subject illustration, a difficult transition, a consequence and enough final detail to assess composition. Inspect its actual intermediate and final frames at the intended viewing size, and compare it directly with the reference. Review the motion, not just a decorative opening. Repair the visual language before multiplying it across a course.
 
+The workflow probes each prototype with local `ffprobe`: it requires a positive-duration video stream with nonzero dimensions, excluding attached cover art. This rejects documents and audio files disguised as clips. It establishes media structure only; full decoding, actual sampled viewing, continuous motion review and any outstanding human acceptance remain separate checks.
+
 Use a design-focused independent review for a substantial course when delegation is available and authorized. Ask the reviewer to identify visible mismatches and demonstrate a corrected scene. Distinguish that judgment from geometry, content review and a learner comprehension test.
 
 If the user rejects the visual direction, mark the affected visual acceptance failed, preserve usable prose/audio and stop final bulk rendering/export. Rebuild representative scenes against the actual reference, then propagate the corrected language. Do not continue treating rejected prototypes as completed visual evidence. A saved review form is traceability, not approval.

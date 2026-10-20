@@ -1,6 +1,7 @@
 """Check traceable editorial/design evidence; never infer teaching quality from metadata."""
 import hashlib
 import json
+import math
 import subprocess
 from pathlib import Path
 
@@ -28,6 +29,39 @@ def named(items, label):
 
 def prose(value, label):
     need(isinstance(value, str) and value.strip(), f'Missing {label}')
+
+
+def video_prototype(path):
+    """Check local media structure; never infer visual review or full decodability."""
+    try:
+        result = subprocess.run([
+            'ffprobe', '-v', 'error', '-protocol_whitelist', 'file,pipe',
+            '-show_streams', '-show_format', '-of', 'json', str(path),
+        ], capture_output=True, text=True, timeout=15)
+    except FileNotFoundError as error:
+        raise ValueError('ffprobe is required to check prototype video streams') from error
+    except subprocess.TimeoutExpired as error:
+        raise ValueError('Prototype video probe timed out') from error
+    need(result.returncode == 0, 'Prototype must contain a positive-duration video stream')
+    try:
+        data = json.loads(result.stdout)
+    except (ValueError, TypeError) as error:
+        raise ValueError('Invalid prototype video probe result') from error
+    for stream in data.get('streams', []):
+        if stream.get('codec_type') != 'video' or stream.get('disposition', {}).get('attached_pic'):
+            continue
+        try:
+            # Some containers expose duration only at the format level.
+            duration = stream.get('duration')
+            if duration in (None, 'N/A'):
+                duration = data.get('format', {}).get('duration')
+            duration = float(duration)
+            width, height = int(stream.get('width', 0)), int(stream.get('height', 0))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if math.isfinite(duration) and duration > 0 and width > 0 and height > 0:
+            return
+    raise ValueError('Prototype must contain a positive-duration video stream')
 
 
 def script(root, lessons):
@@ -106,5 +140,6 @@ def visuals(root, lessons):
         need(relative and not Path(relative).is_absolute() and root.resolve() in path.resolve().parents
              and path.is_file() and not path.is_symlink(), 'Prototype must be a regular project file')
         prose(clip.get('observation'), 'prototype observation')
+        video_prototype(path)
         files.append(relative)
     return files

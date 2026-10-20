@@ -5,11 +5,13 @@ const root=path.resolve(__dirname,'..');
 const course=JSON.parse(fs.readFileSync(path.join(root,'course.json')));
 require('./render-sources.cjs').sourcePaths(root,course);
 const {draw}=require('./world.cjs');
+const {install:checkCanvas}=require('./finite-canvas.cjs');
 const arg=process.argv[2]||'all',silent=process.argv.includes('--silent-preview');
 const selected=course.lessons.filter(l=>['all','posters'].includes(arg)||arg.split(',').includes(l.id));
 if(!selected.length)throw new Error('No matching lessons');
 async function render(l) {
   const {width:W,height:H,fps}=course,c=createCanvas(W,H),g=c.getContext('2d');
+  checkCanvas(g);
   const folder=path.join(root,silent?'review/silent':'player/videos');fs.mkdirSync(folder,{recursive:true});
   const output=path.join(folder,l.id+'.mp4');
   const args=['-hide_banner','-loglevel','error','-y','-f','rawvideo','-pixel_format','rgba','-video_size',`${W}x${H}`,'-framerate',String(fps),'-i','pipe:0'];
@@ -39,7 +41,7 @@ async function render(l) {
 (async()=>{
   if(arg==='posters') {
     fs.mkdirSync(path.join(root,'player/posters'),{recursive:true});
-    for(const l of selected){const c=createCanvas(course.width,course.height);draw(c.getContext('2d'),l,l.duration*.55,course);fs.writeFileSync(path.join(root,'player/posters',l.id+'.png'),c.toBuffer('image/png'));}
+    for(const l of selected){const c=createCanvas(course.width,course.height),g=c.getContext('2d');checkCanvas(g);draw(g,l,l.duration*.55,course);fs.writeFileSync(path.join(root,'player/posters',l.id+'.png'),c.toBuffer('image/png'));}
     return;
   }
   for(const l of selected)await render(l);

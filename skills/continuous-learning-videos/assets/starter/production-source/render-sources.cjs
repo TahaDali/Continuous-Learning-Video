@@ -69,7 +69,7 @@ function sourcePaths(project,course) {
   add('production-source/world.cjs');add('production-source/motion.cjs');
   for(const name of declared)add(name);
   // Keep the discovery contract and installed dependency declaration in its identity.
-  for(const name of ['production-source/render-sources.cjs','production-source/package.json',
+  for(const name of ['production-source/render-sources.cjs','production-source/finite-canvas.cjs','production-source/package.json',
       'production-source/package-lock.json','production-source/npm-shrinkwrap.json'])if(fs.existsSync(path.join(root,name)))add(name,false);
   while(queue.length) {
     const file=queue.pop();
