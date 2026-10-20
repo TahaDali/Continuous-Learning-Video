@@ -32,7 +32,7 @@ The owner reviewed and accepted five private sample courses spanning software en
 
 ## Install
 
-Use the ZIP attached to the [v1.0.1 release](https://github.com/TahaDali/Continuous-Learning-Video/releases/tag/v1.0.1). Inspect its `release-manifest.json` and the published SHA-256 checksum. Extract its complete `continuous-learning-video` folder into your Codex user skills directory, normally `~/.agents/skills/`. Keep every file together. Back up an existing installation before replacing it.
+Use the ZIP attached to the [v1.1.0 release](https://github.com/TahaDali/Continuous-Learning-Video/releases/tag/v1.1.0). Inspect its `release-manifest.json` and the published SHA-256 checksum. Extract its complete `continuous-learning-video` folder into your Codex user skills directory, normally `~/.agents/skills/`. Keep every file together. Back up an existing installation before replacing it.
 
 [Current official Codex skill guidance](https://learn.chatgpt.com/docs/build-skills) describes discovery locations; managed or older installations may use another directory. Confirm the skill appears in the selector, then invoke:
 
@@ -44,14 +44,14 @@ Use the actual posting URL. A link alone requests the whole workflow within exis
 
 For a repository-scoped installation, use `.agents/skills/continuous-learning-video/` instead. This repository contains exactly one `SKILL.md`; no other learning skill needs to be installed.
 
-The mobile and accessibility improvements described above are in the current repository source and are not included in the older v1.0.1 ZIP. Build from `main` to use them in future courses. Existing installations need to be updated; existing course media are not rebuilt.
+Version 1.1.0 includes the mobile and accessibility improvements in the standard skill download. Update an existing installation to use them when creating future courses. Existing course media are not rebuilt.
 
 ### Build from reviewed source
 
 Check out a chosen tag or full commit, inspect it, then build to new paths **outside the repository**:
 
 ```sh
-git clone --branch main https://github.com/TahaDali/Continuous-Learning-Video.git
+git clone --branch v1.1.0 https://github.com/TahaDali/Continuous-Learning-Video.git
 cd Continuous-Learning-Video
 python3 scripts/build_skill.py --output /absolute/work/continuous-learning-video --archive /absolute/work/continuous-learning-video.zip
 ```
