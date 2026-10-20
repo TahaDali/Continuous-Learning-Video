@@ -1,6 +1,7 @@
 """Check traceable editorial/design evidence; never infer teaching quality from metadata."""
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -87,9 +88,11 @@ def visuals(root, lessons):
     prose(review.get('reviewer'), 'prototype reviewer')
     world = root / 'production-source/world.cjs'
     need(review.get('worldSha256') == hashlib.sha256(world.read_bytes()).hexdigest(), 'Prototype review is stale after a world change')
-    dependencies = read(root, 'course.json').get('renderSources', [])
-    expected = {'production-source/world.cjs', 'production-source/motion.cjs', *dependencies}
-    need(set(review.get('sourceHashes', {})) == expected, 'Prototype review needs the declared render source identity')
+    helper = Path(__file__).resolve().parent.parent / 'assets/starter/production-source/render-sources.cjs'
+    result = subprocess.run(['node', str(helper), str(root)], capture_output=True, text=True)
+    need(result.returncode == 0, 'Render dependency discovery failed: ' + result.stderr.strip())
+    expected = set(json.loads(result.stdout))
+    need(set(review.get('sourceHashes', {})) == expected, 'Prototype review needs the complete discovered render source identity')
     for name, value in review['sourceHashes'].items():
         source = root / name
         need(root.resolve() in source.resolve().parents and source.is_file() and not source.is_symlink(), 'Invalid render dependency')

@@ -6,6 +6,7 @@ import os
 import re
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
@@ -57,6 +58,8 @@ class UnifiedWorkflowTests(unittest.TestCase):
     def seed_design(self):
         """Synthetic schema evidence, explicitly not a perceptual quality review."""
         w = self.workflow
+        # Tests opt into the mechanical demonstration; actual new projects cannot.
+        shutil.copyfile(self.skill / 'assets/starter/production-source/world.cjs', self.root / 'production-source/world.cjs')
         (self.root / 'manuscript.md').write_text('# Synthetic mechanical fixture\n\n## Transfer\n\nNot a researched employer course.\n')
         w.write(self.root / 'narrative-map.json', {
             'parts': [{'id': 'p1', 'title': 'Fixture', 'question': 'What is conserved?'}],
@@ -70,7 +73,7 @@ class UnifiedWorkflowTests(unittest.TestCase):
         clip = self.root / 'review/fixture-clip.bin'
         clip.write_bytes(b'Synthetic file-presence fixture; not an actual inspected clip')
         hashes = {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest()
-                  for name in ['production-source/world.cjs', 'production-source/motion.cjs']}
+                  for name in w.renderer_sources(self.root)}
         w.write(self.root / 'review/prototypes.json', {'status': 'completed', 'reviewer': 'Synthetic fixture',
             'worldSha256': hashes['production-source/world.cjs'], 'sourceHashes': hashes,
             'clips': [{'mechanismId': 'transfer', 'path': 'review/fixture-clip.bin', 'observation': 'Schema fixture only.'}]})
@@ -133,6 +136,8 @@ class UnifiedWorkflowTests(unittest.TestCase):
         self.assertTrue((self.skill / 'references/research/chapter-structure.md').is_file())
         self.assertTrue((self.skill / 'references/video/beat-sheet.md').is_file())
         self.assertTrue((self.skill / 'assets/starter/production-source/text_checks.py').is_file())
+        self.assertTrue((self.skill / 'assets/starter/production-source/render-sources.cjs').is_file())
+        self.assertTrue((self.skill / 'assets/starter/production-source/illustrations.cjs').is_file())
         self.assertEqual(self.workflow.read(self.root / 'course.json')['lessons'], [])
         self.assertFalse(self.workflow.preflight()['serviceRequestsMade'])
         for path in self.skill.rglob('*.md'):
@@ -141,6 +146,111 @@ class UnifiedWorkflowTests(unittest.TestCase):
                     continue
                 with self.subTest(file=str(path.relative_to(self.skill)), link=link):
                     self.assertTrue((path.parent / unquote(link.split('#', 1)[0])).is_file())
+
+    def test_new_project_cannot_render_the_demo_or_an_unsupported_visual(self):
+        world = self.root / 'production-source/world.cjs'
+        code = "const {draw}=require(process.argv[1]); for(const visual of ['conserved-transfer','unimplemented']) { try { draw(null,{visual},0,{}); process.exit(2); } catch(e) { if(!e.message.includes('No authored visual world'))throw e; } }"
+        result = subprocess.run(['node', '-e', code, str(world)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotEqual(world.read_bytes(), (self.skill / 'assets/starter/production-source/world.cjs').read_bytes())
+
+    def refresh_prototype_identity(self):
+        w = self.workflow
+        report = w.read(self.root / 'review/prototypes.json')
+        report['sourceHashes'] = {name: hashlib.sha256((self.root / name).read_bytes()).hexdigest()
+                                  for name in w.renderer_sources(self.root)}
+        report['worldSha256'] = report['sourceHashes']['production-source/world.cjs']
+        w.write(self.root / 'review/prototypes.json', report)
+
+    def test_transitive_local_helper_changes_invalidate_visuals_without_manual_listing(self):
+        self.seed_curriculum()
+        self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
+        self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
+        self.save()
+        self.seed_design()
+        folder = self.root / 'production-source/nested'
+        folder.mkdir()
+        (folder / 'paint.cjs').write_text("module.exports = require('./tone.json');\n")
+        leaf = folder / 'tone.json'
+        leaf.write_text('{"color":"#c8e7d8"}\n')
+        world = self.root / 'production-source/world.cjs'
+        world.write_text(world.read_text().replace("id==='left'?P.mint:P.sand", "id==='left'?authoredTone.color:P.sand")
+                         + "\nconst authoredTone = require('./nested/paint.cjs');\n")
+        self.assertEqual(self.data.get('renderSources', []), [])
+        self.refresh_prototype_identity()
+        self.workflow.record(self.root, 'script')
+        self.workflow.record(self.root, 'visuals')
+        paths = self.workflow.read(self.root / 'project.json')['stages']['visuals']['fingerprints']
+        self.assertIn('production-source/nested/paint.cjs', paths)
+        self.assertIn('production-source/nested/tone.json', paths)
+        if os.environ.get('CANVAS_MODULE'):
+            subprocess.run(['node', str(self.root / 'production-source/audit.cjs')], check=True, capture_output=True)
+            audit = self.workflow.read(self.root / 'review/frame-audit.json')
+            self.assertIn('production-source/nested/tone.json', audit['sourceHashes'])
+            self.assertEqual(audit['unresolvedPairs'], 0)
+        leaf.write_text('{"color":"#b8513b"}\n')
+        self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'stale')
+        with self.assertRaisesRegex(ValueError, 'stale after a render dependency change'):
+            self.design_checks().visuals(self.root, {'01'})
+
+    def test_new_module_resolution_target_invalidates_existing_checkpoint(self):
+        self.seed_curriculum()
+        self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
+        self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
+        self.save()
+        self.seed_design()
+        (self.root / 'production-source/tone.json').write_text('{"color":"teal"}\n')
+        with (self.root / 'production-source/world.cjs').open('a') as handle:
+            handle.write("\nconst authoredTone = require('./tone');\n")
+        self.refresh_prototype_identity()
+        self.workflow.record(self.root, 'script')
+        self.workflow.record(self.root, 'visuals')
+        # Node now resolves .js before the unchanged .json; old fingerprints alone cannot notice it.
+        (self.root / 'production-source/tone.js').write_text("module.exports={color:'red'};\n")
+        self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'stale')
+
+    def test_dependency_discovery_rejects_opaque_loading_without_executing_world(self):
+        world = self.root / 'production-source/world.cjs'
+        for loading in ["require(target)", "require(`./${target}.cjs`)", "const load=require;load('./file.cjs')",
+                        "import('./file.cjs')", "import x from './file.js'", "module['require']('./file.cjs')",
+                        "const {createRequire: make}=require('node:module');const load=make(__filename)"]:
+            with self.subTest(loading=loading):
+                world.write_text("throw new Error('World must never execute during discovery');\n" + loading + ';\n')
+                with self.assertRaisesRegex(ValueError, 'unsupported'):
+                    self.workflow.renderer_sources(self.root)
+
+    def test_dependency_discovery_ignores_comment_string_and_regex_examples(self):
+        world = self.root / 'production-source/world.cjs'
+        world.write_text("""// require('./missing-comment.cjs')
+/* require('./missing-block.cjs') */
+const text = \"require('./missing-string.cjs')\";
+const regex = /require\\('missing-regex'\\)/g;
+const template = `A plain teaching example`;
+module.exports={};
+""")
+        paths = self.workflow.renderer_sources(self.root)
+        self.assertIn('production-source/world.cjs', paths)
+        self.assertFalse(any('missing' in path for path in paths))
+
+    def test_dependency_discovery_rejects_imports_outside_project_and_symlink_ancestors(self):
+        outside = self.base / 'outside'
+        outside.mkdir()
+        (outside / 'tone.cjs').write_text("module.exports={};\n")
+        world = self.root / 'production-source/world.cjs'
+        world.write_text("require('../../outside/tone.cjs');\n")
+        with self.assertRaisesRegex(ValueError, 'escapes the project'):
+            self.workflow.renderer_sources(self.root)
+        (self.root / 'production-source/linked').symlink_to(outside, target_is_directory=True)
+        world.write_text("require('./linked/tone.cjs');\n")
+        with self.assertRaisesRegex(ValueError, 'escapes the project|symlink'):
+            self.workflow.renderer_sources(self.root)
+        internal = self.root / 'production-source/internal'
+        internal.mkdir()
+        (internal / 'tone.cjs').write_text('module.exports={};\n')
+        (self.root / 'production-source/internal-link').symlink_to(internal, target_is_directory=True)
+        world.write_text("require('./internal-link/tone.cjs');\n")
+        with self.assertRaisesRegex(ValueError, 'symlink'):
+            self.workflow.renderer_sources(self.root)
 
     def test_missing_research_blocks_later_stage(self):
         with self.assertRaisesRegex(ValueError, 'upstream'):

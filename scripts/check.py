@@ -52,7 +52,7 @@ def check(render=False):
         generator = VIDEO / 'scripts/new_project.py'
         validator = VIDEO / 'scripts/validate_project.py'
         for target in (project, other):
-            run(sys.executable, generator, target, '--title', 'Portable starter check')
+            run(sys.executable, generator, target, '--demo', '--title', 'Portable starter check')
             run(sys.executable, validator, target)
         course = json.loads((project / 'course.json').read_text())
         other_course = json.loads((other / 'course.json').read_text())

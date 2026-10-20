@@ -31,7 +31,7 @@ Read [production and timing](references/production.md) when making or replacing 
 python3 <skill-dir>/scripts/new_project.py /absolute/work/course-project --title "Course title"
 ```
 
-The starter is a mechanism example, not a finished visual language. Replace its demonstration narration, beat sheet and world with topic-specific graphics. Author the full requested course; lesson boundaries are allowed, repeated screen resets within a lesson are not the default.
+New projects start empty with a renderer that refuses to draw until subject scenes are implemented. Add `--demo` only for the separate mechanical example; it is not a finished visual language or a course for the requested subject. Author the full requested course; lesson boundaries are allowed, repeated screen resets within a lesson are not the default.
 
 Narration should be conversational, warm and precise, with meaningful pauses, stress and variation. When the user has not selected a voice, compare short relevant samples before generating the course. Ava is a useful starting candidate for this user's English narration, not a permanent provider requirement. A skill does not carry consent to upload text: obtain any required service authorization for the current material, then send only the approved adapted narration. Existing session authorization and a selected voice do not need repeated confirmation. Use professional human narration when requested or when available synthetic options cannot meet the delivery standard; do not independently order paid work.
 

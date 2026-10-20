@@ -1,12 +1,14 @@
 'use strict';
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
-const {createCanvas}=require(process.env.CANVAS_MODULE||'@napi-rs/canvas'),{draw}=require('./world.cjs');
+const {createCanvas}=require(process.env.CANVAS_MODULE||'@napi-rs/canvas');
 const root=path.resolve(__dirname,'..'),course=require(path.join(root,'course.json'));
 const allowances=require('./intentional-overlaps.json');
+const {sourcePaths}=require('./render-sources.cjs');
+const authoredSources=sourcePaths(root,course),{draw}=require('./world.cjs');
 for(const a of allowances)if(!a.lesson||!a.a||!a.b||!Number.isFinite(a.start)||!Number.isFinite(a.end)||a.start>=a.end||!a.reason?.trim())throw new Error('Invalid intentional-overlap rule');
 const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const report={method:'All output-frame timestamps; visible registered axis-aligned actor and label bounds after camera transform, plus label safe zones. Fully offscreen actors are ignored and actors may cross the clipped viewport. Excludes connector paths, glyph internals and raster/perceptual effects. Owner-contained labels are intentional.',fps:course.fps,sourceHashes:{},lessons:[],unresolvedPairs:0,totalFrames:0};
-for(const name of ['course.json','production-source/world.cjs','production-source/motion.cjs','production-source/intentional-overlaps.json',...(course.renderSources||[])])report.sourceHashes[name]=sha(path.join(root,name));
+for(const name of ['course.json','production-source/intentional-overlaps.json',...authoredSources])report.sourceHashes[name]=sha(path.join(root,name));
 const framesDir=path.join(root,'review/flagged');
 if(fs.existsSync(framesDir)&&fs.readdirSync(framesDir).length){
   const history=fs.mkdtempSync(path.join(root,'review/audit-history-'));
@@ -22,7 +24,9 @@ const c=createCanvas(course.width,course.height),g=c.getContext('2d');
 for(const l of course.lessons) {
   const issues=new Map(),accepted=new Map(),n=Math.ceil(l.duration*course.fps);
   for(let frame=0;frame<n;frame++) {
-    const t=frame/course.fps,s=draw(g,l,t,course),items=s.items.filter(i=>i.alpha>.1&&intersects(i.bounds,s.viewport)),problems=[];
+    const t=frame/course.fps,s=draw(g,l,t,course);
+    for(const item of s.items)if(!Number.isFinite(item.alpha)||!['x','y','w','h'].every(k=>Number.isFinite(item.bounds?.[k]))||item.bounds.w<0||item.bounds.h<0)throw Error('Invalid registered geometry '+l.id+' / frame '+frame+' / '+item.id);
+    const items=s.items.filter(i=>i.alpha>.1&&intersects(i.bounds,s.viewport)),problems=[];
     for(const a of items)if(a.kind==='label'&&!inside(a.bounds,s.safe))problems.push({type:'safe-zone',a:a.id});
     for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++) {
       const a=items[i],b=items[j];

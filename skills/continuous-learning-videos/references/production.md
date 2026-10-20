@@ -4,7 +4,7 @@
 
 The starter uses Python 3, Node.js, FFmpeg/FFprobe and `@napi-rs/canvas`. Use available bundled runtimes first. Otherwise install dependencies within the task workspace, not into unrelated global environments. `CANVAS_MODULE` may point to a known local canvas package. The package records a tested canvas version; check installed interfaces before changing versions.
 
-`new_project.py` refuses to overwrite an existing directory. It creates:
+`new_project.py` refuses to overwrite an existing directory. By default it creates an empty authoring project with a world that throws until subject scenes are implemented. Pass `--demo` only to create the separate 12-second mechanical example for learning the tooling or running tests. It creates:
 
 ```text
 course.json                  Adapted narration and measured timing
@@ -16,7 +16,7 @@ transcripts/
 review/                      Reports, flagged frames and silent previews
 ```
 
-Run commands from the new project root:
+After authoring the actual course, run commands from the new project root:
 
 ```text
 python3 <skill-dir>/scripts/validate_project.py /absolute/project
@@ -29,7 +29,9 @@ Silent previews deliberately go to `review/silent/`, not final `player/videos/`.
 
 The renderer calls `world.draw(context, lesson, time, course)` at each actual frame timestamp. It uses backpressure while streaming pixels to FFmpeg and fails when an unsupported visual is requested. Extend the authored world with subject-specific functions; do not silently fall back to the sample for unimplemented lessons. `motion.cjs` provides camera transforms, object/label bounds and simple primitives. The stage includes `wrappedLabel` with measured font widths and explicit line spacing; its returned height helps choose an owner box before rendering. Extend those helpers when shapes, clipping or typography require it. The sample preserves objects across time and transfers a visible quantity between containers.
 
-`illustrations.cjs` supplies original parameterized people, publications, browsers, phones, envelopes, buildings and clocks. Call `createIllustration(stage)` to register their glyphs and labels with the existing geometry audit. Include this helper and every other imported drawing file in the course's `renderSources`. These conventional forms are a starting vocabulary; author the real subject's missing objects and causal behavior. They do not constitute a complete lesson world, and glyph internals and connector paths still require visual inspection.
+`illustrations.cjs` supplies original parameterized people, publications, browsers, phones, envelopes, buildings and clocks. Call `createIllustration(stage)` to register their glyphs and labels with the existing geometry audit. These conventional forms are a starting vocabulary; author the real subject's missing objects and causal behavior. They do not constitute a complete lesson world, and glyph internals and connector paths still require visual inspection.
+
+`render-sources.cjs` discovers transitive local imports from the world, motion library and explicit `course.renderSources`. It reads source without executing the world, follows direct literal CommonJS `require('./file.cjs')` calls (including local JavaScript and JSON modules), and rejects missing files, imports outside the project, symlinks and unsupported dynamic or aliased loading. Use explicit module-scope imports instead of computed paths, interpolated imports, `import()`, `createRequire` or alternate loaders. This is a supported authoring contract, not a general JavaScript analyzer or sandbox. Ordinary comments, quoted strings and regex examples are ignored. Declare non-module inputs loaded through filesystem APIs, such as fonts, images or data files, in `renderSources`; the scanner cannot infer arbitrary filesystem access. External packages stay outside the copied source set and use the local package declaration. Prototype identity, frame-audit identity and checkpoints use the discovered set, including the discovery helper and package declaration. Changing a discovered file or introducing a different resolution target invalidates dependent stages.
 
 For layout, use explicit foreground/midground/background relationships. Connectors normally pass behind solid objects and labels. Draw a foreground mask at its intended depth rather than blindly moving every panel behind all content. For complex glyphs, register the complete visual extent, including strokes, arcs and moving attachments. Text bounds must use the rendered font and actual transform.
 

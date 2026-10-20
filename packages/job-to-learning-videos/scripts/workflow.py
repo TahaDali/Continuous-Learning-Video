@@ -149,6 +149,13 @@ def digest(path, stage=None):
     return hashlib.sha256(payload).hexdigest()
 
 
+def renderer_sources(root):
+    helper = SKILL / 'assets/starter/production-source/render-sources.cjs'
+    result = subprocess.run(['node', str(helper), str(root)], capture_output=True, text=True)
+    require(result.returncode == 0, 'Render dependency discovery failed: ' + result.stderr.strip())
+    return json.loads(result.stdout)
+
+
 def packaged_files_current(root):
     """Check the actual export, including changes made after delivery recording."""
     try:
@@ -168,10 +175,18 @@ def packaged_files_current(root):
 def state(root):
     data = read(root / 'project.json')
     result, upstream = {}, False
+    render_paths = None
     for stage in STAGES:
         checkpoint = data['stages'].get(stage)
         stale = bool(checkpoint) and any(not (root / p).is_file() or digest(root / p, stage) != value
                                          for p, value in checkpoint['fingerprints'].items())
+        if checkpoint and stage in {'visuals', 'media'}:
+            try:
+                if render_paths is None:
+                    render_paths = set(renderer_sources(root))
+                stale |= not render_paths <= checkpoint['fingerprints'].keys()
+            except (OSError, ValueError, subprocess.SubprocessError):
+                stale = True
         if checkpoint and stage == 'package':
             stale |= not packaged_files_current(root)
         result[stage] = 'stale' if checkpoint and (stale or upstream) else 'completed' if checkpoint else 'pending'
@@ -221,8 +236,7 @@ def record(root, stage):
     if stage in {'script', 'visuals', 'narration', 'media'}:
         course = read(root / 'course.json')
         require([l['id'] for l in course['lessons']] == [l['id'] for l in plan['lessons']], 'Runtime lessons differ from curriculum')
-        render_sources = course.get('renderSources', [])
-        require(isinstance(render_sources, list) and len(set(render_sources)) == len(render_sources), 'Invalid render dependency list')
+        render_sources = renderer_sources(root)
         for source in render_sources:
             inside(root, source)
         if stage in {'visuals', 'media'}:
@@ -239,7 +253,7 @@ def record(root, stage):
         validator(root, media=True)
         audit = read(root / 'review/frame-audit.json')
         require(audit['unresolvedPairs'] == 0, 'Unresolved frame audit findings')
-        expected_sources = {'course.json', 'production-source/world.cjs', 'production-source/motion.cjs', 'production-source/intentional-overlaps.json', *render_sources}
+        expected_sources = {'course.json', 'production-source/intentional-overlaps.json', *render_sources}
         require(set(audit['sourceHashes']) == expected_sources, 'Incomplete frame audit source identity')
         require(audit['totalFrames'] == sum(math.ceil(l['duration'] * course['fps']) for l in course['lessons']), 'Frame audit coverage is incomplete')
         for name, value in audit['sourceHashes'].items():

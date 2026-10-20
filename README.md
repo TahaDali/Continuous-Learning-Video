@@ -2,7 +2,7 @@
 
 A combined Codex skill for turning a job URL into a sourced, narrated video learning course, built from the organization-first storyteller and continuous-video production methods.
 
-This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow has completed one real job-to-private-course trial and remains a private development draft; see [current scope and remaining release work](docs/combined-skill-status.md).
+This repository starts as a private development workspace. Changing its visibility to public is a separate owner decision. The initial import preserved the installed skills as of October 20, 2026. The combined workflow completed an initial job-to-private-course trial and now has five contrasting courses in private design review; see [current scope and remaining release work](docs/combined-skill-status.md).
 
 | Skill | Purpose | Entry point |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ The starter needs Python 3.10+, Node.js, FFmpeg/FFprobe, and the canvas dependen
 From the repository root, create a new project outside this repository:
 
 ```sh
-python3 skills/continuous-learning-videos/scripts/new_project.py /absolute/path/course-project --title "Course title"
+python3 skills/continuous-learning-videos/scripts/new_project.py /absolute/path/course-project --title "Course title" --demo
 ```
 
 From that new project's directory:
@@ -69,6 +69,8 @@ node production-source/audit.cjs
 ```
 
 These commands make a **silent demonstration preview**, not a finished narrated course. See [production and measured timing](skills/continuous-learning-videos/references/production.md) for narration, final rendering, captions, and the player. The [review guide](skills/continuous-learning-videos/references/review-and-delivery.md) distinguishes mechanical checks from listening and synchronized viewing.
+
+Omit `--demo` for an empty authoring project. Its world refuses to draw until the subject's scenes are implemented. The combined job workflow always starts this way; it cannot silently render the mechanical example for a new role.
 
 ## Development and checks
 

@@ -24,7 +24,7 @@ class VideoValidationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='video-validation-test-')
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'course'
-        subprocess.run([sys.executable, str(SKILL / 'scripts/new_project.py'), str(self.root)],
+        subprocess.run([sys.executable, str(SKILL / 'scripts/new_project.py'), str(self.root), '--demo'],
                        check=True, capture_output=True)
         self.data = json.loads((self.root / 'course.json').read_text())
         self.sheet = json.loads((self.root / 'visual-beat-sheet/beat-sheet.json').read_text())
@@ -171,6 +171,24 @@ for(const item of labels)if(item.bounds.x<550||item.bounds.x+item.bounds.w>730||
         self.assertEqual(result.returncode, 1)
         report = json.loads((self.root / 'review/frame-audit.json').read_text())
         self.assertEqual(report['lessons'][0]['unresolved'][0]['type'], 'mechanism-invariant')
+
+    def test_nonfinite_geometry_cannot_hide_as_offscreen(self):
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
+            if not module.exists():
+                self.skipTest('Canvas dependency not installed')
+            env['CANVAS_MODULE'] = str(module)
+        self.data['lessons'] = [dict(id='01', duration=1 / self.data['fps'])]
+        self.save()
+        for invalid in ["x:NaN,y:0,w:10,h:10,alpha:1", "x:0,y:0,w:10,h:Infinity,alpha:1", "x:0,y:0,w:10,h:10,alpha:NaN", "x:0,y:0,w:-1,h:10,alpha:1"]:
+            with self.subTest(invalid=invalid):
+                bounds, alpha = invalid.rsplit(',alpha:', 1)
+                (self.root / 'production-source/world.cjs').write_text(
+                    "exports.draw=()=>({items:[{id:'invalid-hidden',kind:'label',bounds:{" + bounds + "},alpha:" + alpha + "}],viewport:{x:0,y:0,w:1280,h:720},safe:{x:0,y:0,w:1280,h:720}});")
+                result = subprocess.run(['node', str(self.root / 'production-source/audit.cjs')], env=env, capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('Invalid registered geometry', result.stderr)
 
     def test_complete_audio_stream_passes(self):
         self.media_fixture(12)

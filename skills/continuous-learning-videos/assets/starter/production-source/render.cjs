@@ -1,8 +1,10 @@
 'use strict';
 const fs=require('fs'),path=require('path'),{spawn}=require('child_process'),{once}=require('events');
 const {createCanvas}=require(process.env.CANVAS_MODULE||'@napi-rs/canvas');
-const {draw}=require('./world.cjs'),root=path.resolve(__dirname,'..');
+const root=path.resolve(__dirname,'..');
 const course=JSON.parse(fs.readFileSync(path.join(root,'course.json')));
+require('./render-sources.cjs').sourcePaths(root,course);
+const {draw}=require('./world.cjs');
 const arg=process.argv[2]||'all',silent=process.argv.includes('--silent-preview');
 const selected=course.lessons.filter(l=>['all','posters'].includes(arg)||arg.split(',').includes(l.id));
 if(!selected.length)throw new Error('No matching lessons');
