@@ -1,9 +1,10 @@
 'use strict';
 const fs=require('fs'),path=require('path'),{spawn}=require('child_process'),{once}=require('events');
-const {createCanvas}=require(process.env.CANVAS_MODULE||'@napi-rs/canvas');
+const canvasModule=require(process.env.CANVAS_MODULE||'@napi-rs/canvas'),{createCanvas}=canvasModule;
 const root=path.resolve(__dirname,'..');
 const course=JSON.parse(fs.readFileSync(path.join(root,'course.json')));
-require('./render-sources.cjs').sourcePaths(root,course);
+const sources=require('./render-sources.cjs').sourcePaths(root,course);
+if(sources.includes('production-source/design.cjs'))require('./design.cjs').installDesignRuntime(canvasModule);
 const {draw}=require('./world.cjs');
 const {install:checkCanvas}=require('./finite-canvas.cjs');
 const arg=process.argv[2]||'all',silent=process.argv.includes('--silent-preview');

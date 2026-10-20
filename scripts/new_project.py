@@ -11,7 +11,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('output', type=Path)
     p.add_argument('--title', default='Continuous learning course')
-    p.add_argument('--demo', action='store_true', help='Install the explicit 12-second mechanical demonstration instead of an empty authoring project.')
+    examples = p.add_mutually_exclusive_group()
+    examples.add_argument('--demo', action='store_true', help='Install the explicit 12-second mechanical demonstration instead of an empty authoring project.')
+    examples.add_argument('--design-demo', action='store_true',
+                          help='Install the fictional design-system demonstration: templates, cue-driven reveals, camera travel and motivated transitions.')
     args = p.parse_args()
     requested = args.output.expanduser().absolute()
     if requested.is_symlink():
@@ -28,7 +31,13 @@ def main():
                    'player/posters', 'player/captions']:
         (target / folder).mkdir(parents=True, exist_ok=True)
     data = json.loads((target / 'course.json').read_text())
-    if not args.demo:
+    if args.design_demo:
+        example = skill_root / 'assets' / 'design-demo'
+        for name in ['world.cjs', 'intentional-overlaps.json']:
+            shutil.copyfile(example / 'production-source' / name, target / 'production-source' / name)
+        shutil.copyfile(example / 'beat-sheet.json', target / 'visual-beat-sheet/beat-sheet.json')
+        data['lessons'] = [json.loads((example / 'lesson.json').read_text())]
+    elif not args.demo:
         data['lessons'] = []
         (target / 'visual-beat-sheet/beat-sheet.json').write_text('{"lessons": []}\n')
         (target / 'production-source/world.cjs').write_text(
@@ -40,8 +49,11 @@ def main():
     (target / 'course.json').write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
     (target / 'player/course-data.js').write_text('window.COURSE = ' + json.dumps(data, ensure_ascii=False) + ';\n')
     print(target)
-    print('Created an explicit mechanical demonstration; not a subject course.' if args.demo else
-          'Created an empty authoring project. The renderer refuses to draw until its subject world is implemented.')
+    if args.design_demo:
+        print('Created the fictional design-system demonstration; study it, then replace it for a subject course.')
+    else:
+        print('Created an explicit mechanical demonstration; not a subject course.' if args.demo else
+              'Created an empty authoring project. The renderer refuses to draw until its subject world is implemented.')
 
 
 if __name__ == '__main__':

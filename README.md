@@ -28,6 +28,8 @@ The reusable player includes responsive touch controls, readable transcripts, a 
 
 The workflow preserves the relationship between claims, sources, objectives, manuscript, narration and visual mechanisms. New projects start empty: the renderer refuses to draw until the actual subject is authored. The sample is available only through `--demo`.
 
+Every new world is staged with a shared [design system](references/video/design-system.md): bundled Inter, Instrument Serif and JetBrains Mono type roles; a small colour vocabulary with one accent per scene; words revealed on their spoken cues; focus moved by dimming; a camera that travels one world; and transitions chosen for the relationship between scenes. Templates cover the opener, a kinetic claim, comparisons, line stories, procedures and retrieval questions. Timing comes from narration cues, so measured speech re-times a world without edits, and the frame audit fails when narration is too short for a template.
+
 The owner reviewed and accepted five private sample courses spanning software engineering, design, hardware, finance and sales, and approved this public skill release. Those course media and audiences remain private. See [validation and acceptance](docs/validation.md) for evidence and limits.
 
 ## Install
@@ -73,7 +75,7 @@ node production-source/render.cjs posters
 node production-source/audit.cjs
 ```
 
-The silent MP4 is under `review/silent/`. This confirms rendering setup; it does not generate speech or publish anything. Omit `--demo` to create an empty authoring project.
+The silent MP4 is under `review/silent/`. This confirms rendering setup; it does not generate speech or publish anything. Omit `--demo` to create an empty authoring project. Use `--design-demo` instead of `--demo` to render the 70-second design-system example with the same commands.
 
 Check tools and a project's installed canvas without contacting a speech provider:
 

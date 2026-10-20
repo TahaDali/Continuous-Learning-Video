@@ -1,13 +1,21 @@
 'use strict';
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
-const {createCanvas}=require(process.env.CANVAS_MODULE||'@napi-rs/canvas');
+const canvasModule=require(process.env.CANVAS_MODULE||'@napi-rs/canvas'),{createCanvas}=canvasModule;
 const root=path.resolve(__dirname,'..'),course=require(path.join(root,'course.json'));
 const allowances=require('./intentional-overlaps.json');
 const {sourcePaths}=require('./render-sources.cjs');
-const authoredSources=sourcePaths(root,course),{draw}=require('./world.cjs');
-for(const a of allowances)if(!a.lesson||!a.a||!a.b||!Number.isFinite(a.start)||!Number.isFinite(a.end)||a.start>=a.end||!a.reason?.trim())throw new Error('Invalid intentional-overlap rule');
+const authoredSources=sourcePaths(root,course);
+if(authoredSources.includes('production-source/design.cjs'))require('./design.cjs').installDesignRuntime(canvasModule);
+const {draw}=require('./world.cjs');
+// A rule's window is absolute seconds, or a named scene so it follows narration-driven retiming.
+const windowOf=a=>{
+  if(a.scene===undefined)return Number.isFinite(a.start)&&Number.isFinite(a.end)&&a.start<a.end?a:null;
+  const scene=a.start===undefined&&a.end===undefined&&course.lessons.find(l=>l.id===a.lesson)?.scenes.find(s=>s.id===a.scene);
+  return scene||null;
+};
+for(const a of allowances)if(!a.lesson||!a.a||!a.b||!windowOf(a)||!a.reason?.trim())throw new Error('Invalid intentional-overlap rule');
 const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
-const report={method:'All output-frame timestamps; visible registered axis-aligned actor and label bounds after camera transform, plus label safe zones. Fully offscreen actors are ignored and actors may cross the clipped viewport. Excludes connector paths, glyph internals and raster/perceptual effects. Owner-contained labels are intentional.',fps:course.fps,sourceHashes:{},lessons:[],unresolvedPairs:0,totalFrames:0};
+const report={method:'All output-frame timestamps; visible registered axis-aligned actor and label bounds after camera transform, plus label safe zones. Fully offscreen actors are ignored and actors may cross the clipped viewport. Excludes connector paths, glyph internals, declared transition and decor drawing, and raster/perceptual effects. Owner-contained labels are intentional.',fps:course.fps,sourceHashes:{},lessons:[],unresolvedPairs:0,totalFrames:0};
 for(const name of ['course.json','production-source/intentional-overlaps.json',...authoredSources])report.sourceHashes[name]=sha(path.join(root,name));
 const framesDir=path.join(root,'review/flagged');
 if(fs.existsSync(framesDir)&&fs.readdirSync(framesDir).length){
@@ -23,9 +31,10 @@ const inside=(a,b)=>a.x>=b.x&&a.y>=b.y&&a.x+a.w<=b.x+b.w&&a.y+a.h<=b.y+b.h;
 const c=createCanvas(course.width,course.height),g=c.getContext('2d');
 report.numericCanvas={scope:'Finite numeric arguments to wrapped Canvas methods, including calls inside glyph callbacks. Excludes direct state-property assignments, Path2D internals, unwrapped methods and raster/semantic correctness.',operations:require('./finite-canvas.cjs').install(g)};
 for(const l of course.lessons) {
-  const issues=new Map(),accepted=new Map(),n=Math.ceil(l.duration*course.fps);
+  const issues=new Map(),accepted=new Map(),n=Math.ceil(l.duration*course.fps);let transitionFrames=0;
   for(let frame=0;frame<n;frame++) {
     const t=frame/course.fps,s=draw(g,l,t,course);
+    if(s.transition===true)transitionFrames++;
     for(const item of s.items)if(!Number.isFinite(item.alpha)||!['x','y','w','h'].every(k=>Number.isFinite(item.bounds?.[k]))||item.bounds.w<0||item.bounds.h<0)throw Error('Invalid registered geometry '+l.id+' / frame '+frame+' / '+item.id);
     const byId=new Map(s.items.map(i=>[i.id,i]));
     const ownedBy=(child,parent)=>{const visited=new Set([child.id]);let next=child.owner;while(next){if(visited.has(next))throw Error('Cyclic audit ownership: '+child.id);visited.add(next);if(next===parent.id)return true;next=byId.get(next)?.owner;}return false;};
@@ -41,7 +50,7 @@ for(const l of course.lessons) {
     if(s.invariants?.expectedTotal!==undefined&&Math.abs(s.invariants.totalUnits-s.invariants.expectedTotal)>1e-6)problems.push({type:'conservation',a:'displayed-total',actual:s.invariants.totalUnits,expected:s.invariants.expectedTotal});
     for(const check of s.invariants?.checks||[])if(check.passed!==true)problems.push({type:'mechanism-invariant',a:check.id,actual:check.actual,expected:check.expected});
     for(const p of problems) {
-      const reason=allowances.find(a=>a.lesson===l.id&&t>=a.start&&t<=a.end&&((p.a===a.a&&p.b===a.b)||(p.a===a.b&&p.b===a.a)))?.reason;
+      const reason=allowances.find(a=>a.lesson===l.id&&t>=windowOf(a).start&&t<=windowOf(a).end&&((p.a===a.a&&p.b===a.b)||(p.a===a.b&&p.b===a.a)))?.reason;
       const target=reason?accepted:issues,key=[p.type,p.a,p.b||''].join(':');
       if(!target.has(key)) {
         const value={...p,firstFrame:frame,lastFrame:frame,frames:1,reason:reason||null};
@@ -50,9 +59,10 @@ for(const l of course.lessons) {
       } else {const v=target.get(key);v.lastFrame=frame;v.frames++;}
     }
   }
-  report.lessons.push({id:l.id,frames:n,unresolved:[...issues.values()],intentional:[...accepted.values()]});
+  // Frames whose stage declared a pan, iris or wipe; their transition drawing is unregistered.
+  report.lessons.push({id:l.id,frames:n,transitionFrames,unresolved:[...issues.values()],intentional:[...accepted.values()]});
   report.totalFrames+=n;report.unresolvedPairs+=issues.size;
-  console.log(`${l.id}: ${n} frames, ${issues.size} unresolved, ${accepted.size} intentional`);
+  console.log(`${l.id}: ${n} frames, ${issues.size} unresolved, ${accepted.size} intentional${transitionFrames?`, ${transitionFrames} transition`:''}`);
 }
 fs.writeFileSync(path.join(root,'review/frame-audit.json'),JSON.stringify(report,null,2)+'\n');
 if(report.unresolvedPairs)process.exitCode=1;

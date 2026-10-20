@@ -92,6 +92,12 @@ function sourcePaths(project,course) {
       add(path.relative(root,resolved));
     }
   }
+  // design.cjs registers its bundled faces through the filesystem; they belong to its identity.
+  if(sources.has('production-source/design.cjs')) {
+    const fonts=path.join(root,'production-source/fonts');
+    if(!fs.existsSync(fonts))throw new Error('design.cjs needs its bundled production-source/fonts directory');
+    for(const name of fs.readdirSync(fonts).sort())if(/\.(?:ttf|otf)$/i.test(name))add('production-source/fonts/'+name,false);
+  }
   return [...sources].sort();
 }
 

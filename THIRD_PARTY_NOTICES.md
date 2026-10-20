@@ -24,4 +24,18 @@ External dependencies are installed separately; their code and binaries are not 
 | Python and Node.js | Local execution | Separately installed runtimes retain their own licenses. |
 | Browsing, speech and hosting providers | Research, narration and delivery | Their own terms, availability, credentials and permissions apply. Installing this skill does not authorize a new data transfer or public course audience. |
 
-No font file, employer logo or proprietary design document is bundled. The renderer uses a system sans-serif font. Source links are references, not redistribution permission. Review the actual source rights and audience before exporting or publishing a course. No employer endorsement or learner-effectiveness certification is implied.
+## Bundled fonts
+
+The design system bundles unmodified font files in `assets/starter/production-source/fonts/`, each beside its complete license text. They are licensed under the [SIL Open Font License 1.1](https://openfontlicense.org), not Apache-2.0. The OFL permits bundling and redistribution with software, provided the license text accompanies the fonts and the fonts are not sold by themselves. None of these fonts declares a Reserved Font Name.
+
+| Font | Files | Version and source | License file |
+| --- | --- | --- | --- |
+| Inter | Regular, Medium, SemiBold, Bold, ExtraBold | 4.001, [rsms/inter v4.1](https://github.com/rsms/inter/releases/tag/v4.1) `extras/ttf` | `Inter-OFL.txt` |
+| Instrument Serif | Regular, Italic | 1.000, [google/fonts](https://github.com/google/fonts/tree/main/ofl/instrumentserif) | `InstrumentSerif-OFL.txt` |
+| JetBrains Mono | Regular, Bold | 2.304, [JetBrains/JetBrainsMono v2.304](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304) | `JetBrainsMono-OFL.txt` |
+
+Rendered course frames are not font software; the OFL places no restriction on videos or images made with these fonts. Keep the license files with the fonts when copying a project. A replacement font chosen for a course needs its own recorded license before it is bundled or published.
+
+## Other material
+
+No employer logo or proprietary design document is bundled. The mechanical `--demo` world draws with the system sans-serif font; design-system worlds use the bundled fonts above. Source links are references, not redistribution permission. Review the actual source rights and audience before exporting or publishing a course. No employer endorsement or learner-effectiveness certification is implied.

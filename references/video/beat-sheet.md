@@ -19,6 +19,8 @@ The sheet is the bridge from script meaning to executable motion. Write it befor
 
 The bundled JSON keeps those fields as `concept`, `metaphor`, `elements`, `behavior`, `camera`, `next`, `silentMeaning`, `timingMethod` and `risks`. `text` must match the narration. Include richer authoring fields when useful.
 
+For a design-system world, give each beat a `design` object: `template`, world `region`, `transitionIn` (carry, pan, iris, wipe or none, with its reason), `emphasis` (the one word or value that is marked), `focus` (what dims and when attention hands over) and `triggers` (the narration words each reveal is cued on). The trigger words must be spoken in that beat; the world looks them up with `createCues` and fails on a missing word. See [the design system](design-system.md) and the beat sheet installed by `new_project.py --design-demo`.
+
 ## Choosing meaningful motion
 
 Prefer visible mechanisms to a label changing:
