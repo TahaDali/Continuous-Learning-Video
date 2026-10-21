@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 - 2026-10-20
 
 - Add a shared design system for explanatory motion: `design.cjs` provides colour tokens, type roles, easing, narration cue lookup, camera keyframes, an auditable stage, hand-drawn annotations, rolling counters, focus dimming and motivated pan, iris and wipe transitions.
 - Add `templates.cjs` teaching templates: opener with agenda, kinetic statement, carry, compare, line story, stepper, retrieval question and progress rail. Templates take narration cue times and report a `fit-<template>` audit failure when the spoken span is too short.
