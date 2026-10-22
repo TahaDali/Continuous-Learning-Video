@@ -10,7 +10,7 @@
             "region": "R1",
             "transitionIn": "none (cold open)",
             "emphasis": "It doesn't vanish.",
-            "focus": "Display title, then the serif accent; agenda chips become the progress rail.",
+            "focus": "Display title, then the serif accent; agenda chips become the progress rail. No fiction badge: the claim is general, with no invented figures.",
             "triggers": {
               "title": "Money",
               "accent": "It",
@@ -36,7 +36,8 @@
               "silentMeaning": "Something moves.",
               "timingMethod": "estimated",
               "risks": [
-                "Display title must clear the kicker above it."
+                "Display title must clear the kicker above it.",
+                "The kicker names a demonstration; the fiction badge stays off until invented figures appear."
               ],
               "start": 0.18,
               "end": 1.042
@@ -87,7 +88,7 @@
             "region": "R1",
             "transitionIn": "opener lift-out",
             "emphasis": "150",
-            "focus": "Ghost sentence fills as spoken; a gold highlighter marks 150, which then travels into the total badge.",
+            "focus": "Ghost sentence fills as spoken; the signal highlighter marks 150, which then travels into the total badge. The fiction badge comes on with the invented figures.",
             "triggers": {
               "mark": "150",
               "carry": "hold"
@@ -100,9 +101,10 @@
               "metaphor": "A ghosted sentence that fills in as it is spoken.",
               "elements": [
                 "Ghost sentence",
-                "Highlighter on 150"
+                "Signal highlighter on 150",
+                "Fiction badge"
               ],
-              "behavior": "Words fill on their cues; the highlighter sweeps under 150.",
+              "behavior": "Words fill on their cues; the signal highlighter sweeps under 150 as it is said; the fiction badge fades in.",
               "camera": "Centred, still frame.",
               "next": "The highlighted number is carried into the next scene.",
               "silentMeaning": "The important number is 150.",
@@ -137,19 +139,28 @@
         {
           "id": "transfer",
           "design": {
-            "template": "world mechanism",
+            "template": "world mechanism + stateKey + readout",
             "region": "R1",
             "transitionIn": "hero carry into the total badge",
-            "emphasis": "in transit",
-            "focus": "B dims while the quantity leaves A; focus hands to B before A dims on landing.",
+            "emphasis": "ten in transit",
+            "focus": "The state code is taught where each state first appears (held, then in transit). B dims while the quantity leaves A; a reframing push (fitCamera) frames the route and a ledger readout while the units travel, after the equation fades (beforePush) and the balance figures fade (S.onScreen); the release comes before the landing, and focus hands to B before A dims.",
             "triggers": {
               "build": [
                 "account",
                 "account"
               ],
+              "count": [
+                "holds (1st) 100",
+                "holds (2nd) 50"
+              ],
               "route": "now",
               "depart": "leave",
-              "highlight": "counted",
+              "push": "while",
+              "ledger": [
+                "still (1st)",
+                "counted"
+              ],
+              "value": "ten (2nd)",
               "land": "arrive",
               "annotate": "never"
             }
@@ -158,60 +169,65 @@
             {
               "text": "Account A holds 100 units, and Account B holds 50.",
               "concept": "The starting balances.",
-              "metaphor": "Two cards holding measured vessels.",
+              "metaphor": "Two cards holding measured vessels; each names its account over its balance.",
               "elements": [
                 "Account A card",
                 "Account B card",
                 "Vessels",
-                "Rolling counters"
+                "Stacked callouts",
+                "State key: Held"
               ],
-              "behavior": "Each card pops and its vessel fills on its spoken name.",
+              "behavior": "Each card pops on its spoken name; its balance counts up through round steps while its figure is said (spoken count) and the vessel fills with it; the state key names the held state.",
               "camera": "Hold on the badge and both accounts.",
               "next": "A route draws between the vessels.",
               "silentMeaning": "A holds more than B; together they make the badge.",
               "timingMethod": "estimated",
               "risks": [
-                "Kickers stay on the outer corners so the route remains clear."
+                "\"holds\" is spoken twice, so each count cue names its occurrence.",
+                "A balance never shows a figure before it is said."
               ],
               "start": 14.577,
-              "end": 18.298
+              "end": 18.299
             },
             {
               "text": "Now ten units leave Account A.",
               "concept": "A transfer begins at its origin.",
-              "metaphor": "A gold token rises out of A while A drains.",
+              "metaphor": "A hatched token, the in-transit state, rises out of A while A drains.",
               "elements": [
                 "Route",
-                "Token",
-                "Equation"
+                "Hatched token",
+                "Equation",
+                "State key: In transit"
               ],
-              "behavior": "The route draws, the equation appears, and the token departs as A drains to 90.",
-              "camera": "Push in toward A.",
+              "behavior": "The route draws and the equation appears; the hatched token rises out of A and the state key adds In transit; A steps to 90 as the transit term opens, so the line always adds up.",
+              "camera": "Hold the wide frame.",
               "next": "The token rides the route.",
               "silentMeaning": "Ten left A.",
               "timingMethod": "estimated",
               "risks": [
-                "Token crossing the A card is intentional and documented."
+                "Token crossing the A card is intentional and documented.",
+                "The token figure stays above the vessel rims."
               ],
-              "start": 18.298,
+              "start": 18.299,
               "end": 20.569
             },
             {
               "text": "While they travel, they are still counted: ten in transit.",
               "concept": "An in-flight quantity remains part of the total.",
-              "metaphor": "The equation opens an in-transit term while the token travels.",
+              "metaphor": "A ledger of where every unit is: held, in transit, held.",
               "elements": [
                 "Token trail",
-                "In-transit term",
-                "Accent marker"
+                "Ledger readout",
+                "Signal highlighter on 10"
               ],
-              "behavior": "The token travels with a trail; the transit term opens and is highlighted on its cue.",
-              "camera": "Track the token toward B.",
+              "behavior": "The equation fades before the push; the camera pushes in on the route and the ledger; rows land on \"still\" and \"counted\", and 10 appears on the second \"ten\" under the signal highlighter, which retracts on \"Then\".",
+              "camera": "Reframing push: fitCamera on the route and ledger (zoom 1.3), held while the units travel.",
               "next": "The token reaches B.",
               "silentMeaning": "The ten is still counted while moving.",
               "timingMethod": "estimated",
               "risks": [
-                "The opening term registers its exact visible width."
+                "\"ten\" is spoken twice; the figure cues the second.",
+                "Balance figures and the equation fade before the push would carry them to the frame edge."
               ],
               "start": 20.569,
               "end": 24.732
@@ -222,19 +238,21 @@
               "metaphor": "The token sinks into B and a ring confirms the landing; the badge is circled.",
               "elements": [
                 "Landing ring",
+                "Equation",
                 "Scribble on badge",
                 "Note"
               ],
-              "behavior": "B fills to 60, the transit term closes, the badge is circled and annotated.",
-              "camera": "Release the push-in back to the wide frame.",
+              "behavior": "The ledger leaves and the camera releases before the landing; B fills and steps to 60 as the transit term closes; the badge is circled and annotated.",
+              "camera": "Release the push back to the wide frame before the units land.",
               "next": "The badge annotation holds.",
               "silentMeaning": "B gained what A lost; the total did not move.",
               "timingMethod": "estimated",
               "risks": [
-                "Token crossing the B card is intentional and documented."
+                "Token crossing the B card is intentional and documented.",
+                "The ledger is gone before arrival, so it is not read as the state after it."
               ],
               "start": 24.732,
-              "end": 29.084
+              "end": 29.085
             },
             {
               "text": "It is still 150.",
@@ -252,7 +270,7 @@
               "risks": [
                 "The pan must not start before the note is readable."
               ],
-              "start": 29.084,
+              "start": 29.085,
               "end": 30.346
             }
           ]
@@ -264,7 +282,7 @@
             "region": "R2",
             "transitionIn": "camera pan R1 -> R2 with motion blur",
             "emphasis": "The total did not.",
-            "focus": "The changed column dims when the total is named.",
+            "focus": "The changed column dims when the total is named; the conserved column is marked in the good colour.",
             "triggers": {
               "rows": [
                 "fell",
@@ -298,7 +316,7 @@
             {
               "text": "The balances changed: A fell to 90, and B rose to 60.",
               "concept": "Both balances changed by the same amount in opposite directions.",
-              "metaphor": "Old values are struck through; new values pop as chips.",
+              "metaphor": "Old values are struck in ink (replaced, not wrong); new values pop as chips.",
               "elements": [
                 "A row",
                 "B row",
@@ -362,7 +380,7 @@
             "region": "R3",
             "transitionIn": "camera pan R2 -> R3 with motion blur",
             "emphasis": "flat",
-            "focus": "Series dim when the flat total is named.",
+            "focus": "Series dim when the flat total is named; A and B keep their own line colours.",
             "triggers": {
               "title": "four (after \"times\")",
               "series": "balances",
@@ -421,7 +439,7 @@
             "region": "R4",
             "transitionIn": "two-phase accent iris from the total line",
             "emphasis": "in three steps.",
-            "focus": "Completed steps settle to half strength; the gold token marks the active step.",
+            "focus": "Completed steps settle to half strength; the token marks the active step. The fiction badge is off: the method is general, so its details carry no invented figures.",
             "triggers": {
               "steps": [
                 "find",
@@ -445,7 +463,8 @@
               "silentMeaning": "A procedure follows.",
               "timingMethod": "estimated",
               "risks": [
-                "Title must clear the rail."
+                "Title must clear the rail.",
+                "The fiction badge has faded out before the method is read."
               ],
               "start": 51.557,
               "end": 52.904
@@ -519,7 +538,7 @@
               "silentMeaning": "Finish by checking the sum.",
               "timingMethod": "estimated",
               "risks": [
-                "Mono details must remain readable at small size."
+                "Mono details must remain readable; all three steps stay within the word budget."
               ],
               "start": 58.821,
               "end": 60.403
@@ -529,14 +548,22 @@
         {
           "id": "check",
           "design": {
-            "template": "question (night mode)",
+            "template": "question with art (night mode)",
             "region": "R5",
             "transitionIn": "slanted wipe to the night background",
             "emphasis": "150",
-            "focus": "Wrong options dim and are struck; the right option turns gold.",
+            "focus": "Mira, a cast preset, asks the question beside a picture of the situation: both balances held, the 25 that would move hatched. Wrong options dim under a wrong-red strike; the right option takes the signal highlighter; tags then say what each option is. The fiction badge is back on for the practice panel.",
             "triggers": {
               "kicker": "check",
-              "reveal": "still"
+              "speaker": "mira",
+              "ask": [
+                "if",
+                "total (1st)"
+              ],
+              "value": "25",
+              "move": "move",
+              "reveal": "still",
+              "tags": "still + 0.7 s"
             }
           },
           "cues": [
@@ -553,29 +580,35 @@
               "silentMeaning": "This is a question.",
               "timingMethod": "estimated",
               "risks": [
-                "Kicker must clear the prompt."
+                "Kicker must clear the prompt.",
+                "The fiction badge returns with the practice panel."
               ],
               "start": 61.063,
-              "end": 62.139
+              "end": 62.14
             },
             {
-              "text": "If 25 units move from B to A, what is the total?",
-              "concept": "A new transfer in the opposite direction.",
-              "metaphor": "A ghosted prompt and three option chips.",
+              "text": "Mira asks: if 25 units move from B to A, what is the total?",
+              "concept": "A new transfer in the opposite direction, asked by a recurring person.",
+              "metaphor": "A ghosted prompt over a picture: the clerk asks beside two lanes and a hatched quantity about to move.",
               "elements": [
                 "Prompt",
+                "Mira (cast)",
+                "Lanes A and B",
+                "Moves callout",
+                "Arrow",
                 "Options 125, 150, 175"
               ],
-              "behavior": "The prompt fills as spoken; options pop after it.",
+              "behavior": "Mira appears as she is named and speaks while the prompt fills; the lanes draw; \"Moves: 25\" lands on \"25\" and the arrow on \"move\"; options pop after the prompt.",
               "camera": "Slow push-in.",
               "next": "A pause invites an answer.",
               "silentMeaning": "Pick the total.",
               "timingMethod": "estimated",
               "risks": [
-                "Options must keep equal spacing when they scale in."
+                "The picture shows the question, never the answer.",
+                "Prompt, picture and options stay within the 24-word budget."
               ],
-              "start": 62.139,
-              "end": 65.873
+              "start": 62.14,
+              "end": 66.638
             },
             {
               "text": "Pause and think.",
@@ -592,27 +625,29 @@
               "risks": [
                 "Do not fill the pause with motion."
               ],
-              "start": 65.873,
-              "end": 67.076
+              "start": 66.638,
+              "end": 67.841
             },
             {
               "text": "Still 150.",
               "concept": "The answer: the total is unchanged.",
-              "metaphor": "The correct chip turns gold while the others are struck.",
+              "metaphor": "The correct option takes the signal highlighter while the others are struck in the wrong red.",
               "elements": [
                 "Correct option",
-                "Strikes"
+                "Strikes",
+                "Tags"
               ],
-              "behavior": "Wrong options dim and are struck; the correct one turns gold.",
+              "behavior": "The right option takes the signal highlighter (its type turns ink under it); wrong options dim under a wrong-red strike; the prompt dims, then tags say what each option is.",
               "camera": "Hold.",
               "next": "The reason names the rule.",
               "silentMeaning": "The total is still 150.",
               "timingMethod": "estimated",
               "risks": [
-                "Strikes must stay inside their chips."
+                "Strikes must stay inside their chips.",
+                "Tags wait until the prompt has dimmed, so the frame stays within the word budget."
               ],
-              "start": 67.076,
-              "end": 67.835
+              "start": 67.841,
+              "end": 68.601
             },
             {
               "text": "Moving units changes balances, not the total.",
@@ -629,8 +664,8 @@
               "risks": [
                 "Reason must stay above the caption band."
               ],
-              "start": 67.835,
-              "end": 71.063
+              "start": 68.601,
+              "end": 71.832
             }
           ]
         }

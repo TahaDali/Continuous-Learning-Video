@@ -4,7 +4,7 @@
   "goal": "See how a transfer changes balances while conserving the total, staged with the design system.",
   "coverage": "Self-contained fictional demonstration; replace for production.",
   "visual": "designed-transfer",
-  "duration": 71.543,
+  "duration": 72.312,
   "scenes": [
     {
       "id": "open",
@@ -63,11 +63,11 @@
     {
       "id": "check",
       "headline": "Check yourself",
-      "narration": "Check yourself. If 25 units move from B to A, what is the total? Pause and think. Still 150. Moving units changes balances, not the total.",
+      "narration": "Check yourself. Mira asks: if 25 units move from B to A, what is the total? Pause and think. Still 150. Moving units changes balances, not the total.",
       "start": 60.883,
-      "end": 71.543,
+      "end": 72.312,
       "speechStart": 61.063,
-      "speechEnd": 71.063
+      "speechEnd": 71.832
     }
   ]
 }
