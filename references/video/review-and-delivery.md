@@ -13,7 +13,7 @@ Fix collisions through stable positions and choreographed timing. Separate label
 ## Review layers
 
 1. Validate source coverage and conceptual invariants: conserved quantities, consistent units, independent states, honest uncertainty, permissions and exceptions.
-2. Run geometry checks at the output rate, inspect flagged intermediate frames and inspect encoded contact sheets covering every lesson. Add purpose-specific checks for the mechanism, such as conservation including in-flight amounts.
+2. Run geometry checks at the output rate, inspect flagged intermediate frames and inspect encoded contact sheets covering every lesson with the [sentence-end review](#sentence-end-review). Add purpose-specific checks for the mechanism, such as conservation including in-flight amounts.
 3. Probe and fully decode every final MP4. Check codecs, dimensions, rate, duration, audio and caption streams. Compare caption text against exact narration and check ordered, non-overlapping timings within duration. The validation helper covers these mechanical checks.
 4. Listen to the complete narration independently: pronunciation, meaning, stress, rhythm, pauses, warmth, unnatural joins and excessive performance. Audio peak/clipping checks and optional local ASR are useful screens, not substitutes. Never claim to hear content when the tool reports audio input is unavailable.
 5. Watch the synchronized result. Ensure objects gain their meaning at the named phrase, a reveal lands on emphasis, motion leaves comprehension time and captions stay clear. Export a silent excerpt without audio or subtitle streams for the creative test.
@@ -32,6 +32,43 @@ A minimal acceptance report distinguishes:
 | Silent understanding | Producer inspection or learner test | Who inferred what; avoid overstated comprehension |
 
 The user may accept working audio and request release while perceptual review is incomplete. Do not repeat a permission gate; deliver the accepted edition with the limit recorded accurately. Never upgrade playback confirmation into a fabricated listening certificate.
+
+## Sentence-end review
+
+The geometry audit proves bounds and overlaps, not meaning. After the first full render and before export, review what each narration sentence actually leaves on screen:
+
+```bash
+python3 <skill-dir>/scripts/review_frames.py /absolute/project <lessonId>           # player/videos/<lessonId>.mp4 -> review/sentence-end/
+python3 <skill-dir>/scripts/review_frames.py /absolute/project <lessonId> --silent  # review/silent/<lessonId>.mp4 -> review/sentence-end-silent/
+```
+
+For each scene the script grabs the frame 0.6 s into the scene and the frame 0.15 s (`--lead`) before each sentence's last word ends: the state that sentence should have produced. Sentences map to measured word timings by character offset (`charStart`), so a repeated word cannot pull a sample to its earlier occurrence; closing quotes, decimals and common abbreviations do not split sentences, and a sentence may start with a lower-case name such as "iPhone". Without measured timings it spreads the beat-sheet cues and marks the scene `estimated`.
+
+It writes `<lessonId>-plan.json`, full-size frames under `frames/<lessonId>/` and one two-column, time-stamped sheet per scene under `sheets/<lessonId>/`, using ffmpeg only. Each plan entry holds `scene`, `headline`, `start`, `end`, `points` as `[time, sentence]`, `unmapped` sentences, frame and sheet paths, and the sampled `video`, `videoDuration`, `videoModified` and `silent` (no audio stream). It prints which video it sampled, each sheet's sentences beside their tile numbers, the coverage counts and a reviewer checklist. It samples; it does not judge.
+
+- It refuses a video whose length differs from the lesson's `duration` in `course.json` by more than one frame plus 0.1 s: another lesson's video, or a render made before the narration changed.
+- Silent runs default to `review/sentence-end-silent/`, so they never overwrite the final encode's evidence. `--video` samples another file and `--out` writes elsewhere.
+- A full run replaces the lesson's plan, frames and sheets, so a renamed or removed scene leaves no stale sheet.
+- `--scene` (repeatable) redoes only those scenes and keeps the others in the plan. It refuses when the kept scenes were sampled from another video, or at times `course.json` no longer gives; rerun the whole lesson then.
+
+1. Run it for every lesson. Resolve any `unmapped` sentence before review: an unsampled sentence is unreviewed.
+2. Split the lessons into groups. One reviewer per group views every sheet against its sentences, using the printed checklist, and records each finding as lesson, scene, time, sentence, what is wrong and what a learner would wrongly conclude.
+3. One refuting verifier per group then tries to refute each finding on the full-size frames, or on a short clip around its time when duration matters. A finding is refuted by default; it survives only when the verifier reproduces it and agrees it misleads.
+4. Fix confirmed findings in the authored world, not in the review record. Re-render the affected lessons as fresh silent clips (`node production-source/render.cjs <lessonId> --silent-preview`), rerun `review_frames.py <project> <lessonId> --silent --scene <sceneId>` and re-verify each fix on its new frames. After the final narrated render, rerun `review_frames.py <project> <lessonId> --scene <sceneId>` on the final encode and spot-check every fixed scene on its new sheet.
+5. Record coverage honestly in `review/acceptance.json`: lessons and sentences sampled out of the total, findings raised, refuted, confirmed and fixed, and which fixes were re-verified in the final encode. Cite the plan entries behind each claim: only entries with `silent: false` from the final encode count as final-encode verification. One frame per sentence is a sample, so on its own it supports `partial` synchronized viewing (or silent inspection for silent runs), never `completed` continuous viewing.
+
+Defect classes the geometry audit cannot see, each found in real use after a clean audit:
+
+- A recurring real person drawn differently across lessons, so they read as different people.
+- The fiction badge left on over real facts, or missing on a practice panel with invented people or figures.
+- A stale callout from the previous beat that reads as the cause of the next one.
+- A camera push that fades part of a counted group: sixteen items shown as eight.
+- An on-screen detail that answers a question the narration only asks later.
+- A label readable for less than 0.5 s.
+- A panel cut by the caption band.
+- A reveal firing on an earlier occurrence of its cue word.
+
+When reviewers or verifiers are agents, never truncate item lists into their prompts; a serialised list cut at a character limit silently drops items. Write each group's sheet paths, sentences and findings to files, pass the file paths, and check that each agent reports the number of items it read.
 
 ## Player usability
 

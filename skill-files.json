@@ -60,6 +60,7 @@
     "references/workflow.md",
     "scripts/design_checks.py",
     "scripts/new_project.py",
+    "scripts/review_frames.py",
     "scripts/validate_project.py",
     "scripts/workflow.py",
     "scripts/write_beat_sheet.py",
