@@ -36,7 +36,8 @@ async function render(l) {
       if(!ff.stdin.write(g.getImageData(0,0,W,H).data))await Promise.race([once(ff.stdin,'drain'),done.then(()=>{throw new Error('Encoder stopped before all frames');})]);
     }
     ff.stdin.end();await done;
-  } catch(e) {ff.kill();throw e;}
+  // Close the pipe before killing: ffmpeg otherwise keeps waiting for input and a world that throws hangs the render.
+  } catch(e) {ff.stdin.destroy();ff.kill();throw e;}
   console.log(`${l.id}: ${frames} frames -> ${output}`);
 }
 (async()=>{

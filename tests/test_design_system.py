@@ -138,6 +138,26 @@ assert.equal(wordTimes(['a','b'],lesson.scenes[0]).method,'estimated');
         self.assertEqual(design_checks.design_token_findings(project),
                          [f'production-source/world.cjs:{len(lines) + 2}', f'production-source/world.cjs:{len(lines) + 3}'])
 
+    def test_token_lint_rejects_chrome_type_in_worlds(self):
+        project = self.project('designed', '--design-demo')
+        world = project / 'production-source/world.cjs'
+        lines = world.read_text().splitlines()
+        world.write_text('\n'.join(lines + ["// role:'chrome' in a comment is ignored",
+                                            "const a={role:'chrome'};", "const b={tier: \"chrome\"};",
+                                            "const c={chrome:true};", "const d={chromeless:true,role:'chromeKey'};"]) + '\n')
+        self.assertEqual(design_checks.design_token_findings(project),
+                         [f'production-source/world.cjs:{len(lines) + n}' for n in (2, 3, 4)])
+
+    def test_a_world_that_throws_fails_the_render_instead_of_hanging(self):
+        env = self.canvas_environment()
+        project = self.project('designed', '--design-demo')
+        world = project / 'production-source/world.cjs'
+        world.write_text(world.read_text() + "const drawWorld=draw;module.exports.draw=(g,l,t,c)=>{if(t>.5)throw new Error('authored failure');return drawWorld(g,l,t,c);};\n")
+        result = subprocess.run(['node', str(project / 'production-source/render.cjs'), '01', '--silent-preview'],
+                                env=env, capture_output=True, text=True, timeout=90)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('authored failure', result.stderr)
+
     def test_illustrations_draw_on_the_design_stage(self):
         self.node("""
 const assert=require('node:assert/strict'),canvas=require(process.env.CANVAS_MODULE),D=require('./design.cjs');
