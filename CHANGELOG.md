@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0 - Unreleased
+## 1.3.0 - 2026-10-22
 
 - **Design-system guardrails in the frame audit:**
   - Type tiers with floors: content 28 px, tertiary 24 px, chrome 18 px. `role()` raises smaller sizes, and `type-<id>` fails text that is smaller on screen after zoom.
