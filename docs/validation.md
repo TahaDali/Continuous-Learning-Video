@@ -12,6 +12,14 @@ CI exercises source/resource checks, clean locked canvas installation, the expli
 
 The retained player contracts include a later manual pause overriding asynchronous transcript seek/recovery and stale work not affecting a new chapter. The renderer checks registered geometry and selected numeric Canvas arguments at output timestamps. These checks do not cover every glyph, raster effect, connector, causal claim or learner interpretation.
 
+For design-system worlds the frame audit also fails three kinds of frame:
+
+- registered text below its tier's floor on screen;
+- text the edge guard had to fade outside a transition;
+- frames over the 24-word budget.
+
+Narration cue lookup rejects a repeated word that does not name its occurrence. Regression tests cover these guardrails, the templates, the cast and the sentence sampling of `review_frames.py`. Its contact sheets are sampled evidence for a reviewer, not an automated judgment of meaning.
+
 ## Review limits
 
 Complete independent listening and whole-course synchronized/silent viewing were not established by the audit. Selected encoded inspection and owner acceptance remain different evidence. Physical mobile, full screen-reader accessibility, Windows and a clean physical second machine are not certified. No blanket WCAG, human-voice realism, pronunciation or learner-effectiveness claim is made.
