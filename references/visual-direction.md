@@ -21,13 +21,61 @@ Choose recognizable forms for the actual work. A publication has editorial struc
 
 Design each lesson around its own consequential scene. Infrastructure and drawing primitives may be shared. Do not assign the same generic world to unrelated paragraphs merely because they discuss a decision, evidence or a handoff. A revision-package mistake needs to show which definitions were issued, received and built; a generic build-yield diagram cannot substitute for that failure path.
 
-The starter's `production-source/illustrations.cjs` provides original parameterized people, documents, browsers, phones, envelopes, buildings and clocks with darker companion text inks. Use `createIllustration(stage)` with the existing motion stage so glyph and label bounds enter the same audit. Supported literal local CommonJS imports are discovered transitively; declare non-module drawing inputs such as images or fonts in `renderSources`. Dynamic or alternate module loading fails explicitly. This is a vocabulary seed: author the subject's missing forms and causal scene, rather than inserting these glyphs into a repeated diagram. Shapes and paths still need raster inspection; automatic bounds do not verify their internal anatomy, meaning or readability.
+The starter's `production-source/illustrations.cjs` provides original parameterized people, documents, browsers, phones, envelopes, buildings and clocks with darker companion text inks. `figure()` draws a person with a face, hair, clothes, a pose, a prop and a mouth that moves while speaking. A course defines its recurring people once with `defineCast` and stages them with `cast`, so the same person looks the same in every lesson. Use `createIllustration(stage)`, `figure` and `cast` with the design stage or the motion stage so glyph and label bounds enter the same audit. Supported literal local CommonJS imports are discovered transitively; declare non-module drawing inputs such as images or fonts in `renderSources`. Dynamic or alternate module loading fails explicitly. This is a vocabulary seed: author the subject's missing forms and causal scene, rather than inserting these glyphs into a repeated diagram. Shapes and paths still need raster inspection; automatic bounds do not verify their internal anatomy, meaning or readability.
 
 Use a hierarchy of context, active mechanism and outcome. Scale and position encode relationships. Keep enough context to understand why the active detail matters, and zoom only when it reveals something. Empty travel, excessive text containers and crowded detail are different failures; filling space is not the objective. A sparse two-object explanation can be right when it teaches the complete relationship, but it cannot replace a richer operating scene that the narration actually requires.
 
 ## Stage it with the design system
 
 [The design system](video/design-system.md) supplies the shared typographic hierarchy, colour meaning, motion timing, camera language and transitions; the subject supplies the objects and the mechanism. Frame the consequential scene with its templates: an opener with an agenda, one kinetic claim whose emphasised value is carried into the mechanism, a compare or line story that isolates what changed against what held, a stepper for a procedure, and a question on the night background. Keep templates subordinate to the scene they frame. Adapting to a user's reference changes the tokens and roles in one place; it does not justify per-scene fonts, colours or ad hoc easing.
+
+Decide the course-wide choices once, before the first lesson:
+
+- the state code a quantity can be in (`defineStates`);
+- the recurring cast (`defineCast`);
+- each part's opener layout and motif (`defineParts`);
+- where the fiction badge is on and off.
+
+Every lesson then reuses them.
+
+## Write the design brief
+
+Before authoring the first world, write a short brief in the private project, for example `design-brief.md` beside `visual-design.json`. It is working evidence and is not exported. Revise it when a reference or a user's criticism changes the direction, then re-check the lessons the change affects.
+
+```markdown
+# Design brief: <course title>
+
+Reference: <exact edition and lineage, frames inspected>, or "none: the house system".
+Adaptations: <token, face or role changes made once in design.cjs, with font licences>.
+
+## Made once for the course
+- State code: <state: token, solid or hatched, meaning, aliases>
+- Cast: <key: name, role, look>; generic people: <keys>
+- Parts: <part: layout, motif, the kind of hero object>
+- Fiction: <what is invented; which material is real, so the badge is off there>
+
+## Per lesson
+| Lesson | Part | Hero object and its internal detail | Mechanism (visual-design.json id) | Reframing pushes | Transitions in | Practice picture |
+```
+
+The brief states the hard rules below. Each rule has a measure and names what checks it, so a reviewer can mark it met or failed. Where a rule says "review", no automatic check covers it.
+
+| Rule | Measure | Checked by |
+| --- | --- | --- |
+| Type floors | Text carrying meaning is at least 28 px on screen after camera zoom. Units, ticks and glyph-internal IDs are at least 24 px. Only the rail and the fiction badge use 18 px chrome. | Audit `type-<id>` for sizes; `design_checks` rejects chrome type in worlds |
+| Edges | Outside transitions, no visible text comes within 12 px of the safe area (40–1240 × 88–587). Nothing a viewer must read sits in the caption band. | Audit `edge-<id>`, review |
+| Density | At most 24 content words are on screen in a frame. Each beat has one hero filling a third or more of the safe area. | Audit `words`, review |
+| Timing | Every reveal lands on its spoken word, and a repeated cue word names its occurrence. Each template gets at least its minimum spoken span. | `createCues` throws, audit `fit-<template>`, sentence-end review |
+| Reading time | Every label stays readable for at least 0.5 s. A highlighter marks one thing and retracts when the narration moves on. | Sentence-end review |
+| Colour meanings | Signal marks only what is spoken about now. Red marks only what is wrong, green only what is correct or conserved, and violet is only the fiction badge. States never use a meaning colour. No colour or font literals appear in a world. | `defineStates` throws, `design_checks`, review |
+| Numbers | A figure shows only a value the narrator says, and a count passes only through round steps. Totals stay conserved through motion. | `spoken`/`stepValue`, `finish({totalUnits, expectedTotal})`, review |
+| Camera | A slow push stays within 1.06 across a scene, and within 1.03 while templates are on screen unless their labels fade first. Reframing pushes come from `fitCamera`. A counted group stays whole on screen. | Review |
+| Transitions | Iris and wipe paint the full frame, and transitions begin in the closing pause. A pan never arrives on a blank page. | Audit `transitionFrames`, review |
+| Pace | No beat stays sparse or static for more than about 2 s unless the beat sheet gives the reason. | Sentence-end review |
+| People | Recurring people come only from cast presets and look the same in every lesson. | `cast()` throws on a look override, review across lessons |
+| Fiction | The badge is on whenever invented people, companies or figures are on screen, including practice panels, and off over real facts. | Sentence-end review |
+
+The brief does not replace the reference comparison or the prototype review. It makes their findings testable.
 
 ## Animate the cause
 

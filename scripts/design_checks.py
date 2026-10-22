@@ -12,6 +12,8 @@ SYSTEM_MODULES = {'production-source/design.cjs', 'production-source/templates.c
                   'production-source/render-sources.cjs'}
 HEX_COLOUR = re.compile(r'''['"`]#[0-9a-fA-F]{3,8}['"`]''')
 FONT_CHOICE = re.compile(r'''\.font\s*=|registerFromPath|font-family|\d+px\s+['"]?[A-Za-z]''')
+# Chrome type (18 px floor, exempt from the edge guard and word budget) belongs to the rail and badge only.
+CHROME_CHOICE = re.compile(r'''\b(?:role|tier)\s*:\s*['"`]chrome['"`]|\bchrome\s*:\s*true\b''')
 
 
 def need(value, message):
@@ -118,8 +120,9 @@ def design_token_findings(root, sources=None):
     """List authored lines that bypass design.cjs tokens or type roles.
 
     Applies only when the render sources include design.cjs; worlds built directly on
-    motion.cjs keep their own palette. This is a guardrail for literal hex colours and font
-    choices, not a style analyser: computed colours and rgba() shadows are not inspected.
+    motion.cjs keep their own palette. This is a guardrail for literal hex colours, font
+    choices and chrome type outside the system templates, not a style analyser: computed
+    colours and rgba() shadows are not inspected.
     """
     sources = render_sources(root) if sources is None else sources
     if 'production-source/design.cjs' not in sources:
@@ -129,7 +132,8 @@ def design_token_findings(root, sources=None):
         if name in SYSTEM_MODULES or not name.endswith(('.cjs', '.js')):
             continue
         for number, line in enumerate((root / name).read_text().splitlines(), 1):
-            if not line.lstrip().startswith('//') and (HEX_COLOUR.search(line) or FONT_CHOICE.search(line)):
+            if not line.lstrip().startswith('//') and (HEX_COLOUR.search(line) or FONT_CHOICE.search(line)
+                                                       or CHROME_CHOICE.search(line)):
                 findings.append(f'{name}:{number}')
     return findings
 

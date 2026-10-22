@@ -9,7 +9,7 @@ Posting + authorized source material
   -> parent manuscript and adapted lessons
   -> sentence beat sheet and authored visual worlds
   -> authorized measured narration and captions
-  -> encoded videos, geometry/media checks and actual review
+  -> encoded videos, geometry/media checks, sentence-end review and actual review
   -> allowlisted static player export
   -> supported hosting result and exact package identity
 ```
@@ -19,7 +19,12 @@ Posting + authorized source material
 - `scripts/workflow.py` manages nine checkpoints and invalidates later stages when relevant sources change.
 - `scripts/design_checks.py` checks the narrative/visual evidence contract and local video prototypes, and rejects hard-coded colours and fonts in design-system worlds.
 - `scripts/new_project.py` creates an empty authoring project; `--demo` explicitly selects the mechanical example and `--design-demo` the design-system example.
-- `assets/starter/` supplies the editable renderer, the shared design system (`design.cjs`, `templates.cjs`, bundled OFL fonts), narration helper, local server and static player.
+- `assets/starter/` supplies the editable renderer, the shared design system, narration helper, local server and static player. The design system has three modules and the fonts:
+  - `design.cjs`: meaning tokens, a course-defined state code, tiered type roles, cue, camera and spoken-number helpers, and a stage whose type-floor, edge and word-budget checks report through the frame audit.
+  - `templates.cjs`: teaching templates and the top-band chrome.
+  - `illustrations.cjs`: glyphs, people with faces and a course-defined cast.
+  - Bundled OFL fonts.
+- `scripts/review_frames.py` samples each narration sentence's end state from an encoded lesson into time-stamped contact sheets and a plan for the sentence-end review. It samples; reviewers judge.
 - `assets/design-demo/` holds the fictional design-system world, lesson, beat sheet and overlap rules copied by `--design-demo`.
 - `scripts/validate_project.py` checks text/timing/captions and optionally full media decoding.
 - `scripts/build_skill.py` builds only reviewed `skill-files.json` paths and can create a deterministic checksum ZIP outside the source tree.

@@ -4,7 +4,7 @@
 
 The starter uses Python 3, Node.js, FFmpeg/FFprobe and `@napi-rs/canvas`. Use available bundled runtimes first. Otherwise install dependencies within the task workspace, not into unrelated global environments. `CANVAS_MODULE` may point to a known local canvas package. The package records a tested canvas version; check installed interfaces before changing versions.
 
-`new_project.py` refuses to overwrite an existing directory. By default it creates an empty authoring project with a world that throws until subject scenes are implemented. Pass `--demo` only to create the separate 12-second mechanical example for learning the tooling or running tests. Pass `--design-demo` to install the fictional design-system example: a 70-second lesson with its world, full beat sheet and scene-scoped overlap rules. It creates:
+`new_project.py` refuses to overwrite an existing directory. By default it creates an empty authoring project with a world that throws until subject scenes are implemented. Pass `--demo` only to create the separate 12-second mechanical example for learning the tooling or running tests. Pass `--design-demo` to install the fictional design-system example: a lesson of about 72 seconds with its world, full beat sheet and scene-scoped overlap rules. It creates:
 
 ```text
 course.json                  Adapted narration and measured timing

@@ -75,7 +75,7 @@ node production-source/render.cjs posters
 node production-source/audit.cjs
 ```
 
-The silent MP4 is under `review/silent/`. This confirms rendering setup; it does not generate speech or publish anything. Omit `--demo` to create an empty authoring project. Use `--design-demo` instead of `--demo` to render the 70-second design-system example with the same commands.
+The silent MP4 is under `review/silent/`. This confirms rendering setup; it does not generate speech or publish anything. Omit `--demo` to create an empty authoring project. Use `--design-demo` instead of `--demo` to render the roughly 72-second design-system example with the same commands.
 
 Check tools and a project's installed canvas without contacting a speech provider:
 
