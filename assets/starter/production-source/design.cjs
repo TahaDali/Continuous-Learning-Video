@@ -347,7 +347,7 @@ function createDesignStage(g,course,{background='paper'}={}) {
   const viewport={x:32,y:80,w:W-64,h:H-205},safe={x:40,y:88,w:W-80,h:H-221},CY=340;
   // open: inside unclipped(); bare: drawing is not clipped to the viewport; depth: callbacks of
   // view/fade/actor, whose saved state unclipped() must not pop.
-  const items=[],checks=[],guards=new Set();let quiet=0,moving=0,transition=false,words=0,open=0,bare=false,depth=0;
+  const items=[],checks=[],guards=new Set(),notes={};let quiet=0,moving=0,transition=false,words=0,open=0,bare=false,depth=0;
   const night=background==='night';
   g.resetTransform();g.globalAlpha=1;g.filter='none';g.letterSpacing='0px';
   paintBackground(g,W,H,background);
@@ -366,6 +366,9 @@ function createDesignStage(g,course,{background='paper'}={}) {
   function inTransition(fn){transition=true;moving++;try{decor(fn);}finally{moving--;}}
   // Model or timing assertions reported through the audit's mechanism-invariant channel.
   function check(id,passed,actual,expected){if(!checks.some(c=>c.id===id))checks.push({id,passed:passed===true,actual,expected});}
+  // Facts about unregistered page furniture that the audit compares with the script: the fiction
+  // badge's visibility (0..1) against scenes that declare `fiction`.
+  function note(key,value){notes[key]=value;}
   // A template given its scene end asserts that the spoken span leaves room for its choreography.
   function fits(name,start,end,minimum){if(Number.isFinite(end))check('fit-'+name,end-start>=minimum,+(end-start).toFixed(3),'>= '+minimum+'s');}
   function view(cam,fn,{blur=0}={}) {
@@ -640,13 +643,13 @@ function createDesignStage(g,course,{background='paper'}={}) {
       paintBackground(g,W,H,mode);g.beginPath();g.rect(viewport.x,viewport.y,viewport.w,viewport.h);g.clip();clippedRun(fn);g.restore();});
   }
 
-  return {g,W,H,T,E,safe,viewport,night,record,decor,transition:inTransition,check,fits,view,fade,actor,text,label,measure,layout,sentence,card,chip,marker,markText,counter,callout,
+  return {g,W,H,T,E,safe,viewport,night,record,decor,transition:inTransition,check,note,fits,view,fade,actor,text,label,measure,layout,sentence,card,chip,marker,markText,counter,callout,
     stateBox,swatch,onScreen,rule,vrule,hatch,partial,bezier,arrow,scribble,underline,strike,dotGrid,iris,wipe,roundRect,unclipped,
     finish(invariants={}){g.restore();g.filter='none';g.letterSpacing='0px';
       // Transition frames are excluded from the text checks; the words budget applies to the rest.
       const kept=transition?checks.filter(c=>!guards.has(c.id)):checks;
       if(!transition)check('words',words<=WORD_BUDGET,words,'<= '+WORD_BUDGET+' content words on screen');
-      return {items,safe,viewport,invariants:{...invariants,checks:[...(invariants.checks||[]),...kept]},transition,words};}};
+      return {items,safe,viewport,invariants:{...invariants,checks:[...(invariants.checks||[]),...kept]},transition,words,notes};}};
 }
 
 module.exports={T,TYPE,FACES,FONT_FILES,FLOOR,EDGE,WORD_BUDGET,BASELINE,STATES,STATE_ALIASES,E,role,floorOf,clamp,lerp,seg,wordTimes,createCues,

@@ -9,7 +9,7 @@ from pathlib import Path
 # Shared system modules own their palettes and faces; authored modules use their tokens and roles.
 SYSTEM_MODULES = {'production-source/design.cjs', 'production-source/templates.cjs', 'production-source/motion.cjs',
                   'production-source/illustrations.cjs', 'production-source/finite-canvas.cjs',
-                  'production-source/render-sources.cjs'}
+                  'production-source/render-sources.cjs', 'production-source/lesson-scope.cjs'}
 HEX_COLOUR = re.compile(r'''['"`]#[0-9a-fA-F]{3,8}['"`]''')
 FONT_CHOICE = re.compile(r'''\.font\s*=|registerFromPath|font-family|\d+px\s+['"]?[A-Za-z]''')
 # Chrome type (18 px floor, exempt from the edge guard and word budget) belongs to the rail and badge only.

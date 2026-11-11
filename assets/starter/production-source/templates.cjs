@@ -396,7 +396,7 @@ function progressRail(S,t,{steps,at,from,until,night=[],states=null}) {
 // Returns the badge box while it shows, otherwise null.
 function fictionBadge(S,t,{windows,from,until=Infinity,label='Fictional example'}={}) {
   const list=windows??(from!=null?[[from,until]]:[]);
-  const show=list.reduce((m,[a,b=Infinity])=>Math.max(m,seg(t,a,.6)*(1-seg(t,b,.6))),0);if(show<=.002)return null;
+  const show=list.reduce((m,[a,b=Infinity])=>Math.max(m,seg(t,a,.6)*(1-seg(t,b,.6))),0);S.note?.('fictionBadge',show);if(show<=.002)return null;
   const r=role('chrome'),w=S.measure(String(label).toUpperCase(),r)+28,x=PAGE.badgeRight-w,y=PAGE.bandY;bandFit(S,'badge',x,PAGE.badgeRight);
   S.decor(()=>S.unclipped(()=>{const g=S.g;g.save();g.setTransform(1,0,0,1,0,0);g.filter='none';g.globalAlpha*=show;
     g.fillStyle=T.fiction;g.fillRect(x,y-15,w,30);

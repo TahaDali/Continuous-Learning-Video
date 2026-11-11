@@ -15,7 +15,7 @@ function createStage(g,course,camera={x:640,y:340,zoom:1}) {
   // Default 16:9 safe zones; adapt together when the output dimensions change.
   const viewport={x:32,y:80,w:W-64,h:H-205};
   const safe={x:40,y:88,w:W-80,h:H-221};
-  const items=[];
+  const items=[],notes={};
   g.resetTransform();g.globalAlpha=1;g.fillStyle=palette.bg;g.fillRect(0,0,W,H);
   g.fillStyle='#fffefa';g.fillRect(0,H-112,W,88);
   g.save();g.beginPath();g.rect(viewport.x,viewport.y,viewport.w,viewport.h);g.clip();
@@ -47,6 +47,7 @@ function createStage(g,course,camera={x:640,y:340,zoom:1}) {
     lines.forEach((value,i)=>label(id+'-'+i,value,x,y+(i-(lines.length-1)/2)*lineHeight,{size,weight,...options}));
     return {lines,height:Math.max(0,lines.length-1)*lineHeight+size*1.3};
   }
-  return {g,actor,label,wrappedLabel,edge,finish(invariants={}){g.restore();return {items,safe,viewport,invariants};}};
+  // A world that draws its own fiction badge reports its visibility (0..1) as note('fictionBadge', level).
+  return {g,actor,label,wrappedLabel,edge,note(key,value){notes[key]=value;},finish(invariants={}){g.restore();return {items,safe,viewport,invariants,notes};}};
 }
 module.exports={palette,clamp,mix,smooth,progress,createStage};

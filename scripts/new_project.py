@@ -42,6 +42,8 @@ def main():
         (target / 'visual-beat-sheet/beat-sheet.json').write_text('{"lessons": []}\n')
         (target / 'production-source/world.cjs').write_text(
             "'use strict';\n"
+            "// Author each lesson in production-source/worlds/<lessonId>.cjs (exporting draw), with shared\n"
+            "// definitions in one module they require. A lesson without its own module is drawn here.\n"
             "function draw() { throw new Error('No authored visual world. Implement this course and fail explicitly for every unsupported lesson. Use new_project.py --demo only for the separate mechanical example.'); }\n"
             "module.exports = {draw};\n")
     data['title'] = args.title

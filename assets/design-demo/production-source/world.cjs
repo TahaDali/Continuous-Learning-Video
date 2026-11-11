@@ -44,6 +44,13 @@ const planFor=planner(({cue,sc,win})=>{
   // arrive. A push is not a transition: whatever it would carry off frame fades first
   // (beforePush, S.onScreen) and returns after it.
   const in0=Math.max(transit[0],cue('transfer','while')-.3),push=[in0,in0+.7],back0=Math.max(push[1]+1.6,land0-.8),back=[back0,back0+.8];
+  // The equation is on screen only when it can be read. If the push follows the departure too closely
+  // for the in-transit term to be readable for half a second, the line leaves before the term opens;
+  // if that would leave the line itself under a second, it waits for the push to release. It returns
+  // as the units land, so the term is seen closing; only if the release came too late for that does
+  // it wait until the term has closed. (1e-6: back[1] is land[0] rebuilt from sums of tenths.)
+  const lineOut=push[0]-swap[0]>=1.25?push[0]:swap[0];
+  const eqHide=[lineOut-cue('transfer','now')>=1.1?lineOut:-Infinity,swap[1]+.3-back[1]>=.6-1e-6?back[1]:Math.max(back[1],swap[1]+.6)];
   // Transitions begin in the closing pause of a scene, so its last reveal stays readable.
   const pans=[win(sc.contrast),win(sc.series)],iris=win(sc.method),wipe=win(sc.check);
   const wide={...R1,zoom:1},near=fitCamera(M.focus,{maxZoom:1.3});
@@ -51,7 +58,7 @@ const planFor=planner(({cue,sc,win})=>{
   const keys=orderKeys([{t:0,...wide},{t:carryEnd,...R1,zoom:1.03},{t:carryEnd+.8,...wide},{t:push[0],...wide},{t:push[1],...near},
     {t:back[0],...near},{t:back[1],...wide},{t:pans[0][0],...R1,zoom:1.02},{t:pans[0][1],...R2,zoom:1},{t:pans[1][0],...R2,zoom:1.02},
     {t:pans[1][1],...R3,zoom:1},{t:iris[0],...R3,zoom:1.025}]);
-  return {sc,cue,exitAt,carryEnd,dep,transit,land,swap,push,back,pans,iris,wipe,keys,
+  return {sc,cue,exitAt,carryEnd,dep,transit,land,swap,push,back,eqHide,pans,iris,wipe,keys,
     build:[cue('transfer','account',1)-.15,cue('transfer','account',2)-.15],route:cue('transfer','now')-.2,
     // Spoken numbers: a balance counts up while its figure is said ("holds 100"); "holds" is said
     // twice in the scene, so each cue names its occurrence.
@@ -109,10 +116,11 @@ function clippedLabel(S,id,str,x,y,visible,{role:name,color}) {
 }
 
 // 90 + 10 in transit + 50 = 150: the transit term opens only while the quantity travels. The push
-// would carry the line off frame, so beforePush fades it before the push and returns it after.
+// would carry the line off frame, so beforePush fades it before the push and returns it after; the
+// plan widens that window when a term would otherwise be on screen for under half a second.
 // Figures step to each result; they never count through values the narration does not say.
 function equation(S,P,t,{A,B,flight}) {
-  const show=seg(t,P.route+.2,.5)*beforePush(t,[P.push[0],P.back[1]]),open=seg(t,P.swap[0],.6,E.inOut)*(1-seg(t,P.swap[1],.6,E.inOut));
+  const show=seg(t,P.route+.2,.5)*beforePush(t,P.eqHide),open=seg(t,P.swap[0],.6,E.inOut)*(1-seg(t,P.swap[1],.6,E.inOut));
   if(show<=0)return;
   const r=role('title'),gap=16,terms=[
     {id:'eq-a',s:String(A),o:1,c:T.ink},{id:'eq-p1',s:'+',o:1,c:T.mute},

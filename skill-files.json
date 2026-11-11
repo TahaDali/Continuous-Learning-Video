@@ -33,6 +33,7 @@
     "assets/starter/production-source/fonts/JetBrainsMono-Regular.ttf",
     "assets/starter/production-source/illustrations.cjs",
     "assets/starter/production-source/intentional-overlaps.json",
+    "assets/starter/production-source/lesson-scope.cjs",
     "assets/starter/production-source/motion.cjs",
     "assets/starter/production-source/narrate.py",
     "assets/starter/production-source/package-lock.json",

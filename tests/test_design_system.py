@@ -178,7 +178,7 @@ const r=S.finish();assert.deepEqual(r.items.map(i=>i.id),['p','d','l']);assert.e
         self.assertEqual(len(lesson['intentional']), 6)
         self.assertTrue(0 < lesson['transitionFrames'] < lesson['frames'] * .1)
         self.assertIn('production-source/fonts/Inter-Bold.ttf', report['sourceHashes'])
-        for rate in (2.2, 3.4):
+        for rate in (2.2, 3.0, 3.4):
             with self.subTest(rate=rate):
                 retime(project, rate)
                 result, report = self.audit(project, env)

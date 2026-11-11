@@ -52,7 +52,18 @@ function imports(source,file) {
   return found;
 }
 
-function sourcePaths(project,course) {
+// A project that carries lesson-scope.cjs may give a lesson its own module,
+// production-source/worlds/<lessonId>.cjs; every other lesson is drawn by world.cjs.
+const LESSON_ID=/^[a-zA-Z0-9_-]+$/;
+function lessonWorld(project,id) {
+  const own='production-source/worlds/'+id+'.cjs';
+  return typeof id==='string'&&LESSON_ID.test(id)&&fs.existsSync(path.join(project,'production-source/lesson-scope.cjs'))
+    &&fs.existsSync(path.join(project,own))?own:'production-source/world.cjs';
+}
+
+// Without lessonId: every file any lesson's picture can depend on. With one: that lesson's files only,
+// so a change to another lesson's module leaves this lesson's render and audit current.
+function sourcePaths(project,course,lessonId) {
   const root=fs.realpathSync(project),sources=new Set(),queue=[];
   function add(relative,scan=true) {
     if(typeof relative!=='string'||!relative||path.isAbsolute(relative))throw new Error('Render sources must be project-relative regular files');
@@ -66,10 +77,20 @@ function sourcePaths(project,course) {
   }
   const declared=course.renderSources||[];
   if(!Array.isArray(declared)||new Set(declared).size!==declared.length)throw new Error('Invalid renderSources list');
-  add('production-source/world.cjs');add('production-source/motion.cjs');
+  const ids=lessonId===undefined?(Array.isArray(course.lessons)?course.lessons.map(l=>l&&l.id):[]):[lessonId];
+  const worlds=ids.map(id=>lessonWorld(root,id));
+  if(lessonId===undefined||worlds[0]==='production-source/world.cjs')add('production-source/world.cjs');
+  ids.forEach((id,i)=>{
+    if(worlds[i]==='production-source/world.cjs')return;
+    add(worlds[i]);
+    // A lesson's own intentional-overlap rules sit beside its module and belong to its identity.
+    const rules='production-source/worlds/'+id+'.overlaps.json';
+    if(fs.existsSync(path.join(root,rules)))add(rules,false);
+  });
+  add('production-source/motion.cjs');
   for(const name of declared)add(name);
   // Keep the discovery contract and installed dependency declaration in its identity.
-  for(const name of ['production-source/render-sources.cjs','production-source/finite-canvas.cjs','production-source/package.json',
+  for(const name of ['production-source/render-sources.cjs','production-source/lesson-scope.cjs','production-source/finite-canvas.cjs','production-source/package.json',
       'production-source/package-lock.json','production-source/npm-shrinkwrap.json'])if(fs.existsSync(path.join(root,name)))add(name,false);
   while(queue.length) {
     const file=queue.pop();
@@ -101,8 +122,9 @@ function sourcePaths(project,course) {
   return [...sources].sort();
 }
 
-module.exports={sourcePaths,imports};
+module.exports={sourcePaths,imports,lessonWorld};
 if(require.main===module) {
-  try{const root=path.resolve(process.argv[2]);console.log(JSON.stringify(sourcePaths(root,JSON.parse(fs.readFileSync(path.join(root,'course.json'),'utf8')))));}
+  // node render-sources.cjs <project> [lessonId]
+  try{const root=path.resolve(process.argv[2]);console.log(JSON.stringify(sourcePaths(root,JSON.parse(fs.readFileSync(path.join(root,'course.json'),'utf8')),process.argv[3])));}
   catch(error){console.error(error.message);process.exitCode=1;}
 }

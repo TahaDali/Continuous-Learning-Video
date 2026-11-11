@@ -199,7 +199,7 @@
                 "Equation",
                 "State key: In transit"
               ],
-              "behavior": "The route draws and the equation appears; the hatched token rises out of A and the state key adds In transit; A steps to 90 as the transit term opens, so the line always adds up.",
+              "behavior": "The route draws and the equation appears; the hatched token rises out of A and the state key adds In transit; A steps to 90 as the transit term opens, so the line always adds up. When the push follows too closely for that term to be read, the line leaves before the term opens and returns after the push.",
               "camera": "Hold the wide frame.",
               "next": "The token rides the route.",
               "silentMeaning": "Ten left A.",
