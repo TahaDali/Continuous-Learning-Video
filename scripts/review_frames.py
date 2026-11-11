@@ -2,15 +2,20 @@
 """Sample every narration sentence's end state into per-scene contact sheets for a reviewer.
 
 For each scene it grabs the frame 0.6 s into the scene and, for every sentence, the frame `lead`
-seconds before the sentence's last word ends: the state that sentence should have produced. It
-writes a plan (`<lesson>-plan.json`), full-size frames and two-column, time-stamped sheets, then
-prints the sentences beside their times and a reviewer checklist. ffmpeg does all image work.
+seconds before the sentence's last word ends: the state that sentence should have produced. When
+the frame audit recorded transitions for the lesson, each transition's midpoint is sampled too.
+It writes a plan (`<lesson>-plan.json`), a reviewer brief (`<lesson>-brief.md`: every sheet beside
+its sentences, then the checklist), full-size frames and two-column, time-stamped sheets, and
+prints the brief unless --quiet. `all` samples every lesson. ffmpeg does all image work.
 It refuses a video whose length is not the lesson's, and the plan records which video each scene
 came from. It does not judge the frames; a person or reviewer agent must look at every sheet.
 """
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import json
+import math
+import os
 from pathlib import Path
 import re
 import shutil
@@ -29,6 +34,7 @@ CONTINUING = {'etc', 'al', 'inc', 'ltd', 'co', 'corp', 'jr', 'sr'}
 # A lower-case name with an inner capital ("iPhone", "eBay", "iOS") starts a sentence like any capital.
 CAMEL = re.compile(r'[a-z]+[A-Z]')
 OPENING = '[scene opens]'
+TRANSITION = '[transition midpoint]'
 CHECKLIST = [
     'The tile shows the state its sentence has just described: nothing it names is missing, nothing from a later sentence is already there.',
     'Each reveal lands on its spoken word, not on an earlier occurrence of the same word in the scene (compare the tiles before it).',
@@ -40,7 +46,15 @@ CHECKLIST = [
     'Invented people, companies and figures carry the fiction badge (practice panels too); purely real facts do not.',
     'Meaning colours are honest: the highlighter (signal) marks only what is being spoken about now; the wrong red marks only '
     'what is wrong or blocked (the red-orange accent marks change and attention annotations and is not a fault).',
+    'A transition tile (~) shows both scenes or the incoming one, never a blank page, and starts after the last reveal could be read.',
 ]
+# What a clean frame audit of the same render already established on every frame, so a reviewer
+# spends attention on meaning. It lists the checks; it does not claim the audit was run.
+AUDITED = ('A clean frame audit (production-source/audit.cjs) already checks every frame of a design-system world for '
+           'type floors, frame-edge and caption-band clearance of registered labels, the 24-word budget, registered '
+           'overlaps, labels on screen for under 0.5 s, and the fiction badge in scenes that declare `fiction`; a repeated '
+           'cue word without its occurrence and a changed cast look fail when the world is drawn. Those items still '
+           'deserve a finding when a tile shows them, but most of the review is the meaning the audit cannot see.')
 # 5x7 bitmap glyphs for the time stamps, so sheets need neither PIL nor an ffmpeg font filter.
 GLYPHS = {
     '0': '01110 10001 10011 10101 11001 10001 01110', '1': '00100 01100 00100 00100 00100 00100 01110',
@@ -51,6 +65,7 @@ GLYPHS = {
     '.': '00000 00000 00000 00000 00000 01100 01100', '=': '00000 00000 11111 00000 11111 00000 00000',
     't': '01000 01000 11100 01000 01000 01001 00110', 's': '00000 00000 01110 10000 01110 00001 11110',
     '#': '01010 01010 11111 01010 11111 01010 01010', '-': '00000 00000 00000 11111 00000 00000 00000',
+    '~': '00000 00000 01000 10101 00010 00000 00000',
     ' ': '00000 00000 00000 00000 00000 00000 00000'}
 # Red stamps on white strips; grey gutters keep paper-coloured frames apart.
 INK, PAPER, GUTTER, GAP = (210, 20, 20), (255, 255, 255), (150, 150, 150), 6
@@ -178,6 +193,18 @@ def _plan(project, course, lesson, lead, scenes):
     return [scene_points(s, lead, cues=beats.get(s['id']), frame=1 / course.get('fps', 24)) for s in chosen]
 
 
+def audit_transitions(project: Path, lesson: dict, fps: float) -> list[float]:
+    """Midpoints of the transitions the frame audit recorded for this lesson, if it covers this timing."""
+    try:
+        report = json.loads((project / 'review/frame-audit.json').read_text())
+        record = next(r for r in report['lessons'] if r.get('id') == lesson['id'])
+        if record.get('frames') != math.ceil(lesson['duration'] * fps):
+            return []
+        return [round((a + b) / 2, 2) for a, b in record.get('transitions', [])]
+    except (OSError, ValueError, KeyError, TypeError, StopIteration):
+        return []
+
+
 def _probe(video):
     """Width, height and duration of the video, and whether it carries an audio stream."""
     info = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-show_entries',
@@ -249,8 +276,9 @@ def output_folder(project: Path, silent: bool = False) -> Path:
 
 
 def review_lesson(project: Path, lesson_id: str, out: Optional[Path] = None, video: Optional[Path] = None,
-                  lead: float = .15, scale: float = .5, silent: bool = False, scenes: Optional[list] = None) -> list[dict]:
-    """Write the plan, full-size frames and one contact sheet per scene; return the plan."""
+                  lead: float = .15, scale: float = .5, silent: bool = False, scenes: Optional[list] = None,
+                  jobs: Optional[int] = None) -> list[dict]:
+    """Write the plan, the reviewer brief, full-size frames and one contact sheet per scene; return the plan."""
     if not SAFE_ID.fullmatch(lesson_id):
         raise ValueError(f'Unsafe lesson ID: {lesson_id!r}')
     if not 0 <= lead < 5 or not 0 < scale <= 1:
@@ -294,25 +322,47 @@ def review_lesson(project: Path, lesson_id: str, out: Optional[Path] = None, vid
     frames, sheets = out / 'frames' / lesson_id, out / 'sheets' / lesson_id
     keep = {p['scene'] for p in kept}
     # Clear all earlier evidence except the kept scenes', so a renamed, removed or shortened scene leaves none.
-    for folder, suffix in ((frames, r'-\d+\.png'), (sheets, r'\.png')):
+    for folder, suffix in ((frames, r'-t?\d+\.png'), (sheets, r'\.png')):
         folder.mkdir(parents=True, exist_ok=True)
         for old in folder.glob('*.png'):
             if not any(re.fullmatch(re.escape(s) + suffix, old.name) for s in keep):
                 old.unlink()
     modified = datetime.fromtimestamp(video.stat().st_mtime, timezone.utc).isoformat(timespec='seconds')
     size = (max(2, round(vw * scale)), max(2, round(vh * scale)))
+    # A transition's midpoint joins the sheet of the scene it falls in, after that scene's sentences.
+    midpoints = [t for t in audit_transitions(project, lesson, fps) if t < duration]
+    work = []
     for scene in plan:
         # Each scene records what it was sampled from: a merged plan shows which encode each came from.
         scene.update(video=str(video), videoDuration=round(duration, 3), videoModified=modified, silent=not audio)
-        tiles, scene['frames'] = [], []
-        for k, (t, _) in enumerate(scene['points']):
-            full = frames / f'{scene["scene"]}-{k:02}.png'
-            tiles.append(grab(video, t, size, full))
-            scene['frames'].append(str(full))
+        scene['transitions'] = [t for t in midpoints if scene['start'] <= t < scene['end']]
+        scene['frames'] = [str(frames / f'{scene["scene"]}-{k:02}.png') for k in range(len(scene['points']))]
+        scene['transitionFrames'] = [str(frames / f'{scene["scene"]}-t{k:02}.png') for k in range(len(scene['transitions']))]
+        work += [(t, Path(full)) for (t, _), full in zip(scene['points'], scene['frames'])]
+        work += [(t, Path(full)) for t, full in zip(scene['transitions'], scene['transitionFrames'])]
+    # Each grab is its own ffmpeg process, so threads are enough to use every core.
+    with ThreadPoolExecutor(max_workers=max(1, jobs or min(8, os.cpu_count() or 1))) as pool:
+        grabbed = iter(list(pool.map(lambda item: grab(video, item[0], size, item[1]), work)))
+    for scene in plan:
+        tiles = [next(grabbed) for _ in scene['points']] + [next(grabbed) for _ in scene['transitions']]
         labels = [f'#{k} t={t:.2f}s' for k, (t, _) in enumerate(scene['points'])]
+        labels += [f'~{k} t={t:.2f}s' for k, t in enumerate(scene['transitions'])]
         scene['sheet'] = str(contact_sheet(tiles, labels, size, sheets / f'{scene["scene"]}.png'))
-    path.write_text(json.dumps(sorted(kept + plan, key=lambda p: p['start']), indent=1, ensure_ascii=False) + '\n')
+    merged = sorted(kept + plan, key=lambda p: p['start'])
+    path.write_text(json.dumps(merged, indent=1, ensure_ascii=False) + '\n')
+    # The brief always covers the whole lesson, so a --scene re-run leaves one complete reviewer file.
+    (out / f'{lesson_id}-brief.md').write_text(report(merged, lesson_id, out, lead) + '\n')
     return plan
+
+
+def summary(plan: list[dict], lesson_id: str) -> str:
+    """One line of coverage: scenes, sentences, frames and what could not be sampled."""
+    sentences = sum(len(p['points']) - 1 for p in plan)
+    unmapped = sum(len(p['unmapped']) for p in plan)
+    moves = sum(len(p.get('transitions', [])) for p in plan)
+    return (f'Lesson {lesson_id}: {len(plan)} scenes, {sentences} sentences sampled, '
+            f'{sentences + len(plan)} frames, {unmapped} sentences unmapped.'
+            + (f' {moves} transition midpoints sampled.' if moves else ''))
 
 
 def report(plan: list[dict], lesson_id: str, out: Path, lead: float = .15) -> str:
@@ -327,16 +377,14 @@ def report(plan: list[dict], lesson_id: str, out: Path, lead: float = .15) -> st
         lines.append(f"\n## {p['scene']} — {p['headline']} ({p['start']:.1f}–{p['end']:.1f} s, {p['timing']} timing)"
                      f"\n   sheet: {p.get('sheet', '')}")
         lines += [f'  #{k:<2} {t:7.2f}  {sentence}' for k, (t, sentence) in enumerate(p['points'])]
+        lines += [f'  ~{k:<2} {t:7.2f}  {TRANSITION}' for k, t in enumerate(p.get('transitions', []))]
         lines += [f'  UNMAPPED  {sentence}' for sentence in p['unmapped']]
-    sentences = sum(len(p['points']) - 1 for p in plan)
-    unmapped = sum(len(p['unmapped']) for p in plan)
+    lines += ['', summary(plan, lesson_id), f'Plan: {out / (lesson_id + "-plan.json")}']
     estimated = [p['scene'] for p in plan if p['timing'] != 'measured']
-    lines += ['', f'Lesson {lesson_id}: {len(plan)} scenes, {sentences} sentences sampled, '
-                  f'{sentences + len(plan)} frames, {unmapped} sentences unmapped.',
-              f'Plan: {out / (lesson_id + "-plan.json")}']
     if estimated:
         lines.append('Estimated timing (no measured word timings): ' + ', '.join(estimated))
-    lines += ['', f'Reviewer checklist. Tile #0 is 0.6 s into the scene; tile #k is {lead:.2f} s before sentence k ends.',
+    lines += ['', f'Reviewer checklist. Tile #0 is 0.6 s into the scene; tile #k is {lead:.2f} s before sentence k ends; '
+                  'tile ~k is the midpoint of a transition the frame audit recorded.', AUDITED,
               'View every sheet against its sentences and check, per tile:']
     lines += [f'  [ ] {item}' for item in CHECKLIST]
     lines += ['Record each finding as lesson, scene, time, sentence, what is wrong and why it misleads.',
@@ -347,7 +395,7 @@ def report(plan: list[dict], lesson_id: str, out: Path, lead: float = .15) -> st
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('project', type=Path)
-    parser.add_argument('lesson')
+    parser.add_argument('lesson', help='A lesson ID, or "all" for every lesson in course.json.')
     parser.add_argument('--out', type=Path, help='Output folder (default <project>/review/sentence-end, '
                                                  'or review/sentence-end-silent with --silent).')
     source = parser.add_mutually_exclusive_group()
@@ -356,15 +404,31 @@ def main():
     parser.add_argument('--lead', type=float, default=.15, help='Seconds before each sentence ends (default 0.15).')
     parser.add_argument('--scale', type=float, default=.5, help='Tile scale on the sheets (default 0.5).')
     parser.add_argument('--scene', action='append', help='Only this scene ID; repeat for more (re-verification).')
+    parser.add_argument('--quiet', action='store_true',
+                        help='Print one coverage line per lesson and the brief path; the sentences and checklist are in the brief.')
+    parser.add_argument('--jobs', type=int, help='Frames to grab at once (default: one per core, at most 8).')
     args = parser.parse_args()
     project = args.project.expanduser().resolve()
     out = args.out.expanduser().resolve() if args.out else output_folder(project, args.silent)
     try:
-        plan = review_lesson(project, args.lesson, out, args.video and args.video.expanduser().resolve(),
-                             args.lead, args.scale, args.silent, args.scene)
+        lessons = [args.lesson]
+        if args.lesson == 'all':
+            lessons = [l['id'] for l in json.loads((project / 'course.json').read_text())['lessons']]
+            if 'all' in lessons:
+                lessons = ['all']                     # a lesson really named "all" is just that lesson
+            elif args.scene or args.video:
+                raise ValueError('--scene and --video name one lesson; "all" samples each lesson\'s own video')
+        for lesson in lessons:
+            plan = review_lesson(project, lesson, out, args.video and args.video.expanduser().resolve(),
+                                 args.lead, args.scale, args.silent, args.scene, args.jobs)
+            if args.quiet:
+                estimated = sum(1 for p in plan if p['timing'] != 'measured')
+                print(summary(plan, lesson) + (f' {estimated} scenes on estimated timing.' if estimated else '')
+                      + f' Brief: {out / (lesson + "-brief.md")}')
+            else:
+                print(report(plan, lesson, out, args.lead))
     except (ValueError, KeyError, OSError, json.JSONDecodeError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'Review frames failed: {error}\n')
-    print(report(plan, args.lesson, out, args.lead))
 
 
 if __name__ == '__main__':

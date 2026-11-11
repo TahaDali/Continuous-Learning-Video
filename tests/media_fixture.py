@@ -11,6 +11,12 @@ SKILL = Path(__file__).resolve().parent.parent
 
 def media_fixture(fixture, audio_seconds):
     """Silent PCM and synthetic timings test mechanical validation only."""
+    narration_fixture(fixture, audio_seconds)
+    render(fixture)
+
+
+def narration_fixture(fixture, audio_seconds):
+    """Synthetic measured timing, captions and audio for lesson 01; nothing is rendered."""
     blocks = []
     def stamp(seconds, separator):
         return f'00:00:{int(seconds):02}{separator}{round((seconds % 1) * 1000):03}'
@@ -33,10 +39,14 @@ def media_fixture(fixture, audio_seconds):
     with wave.open(str(fixture.root / 'audio/01.wav'), 'wb') as audio:
         audio.setparams((1, 2, 24000, 0, 'NONE', 'not compressed'))
         audio.writeframes(b'\0' * round(48000 * audio_seconds))
+
+
+def render(fixture, *arguments):
     env = dict(os.environ)
     if not env.get('CANVAS_MODULE'):
         module = SKILL / 'assets/starter/production-source/node_modules/@napi-rs/canvas'
         if not module.exists():
             fixture.skipTest('Rendering dependencies not installed')
         env['CANVAS_MODULE'] = str(module)
-    subprocess.run(['node', str(fixture.root / 'production-source/render.cjs'), 'all'], env=env, check=True, capture_output=True)
+    return subprocess.run(['node', str(fixture.root / 'production-source/render.cjs'), *(arguments or ('all',))],
+                          env=env, check=True, capture_output=True, text=True)

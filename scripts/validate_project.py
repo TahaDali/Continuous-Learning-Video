@@ -23,6 +23,26 @@ def norm(text):
     return exact_text(text)
 
 
+# A beat may state these once for all of its sentence cues; a cue that needs its own value overrides it.
+INHERITED = ('metaphor', 'elements', 'camera', 'risks')
+
+
+def cue_field(cue, beat, field):
+    """A cue's own value, or its beat's for the fields a beat may state once."""
+    return cue.get(field) or (beat.get(field) if field in INHERITED else None)
+
+
+def decoded_before(root):
+    """Videos an earlier passing media validation decoded completely, by content hash."""
+    try:
+        report = json.loads((root / 'review/validation.json').read_text())
+        if report.get('status') != 'passed' or not report.get('mediaChecked'):
+            return set()
+        return {video['sha256'] for video in report['videos'] if video.get('decoded') is True}
+    except (OSError, ValueError, KeyError, TypeError):
+        return set()
+
+
 def parse_stamp(s):
     h, m, sec = s.replace(',', '.').split(':')
     return int(h) * 3600 + int(m) * 60 + float(sec)
@@ -38,6 +58,7 @@ def validate(root, media=False):
     require(len({l['id'] for l in lessons}) == len(lessons), 'Duplicate lesson IDs')
     require(len(lessons) == len(sheet['lessons']), 'Lesson coverage differs from beat sheet')
     rows, videos = 0, []
+    known = decoded_before(root) if media else set()
     for lesson, plan in zip(lessons, sheet['lessons'], strict=True):
         require(re.fullmatch(r'[a-zA-Z0-9_-]+', lesson['id']), 'Unsafe lesson ID')
         require(lesson['id'] == plan['id'], 'Lesson order/IDs differ')
@@ -58,7 +79,7 @@ def validate(root, media=False):
             previous_cue_end = beat['start']
             for cue in cues:
                 for field in ['text', 'concept', 'metaphor', 'elements', 'behavior', 'camera', 'next', 'silentMeaning', 'timingMethod', 'risks']:
-                    require(bool(cue.get(field)), f'Missing cue field: {field}')
+                    require(bool(cue_field(cue, planned, field)), f'Missing cue field: {field}')
                 require(finite(cue['start']) and finite(cue['end'])
                         and previous_cue_end <= cue['start'] < cue['end'] <= beat['end'] + .01, 'Sentence cues overlap, are unordered, or outside beat')
                 previous_cue_end = cue['end']
@@ -118,9 +139,12 @@ def validate(root, media=False):
             require(abs(float(stream['duration']) - lesson['duration']) < tolerance, f'{label} stream duration differs')
             require(abs(float(stream.get('start_time', 0))) < tolerance, f'{label} stream starts late')
         require(abs(float(result['format']['duration']) - lesson['duration']) < tolerance, 'Container duration differs')
-        decoded = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(video), '-f', 'null', '-'], capture_output=True)
-        require(decoded.returncode == 0 and not decoded.stderr, 'Full media decode failed')
-        videos.append({'id': lesson['id'], 'sha256': hashlib.sha256(video.read_bytes()).hexdigest(), 'decoded': True})
+        digest = hashlib.sha256(video.read_bytes()).hexdigest()
+        # The same bytes decode the same way: a file an earlier passing run decoded is not decoded again.
+        if digest not in known:
+            decoded = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(video), '-f', 'null', '-'], capture_output=True)
+            require(decoded.returncode == 0 and not decoded.stderr, 'Full media decode failed')
+        videos.append({'id': lesson['id'], 'sha256': digest, 'decoded': True})
     js = (root / 'player/course-data.js').read_text().strip()
     require(js.startswith('window.COURSE = ') and js.endswith(';'), 'Malformed player data')
     require(json.loads(js[len('window.COURSE = '):-1]) == data, 'Player data is stale')

@@ -311,6 +311,66 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(len(plan[1]['points']), 2)
         self.assertEqual(len(list(frames.glob('initial-*.png'))), 3)
 
+    @unittest.skipUnless(FFMPEG, 'ffmpeg is not installed')
+    def test_all_lessons_run_quietly_and_leave_a_complete_brief_each(self):
+        self.data['lessons'].append(dict(json.loads(json.dumps(self.data['lessons'][0])), id='02'))
+        self.save()
+        for lesson in ('01', '02'):
+            grey_video(self.root / f'player/videos/{lesson}.mp4', audio=True)
+        result = self.run_script('--quiet', '--jobs', '2', lesson='all')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        out = self.root / 'review/sentence-end'
+        lines = result.stdout.splitlines()
+        self.assertEqual(len(lines), 2)
+        for lesson, line in zip(('01', '02'), lines):
+            self.assertEqual(line, f'Lesson {lesson}: 3 scenes, 8 sentences sampled, 11 frames, 0 sentences unmapped. '
+                                   f'Brief: {out.resolve() / (lesson + "-brief.md")}')
+            # Everything a reviewer needs is in the brief, so none of it has to pass through the caller.
+            brief = (out / f'{lesson}-brief.md').read_text()
+            self.assertTrue(brief.startswith(f'Lesson {lesson} sampled from '))
+            for expected in ('Dr. Ho signs for 2.5 kg.', 'sheet: ' + str(out.resolve() / 'sheets' / lesson / 'move.png'),
+                             review_frames.AUDITED, *review_frames.CHECKLIST):
+                self.assertIn(expected, brief)
+            self.assertEqual(len(list((out / 'frames' / lesson).glob('*.png'))), 11)
+        self.assertNotIn('Reviewer checklist', result.stdout)
+        # A --scene re-run rewrites the brief for the whole lesson, not only the scene it sampled.
+        self.assertEqual(self.run_script('--quiet', '--scene', 'move').returncode, 0)
+        brief = (out / '01-brief.md').read_text()
+        self.assertIn('## initial', brief)
+        self.assertIn('## result', brief)
+        refused = self.run_script('--scene', 'move', lesson='all')
+        self.assertEqual(refused.returncode, 1)
+        self.assertIn('name one lesson', refused.stderr)
+
+    @unittest.skipUnless(FFMPEG, 'ffmpeg is not installed')
+    def test_transition_midpoints_recorded_by_the_audit_join_the_sheets(self):
+        video = self.root / 'player/videos/01.mp4'
+        grey_video(video)
+        audit = self.root / 'review/frame-audit.json'
+        audit.parent.mkdir(exist_ok=True)
+        audit.write_text(json.dumps({'lessons': [{'id': '01', 'frames': 288, 'transitions': [[2.7, 3.7], [7.7, 8.7]]}]}))
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        out = self.root / 'review/sentence-end'
+        plan = {p['scene']: p for p in json.loads((out / '01-plan.json').read_text())}
+        self.assertEqual([plan[s]['transitions'] for s in ('initial', 'move', 'result')], [[], [3.2], [8.2]])
+        self.assertEqual([Path(f).name for f in plan['move']['transitionFrames']], ['move-t00.png'])
+        self.assertEqual(rgb(Path(plan['move']['transitionFrames'][0]))[:2], (320, 180))
+        # The sentence points are unchanged; the transition tile follows them on the sheet.
+        self.assertEqual(len(plan['move']['points']), 5)
+        width, height, _ = rgb(Path(plan['move']['sheet']))
+        self.assertEqual((width, height), (2 * 160 + 6, 3 * (15 + 90) + 2 * 6))
+        self.assertIn(f'  ~0     3.20  {review_frames.TRANSITION}', result.stdout)
+        self.assertIn('11 frames, 0 sentences unmapped. 2 transition midpoints sampled.', result.stdout)
+        # Re-sampling another scene keeps this scene's transition frame.
+        self.assertEqual(self.run_script('--scene', 'initial').returncode, 0)
+        self.assertTrue((out / 'frames/01/move-t00.png').is_file())
+        # An audit of another timing says nothing about this render.
+        audit.write_text(json.dumps({'lessons': [{'id': '01', 'frames': 100, 'transitions': [[2.7, 3.7]]}]}))
+        self.assertEqual(self.run_script().returncode, 0)
+        self.assertEqual(json.loads((out / '01-plan.json').read_text())[1]['transitions'], [])
+        self.assertFalse((out / 'frames/01/move-t00.png').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

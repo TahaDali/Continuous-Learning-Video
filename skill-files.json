@@ -62,6 +62,7 @@
     "scripts/design_checks.py",
     "scripts/new_project.py",
     "scripts/review_frames.py",
+    "scripts/sync_plan.py",
     "scripts/validate_project.py",
     "scripts/workflow.py",
     "scripts/write_beat_sheet.py",

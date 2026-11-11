@@ -223,6 +223,31 @@ for(const item of labels)if(item.bounds.x<550||item.bounds.x+item.bounds.w>730||
         self.assertEqual(report['status'], 'passed')
         self.assertEqual(report['factualSourceVerification'], 'not evaluated by this tool')
 
+    def test_unchanged_video_is_not_decoded_twice(self):
+        self.media_fixture(12)
+        self.assertEqual(VALIDATOR.validate(self.root, media=True)['videos'][0]['decoded'], True)
+        decodes = []
+        run = VALIDATOR.subprocess.run
+        def counting(command, *args, **kwargs):
+            if '-f' in command and 'null' in command:
+                decodes.append(command)
+            return run(command, *args, **kwargs)
+        VALIDATOR.subprocess.run = counting
+        self.addCleanup(setattr, VALIDATOR.subprocess, 'run', run)
+        # Same bytes: every other check runs again, the full decode does not.
+        report = VALIDATOR.validate(self.root, media=True)
+        self.assertEqual((decodes, report['status'], report['videos'][0]['decoded']), ([], 'passed', True))
+        # Changed bytes, or no earlier passing record, are decoded.
+        video = self.root / 'player/videos/01.mp4'
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-c', 'copy', '-metadata', 'comment=changed',
+                        str(video.with_suffix('.new.mp4'))], check=True, capture_output=True)
+        video.with_suffix('.new.mp4').replace(video)
+        VALIDATOR.validate(self.root, media=True)
+        self.assertEqual(len(decodes), 1)
+        (self.root / 'review/validation.json').write_text('{"status": "failed"}')
+        VALIDATOR.validate(self.root, media=True)
+        self.assertEqual(len(decodes), 2)
+
     def test_truncated_audio_stream_is_rejected(self):
         self.media_fixture(1)
         with self.assertRaisesRegex(ValueError, 'Audio stream duration'):

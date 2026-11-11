@@ -16,7 +16,12 @@ import tempfile
 from urllib.parse import urlsplit
 
 SKILL = Path(__file__).resolve().parent.parent
-STAGES = ('research', 'curriculum', 'script', 'visuals', 'narration', 'media', 'review', 'package', 'delivery')
+STAGES = ('research', 'curriculum', 'script', 'narration', 'visuals', 'media', 'review', 'package', 'delivery')
+# Narration and visuals both follow the script and neither waits for the other; media needs both.
+# Narrating first lets worlds be authored on measured timing; visuals first remains valid.
+REQUIRES = {'research': (), 'curriculum': ('research',), 'script': ('curriculum',), 'narration': ('script',),
+            'visuals': ('script',), 'media': ('narration', 'visuals'), 'review': ('media',),
+            'package': ('review',), 'delivery': ('package',)}
 TIMING = {'start', 'end', 'duration', 'speechStart', 'speechEnd', 'wordTimings', 'timingMethod', 'narrationVoice'}
 STATUSES = {'completed', 'partial', 'pending', 'unavailable', 'failed'}
 
@@ -68,6 +73,18 @@ def index(items, name):
 
 def text(value, message):
     require(isinstance(value, str) and value.strip(), message)
+
+
+def upstream(stage):
+    """Every stage this one depends on, in workflow order."""
+    found = set()
+    def visit(name):
+        for dependency in REQUIRES[name]:
+            if dependency not in found:
+                found.add(dependency)
+                visit(dependency)
+    visit(stage)
+    return [name for name in STAGES if name in found]
 
 
 def evidence(root):
@@ -178,7 +195,7 @@ def packaged_files_current(root):
 
 def state(root):
     data = read(root / 'project.json')
-    result, upstream = {}, False
+    result = {}
     render_paths = None
     for stage in STAGES:
         checkpoint = data['stages'].get(stage)
@@ -193,14 +210,15 @@ def state(root):
                 stale = True
         if checkpoint and stage == 'package':
             stale |= not packaged_files_current(root)
-        result[stage] = 'stale' if checkpoint and (stale or upstream) else 'completed' if checkpoint else 'pending'
-        upstream |= result[stage] != 'completed'
+        # A dependency's own status already folds in everything above it.
+        blocked = any(result[dependency] != 'completed' for dependency in REQUIRES[stage])
+        result[stage] = 'stale' if checkpoint and (stale or blocked) else 'completed' if checkpoint else 'pending'
     return data, result
 
 
 def ready_before(root, stage):
     data, statuses = state(root)
-    required = STAGES[:STAGES.index(stage)]
+    required = upstream(stage)
     require(all(statuses[s] == 'completed' for s in required),
             'Complete or refresh upstream stages: ' + ', '.join(s for s in required if statuses[s] != 'completed'))
     return data
@@ -249,7 +267,9 @@ def record(root, stage):
         validator(root)
         refresh_sheet(root)
     if stage == 'narration':
-        refresh_sheet(root)
+        # The readable sheet needs the visual fields; when narration comes first, visuals writes it.
+        if state(root)[1]['visuals'] == 'completed':
+            refresh_sheet(root)
         for lesson in course['lessons']:
             require(all(beat.get('wordTimings') for beat in lesson['scenes']), 'Narration needs measured words')
             artifacts += [f"audio/{lesson['id']}.wav", f"player/captions/{lesson['id']}.srt", f"player/captions/{lesson['id']}.vtt"]
@@ -278,11 +298,20 @@ def record(root, stage):
         require(packaged_files_current(root), 'Export changed after packaging')
     for name in artifacts:
         inside(root, name)
-    for later in STAGES[STAGES.index(stage) + 1:]:
-        data['stages'].pop(later, None)
+    for later in STAGES:
+        if stage in upstream(later):
+            data['stages'].pop(later, None)
     data['stages'][stage] = {'recordedAt': now(), 'fingerprints': {name: digest(root / name, stage) for name in artifacts}}
     write(root / 'project.json', data)
     return state(root)[1]
+
+
+def sync(root, split=False):
+    """Derive estimated timing, player data and the beat-sheet skeleton from course.json."""
+    spec = importlib.util.spec_from_file_location('course_sync_plan', SKILL / 'scripts/sync_plan.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.sync(root, split)
 
 
 def refresh_sheet(root):
@@ -451,6 +480,9 @@ def main():
     create = commands.add_parser('init')
     create.add_argument('project', type=Path)
     create.add_argument('--job-url', help='Omit for supplied posting text; record its provenance before research checkpointing')
+    derive = commands.add_parser('sync', help='Derive estimated timing, player data and the beat-sheet skeleton from course.json')
+    derive.add_argument('project', type=Path)
+    derive.add_argument('--split', action='store_true', help='Keep one working beat-sheet file per lesson')
     for name in ('status', 'record', 'export'):
         command = commands.add_parser(name)
         command.add_argument('project', type=Path)
@@ -466,6 +498,8 @@ def main():
             root = args.project.expanduser().resolve()
             if args.command == 'init':
                 result = {'project': str(init(root, args.job_url))}
+            elif args.command == 'sync':
+                result = sync(root, args.split)
             elif args.command == 'status':
                 result = state(root)[1]
             elif args.command == 'record':

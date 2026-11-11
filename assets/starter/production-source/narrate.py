@@ -176,6 +176,21 @@ def finalize(data, sheet, root, voice):
         complete_transcript.append('\n'.join(transcript))
     (root / 'course.json').write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
     (root / 'visual-beat-sheet/beat-sheet.json').write_text(json.dumps(sheet, ensure_ascii=False, indent=2) + '\n')
+    # A lesson's working file (workflow.py sync --split) takes the same measured timing, so nobody
+    # authors against estimates after narration. Its authored fields are left as they are; a beat
+    # whose sentence cues were regrouped there waits for the next sync.
+    for plan in sheet['lessons']:
+        own = root / 'visual-beat-sheet/lessons' / (plan['id'] + '.json')
+        if not own.is_file():
+            continue
+        working, measured = json.loads(own.read_text()), {beat['id']: beat for beat in plan['beats']}
+        for beat in working.get('beats', []):
+            source = measured.get(beat.get('id'))
+            if source and [cue.get('text') for cue in beat.get('cues', [])] == [cue['text'] for cue in source['cues']]:
+                beat.update(start=source['start'], end=source['end'])
+                for cue, timed in zip(beat['cues'], source['cues']):
+                    cue.update(start=timed['start'], end=timed['end'], timingMethod=timed['timingMethod'])
+        own.write_text(json.dumps(working, ensure_ascii=False, indent=2) + '\n')
     (root / 'production-source/word-timing-manifest.json').write_text(json.dumps(all_words, ensure_ascii=False, indent=2) + '\n')
     (root / 'player/course-data.js').write_text('window.COURSE = ' + json.dumps(data, ensure_ascii=False) + ';\n')
     (root / 'transcripts/COMPLETE-TRANSCRIPT.md').write_text('\n\n---\n\n'.join(complete_transcript))

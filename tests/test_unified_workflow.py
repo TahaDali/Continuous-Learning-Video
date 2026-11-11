@@ -15,7 +15,7 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'scripts'))
 from build_skill import build
-from media_fixture import media_fixture
+from media_fixture import media_fixture, narration_fixture, render
 
 
 class UnifiedWorkflowTests(unittest.TestCase):
@@ -148,7 +148,173 @@ class UnifiedWorkflowTests(unittest.TestCase):
             handle.write('\n// Changed after recorded prototype inspection\n')
         self.assertEqual(self.workflow.state(self.root)[1]['visuals'], 'stale')
         with self.assertRaisesRegex(ValueError, 'visuals'):
-            self.workflow.record(self.root, 'narration')
+            self.workflow.record(self.root, 'media')
+
+    def seed_script(self):
+        self.seed_curriculum()
+        self.data = self.workflow.read(self.skill / 'assets/starter/course.json')
+        self.sheet = self.workflow.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')
+        self.save()
+        self.seed_design()
+        self.workflow.record(self.root, 'script')
+
+    def test_narration_and_visuals_follow_the_script_in_either_order(self):
+        self.seed_script()
+        statuses = self.workflow.state(self.root)[1]
+        self.assertEqual(list(statuses), ['research', 'curriculum', 'script', 'narration', 'visuals', 'media',
+                                          'review', 'package', 'delivery'])
+        # Narration first: measured timing exists before any world is recorded.
+        narration_fixture(self, 12)
+        readable = self.root / 'visual-beat-sheet/beat-sheet.md'
+        statuses = self.workflow.record(self.root, 'narration')
+        self.assertEqual((statuses['script'], statuses['narration'], statuses['visuals']), ('completed', 'completed', 'pending'))
+        self.assertFalse(readable.exists())            # the readable sheet needs the visual fields
+        with self.assertRaisesRegex(ValueError, 'upstream stages: visuals'):
+            self.workflow.record(self.root, 'media')
+        statuses = self.workflow.record(self.root, 'visuals')
+        self.assertEqual((statuses['narration'], statuses['visuals']), ('completed', 'completed'))
+        self.assertIn('measured synthetic fixture', readable.read_text())
+        # Recording either one again leaves the other in place; recording the script clears both.
+        self.assertEqual(self.workflow.record(self.root, 'narration')['visuals'], 'completed')
+        self.assertEqual(self.workflow.record(self.root, 'visuals')['narration'], 'completed')
+        statuses = self.workflow.record(self.root, 'script')
+        self.assertEqual((statuses['narration'], statuses['visuals']), ('pending', 'pending'))
+
+    def test_a_visual_change_does_not_invalidate_recorded_narration(self):
+        self.seed_script()
+        narration_fixture(self, 12)
+        self.workflow.record(self.root, 'narration')
+        self.workflow.record(self.root, 'visuals')
+        with (self.root / 'production-source/motion.cjs').open('a') as handle:
+            handle.write('\n// A visual fix after narration was measured\n')
+        statuses = self.workflow.state(self.root)[1]
+        self.assertEqual((statuses['narration'], statuses['visuals'], statuses['media']), ('completed', 'stale', 'pending'))
+        # A narration change invalidates narration, not the visual plan, whose fingerprint ignores timing.
+        self.refresh_prototype_identity()
+        self.workflow.record(self.root, 'visuals')
+        self.data['lessons'][0]['scenes'][0]['wordTimings'][0]['end'] += .01
+        self.save()
+        statuses = self.workflow.state(self.root)[1]
+        self.assertEqual((statuses['script'], statuses['narration'], statuses['visuals']), ('completed', 'stale', 'completed'))
+
+    def test_per_lesson_course_runs_from_untimed_scripts_to_export_and_a_one_lesson_fix(self):
+        """The documented order: scripts, sync, narration, per-lesson worlds, one render, export."""
+        w, date = self.workflow, '2026-10-20T12:00:00+00:00'
+        self.seed_research()
+        w.write(self.root / 'curriculum.json', {'objectives': [{'id': 'o1', 'text': 'Explain the conserved quantity', 'requirementIds': ['r1']}],
+            'lessons': [{'id': i, 'title': 'Fictional transfer ' + i, 'objectiveIds': ['o1'], 'claimIds': ['c1']} for i in ('01', '02')],
+            'exclusions': []})
+        w.record(self.root, 'curriculum')
+        # Scripts as an author leaves them: narration and headlines, no timing, no beat sheet.
+        starter = w.read(self.skill / 'assets/starter/course.json')
+        authored = w.read(self.skill / 'assets/starter/visual-beat-sheet/beat-sheet.json')['lessons'][0]
+        lesson = {k: v for k, v in starter['lessons'][0].items() if k != 'duration'}
+        lesson['scenes'] = [{k: v for k, v in scene.items() if k not in {'start', 'end'}} for scene in lesson['scenes']]
+        course = w.read(self.root / 'course.json')
+        course['lessons'] = [dict(json.loads(json.dumps(lesson)), id=i) for i in ('01', '02')]
+        w.write(self.root / 'course.json', course)
+        report = w.sync(self.root, split=True)
+        self.assertEqual((report['cues'], report['estimatedTiming'], report['toAuthor']), (6, ['01', '02'], ['01', '02']))
+        (self.root / 'manuscript.md').write_text('# Synthetic mechanical fixture\n\n## Transfer\n\nNot a researched employer course.\n')
+        w.write(self.root / 'narrative-map.json', {
+            'parts': [{'id': 'p1', 'title': 'Fixture', 'question': 'What is conserved?'}],
+            'chapters': [{'id': 'c1', 'partId': 'p1', 'heading': '## Transfer', 'lessonIds': ['01', '02'],
+                          'retainedDecisions': ['Retain the total'], 'adaptation': 'Synthetic schema fixture only'}]})
+        w.write(self.root / 'review/editorial.json', {'status': 'completed', 'reviewer': 'Synthetic fixture',
+            'findings': [{'partId': 'p1', 'chapterId': 'c1', 'observation': 'Schema fixture only; no teaching-quality claim.'}]})
+        w.record(self.root, 'script')
+
+        # Narration before any world exists: the project's own finalize() on cached synthetic blocks.
+        sys.path.insert(0, str(self.root / 'production-source'))
+        spec = importlib.util.spec_from_file_location('fixture_narrate', self.root / 'production-source/narrate.py')
+        narrate = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(narrate)
+        import wave
+        data, sheet = w.read(self.root / 'course.json'), w.read(self.root / 'visual-beat-sheet/beat-sheet.json')
+        for item in data['lessons']:
+            for beat in item['scenes']:
+                words, at = [], .05
+                for token in beat['narration'].split():
+                    text = token.strip('.,')
+                    start = beat['narration'].index(text, words[-1]['charEnd'] if words else 0)
+                    words.append({'text': text, 'charStart': start, 'charEnd': start + len(text), 'start': round(at, 3), 'end': round(at + .2, 3)})
+                    at += .3
+                stem = narrate.stem_for(item, beat)
+                (self.root / 'audio' / (stem + '.words.json')).write_text(json.dumps({'words': words}))
+                with wave.open(str(self.root / 'audio' / (stem + '.wav')), 'wb') as audio:
+                    audio.setparams((1, 2, 24000, 0, 'NONE', 'not compressed'))
+                    audio.writeframes(b'\0' * (round(at * 24000) * 2))
+        narrate.finalize(data, sheet, self.root, 'synthetic-fixture')
+        statuses = w.record(self.root, 'narration')
+        self.assertEqual((statuses['script'], statuses['narration'], statuses['visuals']), ('completed', 'completed', 'pending'))
+
+        # Visuals: one module and one beat-sheet file per lesson; the shared mechanism is defined once.
+        production = self.root / 'production-source'
+        shutil.copyfile(self.skill / 'assets/starter/production-source/world.cjs', production / 'shared.cjs')
+        (production / 'worlds').mkdir()
+        for i in ('01', '02'):
+            (production / 'worlds' / (i + '.cjs')).write_text("'use strict';\nmodule.exports={draw:require('../shared.cjs').draw};\n")
+            own = self.root / 'visual-beat-sheet/lessons' / (i + '.json')
+            entry = w.read(own)
+            self.assertEqual(entry['context']['title'], lesson['title'])
+            for beat, planned in zip(entry['beats'], authored['beats'], strict=True):
+                self.assertTrue(beat['cues'][0]['timingMethod'].startswith('measured'))
+                beat['cues'][0].update({k: v for k, v in planned['cues'][0].items() if k not in {'text', 'start', 'end', 'timingMethod'}})
+            w.write(own, entry)
+        report = w.sync(self.root)
+        self.assertEqual((report['missingVisualFields'], report['estimatedTiming'], report['narrationChangedSinceMeasured']), (0, [], []))
+        self.assertEqual(w.state(self.root)[1]['narration'], 'completed')      # syncing leaves measured narration alone
+        w.write(self.root / 'visual-design.json', {'mechanisms': [{'id': 'transfer', 'lessonIds': ['01', '02'],
+            'question': 'Does the total stay fixed?', 'states': [{'id': 'a', 'meaning': 'Before'}, {'id': 'b', 'meaning': 'After'}],
+            'transitions': [{'from': 'a', 'to': 'b', 'trigger': 'Transfer', 'change': 'Amount moves', 'invariant': 'Total remains fixed'}]}]})
+        clip = self.root / 'review/fixture-clip.mp4'
+        subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=teal:s=32x24:r=8', '-frames:v', '4', '-c:v', 'libx264',
+                        '-pix_fmt', 'yuv420p', '-threads', '1', '-an', '-y', str(clip)], check=True, capture_output=True)
+        w.write(self.root / 'review/prototypes.json', {'status': 'completed', 'reviewer': 'Synthetic fixture', 'worldSha256': '', 'sourceHashes': {},
+            'clips': [{'mechanismId': 'transfer', 'path': 'review/fixture-clip.mp4', 'observation': 'Generated silent media/schema fixture only.'}]})
+        self.refresh_prototype_identity()
+        w.record(self.root, 'visuals')
+        fingerprints = w.read(self.root / 'project.json')['stages']['visuals']['fingerprints']
+        for name in ('production-source/worlds/01.cjs', 'production-source/worlds/02.cjs', 'production-source/shared.cjs',
+                     'production-source/lesson-scope.cjs'):
+            self.assertIn(name, fingerprints)
+
+        # Media: one render writes the pictures and the narrated files; the audit covers both lessons.
+        self.data = None
+        first = render(self)
+        self.assertIn('01: picture, narration and captions', first.stdout)
+        env = dict(os.environ)
+        if not env.get('CANVAS_MODULE'):
+            env['CANVAS_MODULE'] = str(ROOT / 'assets/starter/production-source/node_modules/@napi-rs/canvas')
+        def node(script, *arguments):
+            return subprocess.run(['node', str(production / script), *arguments], env=env, check=True, capture_output=True, text=True)
+        node('render.cjs', 'posters')
+        node('audit.cjs')
+        w.record(self.root, 'media')
+        w.write(self.root / 'review/acceptance.json', {
+            key: {'status': 'pending', 'coverage': 'Synthetic fixture; no perceptual review performed.'}
+            for key in ('content', 'listening', 'synchronizedViewing', 'silentInspection')})
+        w.record(self.root, 'review')
+        output = self.base / 'export'
+        w.export(self.root, output)
+        self.assertEqual(sorted(p.name for p in (output / 'videos').iterdir()), ['01.mp4', '02.mp4'])
+        exported = json.loads((output / 'course-data.js').read_text()[len('window.COURSE = '):-2])
+        self.assertEqual(set(exported['lessons'][1]['scenes'][0]), {'id', 'headline', 'narration', 'start', 'end'})
+
+        # A fix confined to lesson 02 redraws and replays lesson 02 only, and the checkpoints accept it.
+        own = production / 'worlds/02.cjs'
+        own.write_text(own.read_text() + '// A fix confined to this lesson.\n')
+        statuses = w.state(self.root)[1]
+        self.assertEqual((statuses['narration'], statuses['visuals'], statuses['media']), ('completed', 'stale', 'stale'))
+        self.refresh_prototype_identity()
+        w.record(self.root, 'visuals')
+        again = render(self)
+        self.assertIn('01: picture is current, not redrawn', again.stdout)
+        self.assertNotIn('02: picture is current', again.stdout)
+        self.assertIn('01: ', node('audit.cjs').stdout.splitlines()[0])
+        audit = w.read(self.root / 'review/frame-audit.json')
+        self.assertEqual([item.get('reused') for item in audit['lessons']], [True, None])
+        self.assertEqual(w.record(self.root, 'media')['media'], 'completed')
 
     def test_changed_declared_renderer_helper_invalidates_review(self):
         self.seed_design()
@@ -345,6 +511,9 @@ module.exports={};
                 command.append(argument)
             subprocess.run(command, env=env, check=True, capture_output=True)
         self.workflow.record(self.root, 'media')
+        # Rendering again redraws nothing, so the recorded media stays current.
+        self.assertIn('01: picture is current, not redrawn', render(self).stdout)
+        self.assertEqual(self.workflow.state(self.root)[1]['media'], 'completed')
         self.workflow.write(self.root / 'review/acceptance.json', {
             key: {'status': 'pending', 'coverage': 'Synthetic fixture; no perceptual review performed.'}
             for key in ('content', 'listening', 'synchronizedViewing', 'silentInspection')})

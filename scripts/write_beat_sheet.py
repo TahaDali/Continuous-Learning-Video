@@ -6,6 +6,10 @@ from html import escape
 from pathlib import Path
 
 
+# A beat may state these once for all of its sentence cues (validate_project.py reads them the same way).
+INHERITED = ('metaphor', 'elements', 'camera', 'risks')
+
+
 def write_sheet(root):
     data = json.loads((root / 'visual-beat-sheet/beat-sheet.json').read_text())
     def cell(value):
@@ -24,6 +28,7 @@ def write_sheet(root):
                   '|---|---|---|---|---|---|---|---|---|']
         for beat in lesson['beats']:
             for cue in beat['cues']:
+                cue = {**cue, **{field: beat[field] for field in INHERITED if not cue.get(field) and beat.get(field)}}
                 values = [f"{cue['start']:.3f}–{cue['end']:.3f}s", cue['timingMethod'], cue['text'], cue['concept'],
                           cue['metaphor'] + ': ' + '; '.join(cue['elements']), cue['behavior'], cue['next'],
                           cue['silentMeaning'], cue['risks']]
