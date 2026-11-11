@@ -20,6 +20,18 @@ For design-system worlds the frame audit also fails three kinds of frame:
 
 Narration cue lookup rejects a repeated word that does not name its occurrence. Regression tests cover these guardrails, the templates, the cast and the sentence sampling of `review_frames.py`. Its contact sheets are sampled evidence for a reviewer, not an automated judgment of meaning.
 
+## Faster production path
+
+The production path was shortened without changing what a course looks like. Regression tests cover each claim below.
+
+- **One encode per lesson.** `render.cjs` draws a lesson's picture once and the narrated file copies that video stream. On the design demo with synthetic narration, the narrated MP4 produced this way is byte-identical to the one the previous renderer drew a second time.
+- **Per-lesson scope.** A lesson with its own module is redrawn and replayed only when its own files, its lesson record or timing, its rules, the shared course fields or the tool itself change. A lesson's world cannot read another lesson's scenes or timing, so that identity cannot miss a dependency.
+- **Two more every-frame checks.** The audit rejects a label that becomes readable and is gone within 0.5 s, and holds the fiction badge to scenes that declare `fiction`. The first found a real case in the bundled design demo, where an equation term was on screen for 0.25 s at default timing; the demo now fades that line before the term would open. Compared frame by frame before encoding, the demo is unchanged at slow narration rates and differs only in that one- to two-second window at the others.
+- **Derived plan structure.** `workflow.py sync` builds the beat-sheet skeleton, timing estimates and player data from `course.json`. A sync of the design demo leaves every authored field and cue time unchanged.
+- **Independent narration and visuals stages.** Either can be recorded first; narration first is the documented order.
+
+A mechanical trial on four copies of the demo lesson (5.8 minutes of video, synthetic silent narration, four cores) took 283 s through the previous commands and 93 s through these, with the same outputs. That measures tool time only. It is not a measurement of an authored course, of agent time or tokens, or of review quality; no speech was requested and no course was authored or hosted for this change.
+
 ## Review limits
 
 Complete independent listening and whole-course synchronized/silent viewing were not established by the audit. Selected encoded inspection and owner acceptance remain different evidence. Physical mobile, full screen-reader accessibility, Windows and a clean physical second machine are not certified. No blanket WCAG, human-voice realism, pronunciation or learner-effectiveness claim is made.

@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+Shorter production runs with the same pictures. Tool time on a four-lesson mechanical trial fell from 283 s to 93 s; see [validation](docs/validation.md#faster-production-path) for what that does and does not measure.
+
+- **One encode per lesson.** `render.cjs` draws each picture once into `review/silent/` and writes the narrated video by copying that stream and adding audio and captions. The narrated file is byte-identical to the one the previous renderer drew a second time. `--force` redraws; `--jobs N` renders lessons side by side.
+- **Per-lesson worlds.** A lesson can have its own module, `production-source/worlds/<lessonId>.cjs`, and its own overlap rules in `worlds/<lessonId>.overlaps.json`. `lesson-scope.cjs` gives each lesson an identity of what its picture depends on; the renderer redraws and the audit replays only lessons whose identity changed. `audit.cjs --lesson <lessonId>` audits one lesson without touching the course report.
+- **Narration no longer waits for visuals.** `workflow.py` treats narration and visuals as independent stages after the script. Narrating first is now the documented order, so worlds are authored on measured timing.
+- **`workflow.py sync`.** Derives estimated scene timing, `player/course-data.js` and the sentence-cue skeleton of the beat sheet from `course.json`, keeps authored visual fields across script changes, and with `--split` keeps one working beat-sheet file per lesson.
+- **Beat-level fields.** A beat may state `metaphor`, `elements`, `camera` and `risks` once for its cues.
+- **Audit checks.** `flash` rejects a label that becomes readable and is gone within 0.5 s. `fiction-badge` holds the badge to scenes that declare `"fiction": true` or `false` in `course.json`. Transition windows are recorded per lesson. A flagged frame is drawn on its own canvas, so a failing audit no longer rasterizes every earlier frame.
+- **Sentence-end review.** `review_frames.py` accepts `all`, writes a reviewer brief per lesson, has `--quiet` and `--jobs`, and samples the midpoint of each transition the audit recorded.
+- **Validation.** A final video whose bytes an earlier passing run decoded is not decoded again.
+- **Design demo.** Its equation line now leaves before the in-transit term would flash, and its scenes declare `fiction`.
+- **Documentation.** Call signatures moved from the design-system reference into `references/video/design-api.md`. The workflow reference gains per-lesson and delegation guidance.
+
+Existing projects keep working with their own copies of the renderer and audit. To use the new path in one, copy `render.cjs`, `audit.cjs`, `render-sources.cjs` and `lesson-scope.cjs` from the starter. The fiction-badge check also needs the starter's `templates.cjs` and the stage's `note` method in `design.cjs` and `motion.cjs`; a project that customized `design.cjs` adds that method instead of replacing the file. Worlds may then need changes:
+
+- A label on screen for under 0.5 s now fails the audit. Fix its timing, or add a rule with `"type": "flash"` and a reason.
+- A world that reads another lesson's `scenes` or timing through its `course` argument now throws.
+- `workflow.py status` lists narration before visuals. Checkpoints recorded in the old order remain valid.
+
 ## 1.3.0 - 2026-10-22
 
 - **Design-system guardrails in the frame audit:**

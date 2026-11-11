@@ -4,9 +4,11 @@
 
 Inspect beginnings, endings and intermediate states. Check moving labels, full glyph extents, camera zoom, temporary copies, object travel, foreground masks and caption space. Include completed connector segments and partial arrowheads: a route can cross text before it reaches its clear final position. Different drawing contexts need one global draw order when assessing whether a later opaque object actually covers an earlier path. A clear end frame does not establish a clear transition.
 
-The bundled audit replays every output-frame timestamp and checks visible registered object/label intersections and label safe zones in screen coordinates. Fully offscreen actors are ignored, and actors can cross the clipped viewport on entrance or exit. Delay labels until readable. It records flagged frame ranges, a representative PNG, declared intentional pairs and source hashes. Its result is a geometric screen, not a claim that a human inspected every frame. The audit rejects non-finite alpha or bounds before filtering visibility, so NaN coordinates cannot disappear from collision checks. New rendering code must register its extents; unregistered strokes cannot be certified by this audit.
+The bundled audit replays every output-frame timestamp and checks visible registered object/label intersections and label safe zones in screen coordinates. Fully offscreen actors are ignored, and actors can cross the clipped viewport on entrance or exit. Delay labels until readable. It records flagged frame ranges, a representative PNG, declared intentional pairs and source hashes. It also follows each label through time and rejects one that becomes readable and is gone within 0.5 s (`flash`), and it holds the fiction badge to every scene that declares `fiction` in `course.json` (`fiction-badge`). Its result is a mechanical screen, not a claim that a human inspected every frame. The audit rejects non-finite alpha or bounds before filtering visibility, so NaN coordinates cannot disappear from collision checks. New rendering code must register its extents; unregistered strokes cannot be certified by this audit.
 
-Intentional overlap rules are narrow records in `intentional-overlaps.json`: exact lesson ID, exact stable object IDs, bounded start/end times and an educational reason. An intentional stack, contained label or emerging copy can be legitimate. Nested illustrated composites can use explicit `owner` links on actor and label records; the audit follows those ancestors only when the descendant fits inside them. Shared ownership never exempts sibling collisions. Do not exempt all documents or an entire lesson. Examine each exemption's intermediate encoded frames. Report the accepted pairs alongside zero unresolved findings; do not hide them in a pass count.
+A lesson is replayed again only when something its picture depends on has changed: its own source files, its lesson record and timing, its rules, the shared course fields or the auditor. Otherwise its last clean result is kept and marked `reused`; the report still covers every lesson and every current source hash. A lesson with unresolved findings is always replayed, and `node production-source/audit.cjs --force` replays all of them.
+
+Intentional overlap rules are narrow records in `intentional-overlaps.json`: exact lesson ID, exact stable object IDs, bounded start/end times and an educational reason. A lesson drawn by its own module keeps its rules beside it in `production-source/worlds/<lessonId>.overlaps.json`, where the lesson is implied. A rule with `"type": "flash"` names one label (`a`, no `b`) that may be on screen for under 0.5 s; it excuses nothing else about that label. An intentional stack, contained label or emerging copy can be legitimate. Nested illustrated composites can use explicit `owner` links on actor and label records; the audit follows those ancestors only when the descendant fits inside them. Shared ownership never exempts sibling collisions. Do not exempt all documents or an entire lesson. Examine each exemption's intermediate encoded frames. Report the accepted pairs alongside zero unresolved findings; do not hide them in a pass count.
 
 Fix collisions through stable positions and choreographed timing. Separate label placement from actor construction where useful, stage reveals, route transfers through actual gaps and keep connectors behind foreground objects. Reserve space for captions, but also check actual browser/native caption rendering because font metrics and controls can differ. Do not solve crowding by making essential type unreadably small.
 
@@ -38,37 +40,40 @@ The user may accept working audio and request release while perceptual review is
 The geometry audit proves bounds and overlaps, not meaning. After the first full render and before export, review what each narration sentence actually leaves on screen:
 
 ```bash
-python3 <skill-dir>/scripts/review_frames.py /absolute/project <lessonId>           # player/videos/<lessonId>.mp4 -> review/sentence-end/
+python3 <skill-dir>/scripts/review_frames.py /absolute/project all --quiet          # every lesson's player/videos/<lessonId>.mp4 -> review/sentence-end/
+python3 <skill-dir>/scripts/review_frames.py /absolute/project <lessonId>           # one lesson, printing its brief
 python3 <skill-dir>/scripts/review_frames.py /absolute/project <lessonId> --silent  # review/silent/<lessonId>.mp4 -> review/sentence-end-silent/
 ```
 
 For each scene the script grabs the frame 0.6 s into the scene and the frame 0.15 s (`--lead`) before each sentence's last word ends: the state that sentence should have produced. Sentences map to measured word timings by character offset (`charStart`), so a repeated word cannot pull a sample to its earlier occurrence; closing quotes, decimals and common abbreviations do not split sentences, and a sentence may start with a lower-case name such as "iPhone". Without measured timings it spreads the beat-sheet cues and marks the scene `estimated`.
 
-It writes `<lessonId>-plan.json`, full-size frames under `frames/<lessonId>/` and one two-column, time-stamped sheet per scene under `sheets/<lessonId>/`, using ffmpeg only. Each plan entry holds `scene`, `headline`, `start`, `end`, `points` as `[time, sentence]`, `unmapped` sentences, frame and sheet paths, and the sampled `video`, `videoDuration`, `videoModified` and `silent` (no audio stream). It prints which video it sampled, each sheet's sentences beside their tile numbers, the coverage counts and a reviewer checklist. It samples; it does not judge.
+It writes `<lessonId>-plan.json`, full-size frames under `frames/<lessonId>/` and one two-column, time-stamped sheet per scene under `sheets/<lessonId>/`, using ffmpeg only. Each plan entry holds `scene`, `headline`, `start`, `end`, `points` as `[time, sentence]`, `unmapped` sentences, frame and sheet paths, and the sampled `video`, `videoDuration`, `videoModified` and `silent` (no audio stream). It also writes `<lessonId>-brief.md`: which video it sampled, each sheet's path and sentences beside their tile numbers, the coverage counts and the reviewer checklist. That brief is what it prints; with `--quiet` it prints one coverage line per lesson and the brief's path instead, so a whole course can be sampled without its sentences passing through the caller. `--jobs` sets how many frames are grabbed at once. It samples; it does not judge.
+
+When the frame audit has recorded the lesson's transitions at this timing, the midpoint of each pan, iris and wipe is sampled too. It appears as a `~` tile after the sentences of the scene it falls in, and as `transitions` and `transitionFrames` in the plan. Run the audit before sampling to get them.
 
 - It refuses a video whose length differs from the lesson's `duration` in `course.json` by more than one frame plus 0.1 s: another lesson's video, or a render made before the narration changed.
 - Silent runs default to `review/sentence-end-silent/`, so they never overwrite the final encode's evidence. `--video` samples another file and `--out` writes elsewhere.
 - A full run replaces the lesson's plan, frames and sheets, so a renamed or removed scene leaves no stale sheet.
 - `--scene` (repeatable) redoes only those scenes and keeps the others in the plan. It refuses when the kept scenes were sampled from another video, or at times `course.json` no longer gives; rerun the whole lesson then.
 
-1. Run it for every lesson. Resolve any `unmapped` sentence before review: an unsampled sentence is unreviewed.
-2. Split the lessons into groups. One reviewer per group views every sheet against its sentences, using the printed checklist, and records each finding as lesson, scene, time, sentence, what is wrong and what a learner would wrongly conclude.
+1. Run it for `all` lessons. Resolve any `unmapped` sentence before review: an unsampled sentence is unreviewed.
+2. Split the lessons into groups. One reviewer per group views every sheet against its sentences, using the checklist in each lesson's brief, and records each finding as lesson, scene, time, sentence, what is wrong and what a learner would wrongly conclude.
 3. One refuting verifier per group then tries to refute each finding on the full-size frames, or on a short clip around its time when duration matters. A finding is refuted by default; it survives only when the verifier reproduces it and agrees it misleads.
-4. Fix confirmed findings in the authored world, not in the review record. Re-render the affected lessons as fresh silent clips (`node production-source/render.cjs <lessonId> --silent-preview`), rerun `review_frames.py <project> <lessonId> --silent --scene <sceneId>` and re-verify each fix on its new frames. After the final narrated render, rerun `review_frames.py <project> <lessonId> --scene <sceneId>` on the final encode and spot-check every fixed scene on its new sheet.
+4. Fix confirmed findings in the authored world, not in the review record. Render the affected lessons again (`node production-source/render.cjs <lessonId>`) and run the audit: only a lesson whose picture changed is redrawn and replayed, and its narrated file takes the new picture unchanged. Then rerun `review_frames.py <project> <lessonId> --scene <sceneId>` and re-verify each fix on its new frames from that final encode. Before narration exists, use `--silent-preview` and `--silent` instead; that evidence holds only for the timing it was sampled at, so sample the final encode again once narration has re-timed the lesson.
 5. Record coverage honestly in `review/acceptance.json`: lessons and sentences sampled out of the total, findings raised, refuted, confirmed and fixed, and which fixes were re-verified in the final encode. Cite the plan entries behind each claim: only entries with `silent: false` from the final encode count as final-encode verification. One frame per sentence is a sample, so on its own it supports `partial` synchronized viewing (or silent inspection for silent runs), never `completed` continuous viewing.
 
-Defect classes the geometry audit cannot see, each found in real use after a clean audit:
+Defect classes found in real use after a clean geometry audit. Some are now rejected mechanically, as marked; the review still owns the rest and anything the mark does not cover:
 
-- A recurring real person drawn differently across lessons, so they read as different people.
-- The fiction badge left on over real facts, or missing on a practice panel with invented people or figures.
+- A recurring real person drawn differently across lessons, so they read as different people. (A cast preset cannot be restyled; a person drawn outside the cast can.)
+- The fiction badge left on over real facts, or missing on a practice panel with invented people or figures. (Audited in scenes that declare `fiction`.)
 - A stale callout from the previous beat that reads as the cause of the next one.
 - A camera push that fades part of a counted group: sixteen items shown as eight.
 - An on-screen detail that answers a question the narration only asks later.
-- A label readable for less than 0.5 s.
+- A label readable for less than 0.5 s. (The audit rejects a label on screen for under 0.5 s; one held too briefly for its length is still yours to catch.)
 - A panel cut by the caption band.
-- A reveal firing on an earlier occurrence of its cue word.
+- A reveal firing on an earlier occurrence of its cue word. (A repeated cue word without its occurrence throws.)
 
-When reviewers or verifiers are agents, never truncate item lists into their prompts; a serialised list cut at a character limit silently drops items. Write each group's sheet paths, sentences and findings to files, pass the file paths, and check that each agent reports the number of items it read.
+When reviewers or verifiers are agents, never truncate item lists into their prompts; a serialised list cut at a character limit silently drops items. Each lesson's brief already holds its sheet paths, sentences and checklist: pass the brief paths, have findings written to files, and check that each agent reports the number of sheets it read.
 
 ## Player usability
 

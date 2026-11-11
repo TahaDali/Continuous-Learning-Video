@@ -2,6 +2,20 @@
 
 The sheet is the bridge from script meaning to executable motion. Write it before rendering, then update its timing and wording to match the final narration. Long scripts can group sentences under a beat, but each sentence still needs an explicit cue and educational purpose.
 
+## Start from the skeleton
+
+Do not type narration into the sheet. After the lesson scripts are written, run:
+
+```bash
+python3 <skill-dir>/scripts/workflow.py sync /absolute/project --split
+```
+
+It builds the sheet from `course.json`: one beat per scene, one cue per sentence with its exact `text` and timing, and one working file per lesson, `visual-beat-sheet/lessons/<lessonId>.json`. Each working file also carries context copied from the script on every run (the lesson's title, goal and practice question, and each beat's `headline` and declared `fiction`), so a lesson can be designed from that one file without opening the whole course.
+
+Author the visual fields in the lesson files, then run `sync` again. It rebuilds the canonical `beat-sheet.json` from them, refreshes timing from `course.json` (measured word boundaries once narration exists; `narrate.py` also writes them into the lesson files directly) and reports how many fields are still missing and in which lessons. Once lesson files exist they are the authoring surface: `sync` refuses to overwrite a later direct edit to `beat-sheet.json`. When narration changes, a cue whose sentence is unchanged keeps every authored field and a new sentence arrives empty.
+
+To group or split sentences differently, edit the cue `text` values so that together they still cover the scene's narration exactly; `sync` keeps that segmentation.
+
 ## Fields
 
 | Field | Required meaning |
@@ -18,6 +32,8 @@ The sheet is the bridge from script meaning to executable motion. Write it befor
 | Composition risk | Crossings, temporary duplicates, small type, masking or caption proximity |
 
 The bundled JSON keeps those fields as `concept`, `metaphor`, `elements`, `behavior`, `camera`, `next`, `silentMeaning`, `timingMethod` and `risks`. `text` must match the narration. Include richer authoring fields when useful.
+
+`concept`, `behavior`, `next` and `silentMeaning` belong to each sentence. `metaphor`, `elements`, `camera` and `risks` often hold for a whole scene: state them once on the beat, and give a cue its own value only where that sentence differs. The validator and the readable sheet read a cue's value first and its beat's otherwise.
 
 For a design-system world, give each beat a `design` object: `template`, world `region`, `transitionIn` (carry, pan, iris, wipe or none, with its reason), `emphasis` (the one word or value that is marked), `focus` (what dims and when attention hands over) and `triggers` (the narration words each reveal is cued on). The trigger words must be spoken in that beat; the world looks them up with `createCues` and fails on a missing word. See [the design system](design-system.md) and the beat sheet installed by `new_project.py --design-demo`.
 

@@ -16,6 +16,14 @@ transcripts/
 review/                      Reports, flagged frames and silent previews
 ```
 
+After the lesson scripts are written, derive what follows from them instead of typing it again:
+
+```text
+python3 <skill-dir>/scripts/workflow.py sync /absolute/project --split
+```
+
+`sync` gives scenes without timing an estimated span, rewrites `player/course-data.js` to match `course.json`, and builds the sentence-cue skeleton of the beat sheet from each scene's exact narration. It never estimates over measured narration timing and never drops an authored visual field of a cue whose text is unchanged. With `--split` it keeps one working file per lesson; see [the beat sheet](beat-sheet.md). Run it again after any change to a script or a lesson file.
+
 After authoring the actual course, run commands from the new project root:
 
 ```text
@@ -25,7 +33,15 @@ node production-source/render.cjs posters
 node production-source/audit.cjs
 ```
 
-Silent previews deliberately go to `review/silent/`, not final `player/videos/`. They are not final narrated deliverables. The example is 12 seconds for inexpensive mechanical testing; production lesson lengths follow the user's brief.
+Silent previews deliberately go to `review/silent/`, not final `player/videos/`. They are not final narrated deliverables, but they are the lesson's picture: the narrated render copies that video stream and never draws it a second time. The example is 12 seconds for inexpensive mechanical testing; production lesson lengths follow the user's brief.
+
+## One lesson at a time
+
+Give each lesson its own module, `production-source/worlds/<lessonId>.cjs`, exporting `draw(g, lesson, t, course)`. The renderer, posters and audit use it for that lesson and fall back to `world.cjs` for a lesson without one. Put what the whole course shares (the state code, the cast, the part openers, common glyphs and mechanisms) in a module the lesson modules `require`, such as `production-source/shared.cjs`, so each is defined once. A lesson's intentional-overlap rules can sit beside its module in `worlds/<lessonId>.overlaps.json`.
+
+This is what keeps a fix cheap. Each lesson has an identity made of the files its module reaches through literal `require` calls, its own record in `course.json` with its timing, the course-level fields, and the other lessons' descriptive fields. `render.cjs` redraws a picture and `audit.cjs` replays a lesson only when that identity has changed, so a fix in one lesson's module, or new narration timing for one lesson, leaves every other lesson's picture and audit result standing. A change to a shared module, or to any lesson's title, part or goal, correctly redoes them all.
+
+To make that safe, a lesson's world receives the other lessons without their `scenes` and timing; reading either throws and names both lessons. Use another lesson's title, part or goal freely, and put anything else several lessons need into a course-level field. `--force` redraws or replays regardless. `--jobs N` sets how many lessons run at once: half the cores for rendering, all of them for the audit, by default.
 
 The renderer calls `world.draw(context, lesson, time, course)` at each actual frame timestamp. It uses backpressure while streaming pixels to FFmpeg and fails when an unsupported visual is requested. Extend the authored world with subject-specific functions; do not silently fall back to the sample for unimplemented lessons. `motion.cjs` provides camera transforms, object/label bounds and simple primitives. The stage includes `wrappedLabel` with measured font widths and explicit line spacing; its returned height helps choose an owner box before rendering. Extend those helpers when shapes, clipping or typography require it. The sample preserves objects across time and transfers a visible quantity between containers.
 
@@ -44,6 +60,8 @@ The starter geometry is conservative axis-aligned bounding boxes. Transparent en
 Inspect actual encoded frames even after a clean audit. Owner-contained labels are excluded from intersection findings, so a label can still cross an internal border such as a database cylinder's ellipse. Size the usable interior for the measured wrapped text and inspect the result at full resolution. A fresh audit archives previous flagged images with their report, so stale failures do not appear to be current findings.
 
 ## Narration
+
+Narration depends only on the lesson scripts, so generate it as soon as the script stage is recorded and the voice is settled, before authoring the worlds. Every cue is then a measured word boundary from the first frame drawn, a template that needs a longer spoken span fails on the first audit instead of after a re-time, and the first full render is the final one. The helper caches each block by text, voice and rate, so a later script edit sends only the changed block again. When a voice is still being chosen or a provider is unavailable, author on estimated timing and narrate later: the cue-driven world follows the new timing, and the render redraws the lessons it changed.
 
 Reuse a selected voice and existing consent when applicable. Otherwise prepare two short samples of adapted narration representative of a question, an explanation and a discovery. Ask a focused preference question while proceeding with independent visual work. Do not upload original documents to sample a voice. The user's approval of a voice in one project is a preference, not permission to send new private material in another.
 
@@ -72,6 +90,8 @@ node production-source/render.cjs posters
 node production-source/audit.cjs
 python3 <skill-dir>/scripts/validate_project.py /absolute/project --media
 ```
+
+`render.cjs all` draws each lesson's picture once, into `review/silent/<lessonId>.mp4` with a `<lessonId>.picture.json` record of what it was drawn from, then writes `player/videos/<lessonId>.mp4` by copying that video stream and adding the audio and captions. A picture that is already current is not drawn again, so after a silent preview the narrated files take seconds, and the delivered picture is the reviewed one packet for packet. Name lessons to render only those: `node production-source/render.cjs 03,07`. The media validator decodes each final file completely once; a file whose bytes an earlier passing validation already decoded is not decoded again.
 
 The output is 1280×720, 24 fps H.264/AAC with optional English captions in the sample. Configure aspect ratio, language, dimensions and rate deliberately when the brief differs, then update safe zones, captions and tests together. Timing changes invalidate affected renders and review evidence.
 

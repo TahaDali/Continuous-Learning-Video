@@ -36,7 +36,7 @@ Decide the course-wide choices once, before the first lesson:
 - each part's opener layout and motif (`defineParts`);
 - where the fiction badge is on and off.
 
-Every lesson then reuses them.
+Every lesson then reuses them. Put them in one shared module that each lesson's own module requires, so they are defined once and a lesson can be authored, rendered and audited on its own (see [production](video/production.md#one-lesson-at-a-time)).
 
 ## Write the design brief
 
@@ -66,14 +66,14 @@ The brief states the hard rules below. Each rule has a measure and names what ch
 | Edges | Outside transitions, no visible text comes within 12 px of the safe area (40–1240 × 88–587). Nothing a viewer must read sits in the caption band. | Audit `edge-<id>`, review |
 | Density | At most 24 content words are on screen in a frame. Each beat has one hero filling a third or more of the safe area. | Audit `words`, review |
 | Timing | Every reveal lands on its spoken word, and a repeated cue word names its occurrence. Each template gets at least its minimum spoken span. | `createCues` throws, audit `fit-<template>`, sentence-end review |
-| Reading time | Every label stays readable for at least 0.5 s. A highlighter marks one thing and retracts when the narration moves on. | Sentence-end review |
+| Reading time | Every label stays readable for at least 0.5 s. A highlighter marks one thing and retracts when the narration moves on. | Audit `flash` for a label on screen under 0.5 s; sentence-end review for the rest |
 | Colour meanings | Signal marks only what is spoken about now. Red marks only what is wrong, green only what is correct or conserved, and violet is only the fiction badge. States never use a meaning colour. No colour or font literals appear in a world. | `defineStates` throws, `design_checks`, review |
 | Numbers | A figure shows only a value the narrator says, and a count passes only through round steps. Totals stay conserved through motion. | `spoken`/`stepValue`, `finish({totalUnits, expectedTotal})`, review |
 | Camera | A slow push stays within 1.06 across a scene, and within 1.03 while templates are on screen unless their labels fade first. Reframing pushes come from `fitCamera`. A counted group stays whole on screen. | Review |
 | Transitions | Iris and wipe paint the full frame, and transitions begin in the closing pause. A pan never arrives on a blank page. | Audit `transitionFrames`, review |
 | Pace | No beat stays sparse or static for more than about 2 s unless the beat sheet gives the reason. | Sentence-end review |
 | People | Recurring people come only from cast presets and look the same in every lesson. | `cast()` throws on a look override, review across lessons |
-| Fiction | The badge is on whenever invented people, companies or figures are on screen, including practice panels, and off over real facts. | Sentence-end review |
+| Fiction | The badge is on whenever invented people, companies or figures are on screen, including practice panels, and off over real facts. | Audit `fiction-badge` in scenes that declare `fiction`; sentence-end review elsewhere |
 
 The brief does not replace the reference comparison or the prototype review. It makes their findings testable.
 
